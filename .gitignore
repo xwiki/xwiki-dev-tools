@@ -6,5 +6,6 @@ target-eclipse
 .fbprefs
 bin
 .externalToolBuilders
+hibernate.cfg.xml
 xwiki.cfg
 xwiki.properties
