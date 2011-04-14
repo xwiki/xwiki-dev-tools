@@ -1,0 +1,8 @@
+# Build
+target
+target-eclipse
+
+# Eclipse
+.fbprefs
+bin
+.externalToolBuilders
