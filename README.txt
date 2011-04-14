@@ -8,7 +8,8 @@ This is a Eclipse project used to easily debug a complete XWiki Enterprise (it c
 
 Make sure to import the project as existing Eclipse project and not as Maven project otherwise M2Eclipse will try to rebuild the configuration and could break some things.
 
-There is still some things to do once the project is imported into Eclipse workspace.
+There is still some things to do once the project is imported into Eclipse workspace:
+- create a XWIKIPLATFORM shared resource which is targeting xwiki-platform git repository you cloned
 
 == Set configuration ==
 

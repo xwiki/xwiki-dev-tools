@@ -6,3 +6,5 @@ target-eclipse
 .fbprefs
 bin
 .externalToolBuilders
+xwiki.cfg
+xwiki.properties
