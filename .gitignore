@@ -9,3 +9,4 @@ bin
 hibernate.cfg.xml
 xwiki.cfg
 xwiki.properties
+.checkstyle
