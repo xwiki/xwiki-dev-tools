@@ -61,11 +61,6 @@
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/cache</locationURI>
 		</link>
 		<link>
-			<name>src/main/webapp/WEB-INF/commons-logging.properties</name>
-			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/commons-logging.properties</locationURI>
-		</link>
-		<link>
 			<name>src/main/webapp/WEB-INF/fonts</name>
 			<type>2</type>
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/fonts</locationURI>
