@@ -41,6 +41,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>src/main/resources/logback.xml</name>
+			<type>1</type>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/resources/logback.xml</locationURI>
+		</link>
+		<link>
 			<name>src/main/webapp/redirect</name>
 			<type>1</type>
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/redirect</locationURI>
