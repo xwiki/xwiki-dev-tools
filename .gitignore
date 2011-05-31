@@ -14,6 +14,7 @@ xwiki.cfg
 xwiki.properties
 
 # Warkaround a EGit bug that makes it see linked resource as if it was unversionned folders
+# See https://bugs.eclipse.org/bugs/show_bug.cgi?id=333338
 src/main/resources/logback.xml
 src/main/webapp/resources
 src/main/webapp/skins
