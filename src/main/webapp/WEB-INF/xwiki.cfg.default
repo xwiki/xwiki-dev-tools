@@ -14,8 +14,8 @@
 
 #-# [Since 1.6RC1] Defines the list of supported syntaxes
 #-# Available syntaxes are: 
-#-#    xwiki/1.0, xwiki/2.0, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0, html/4.01, plain/1.0
-xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0
+#-#    xwiki/1.0, xwiki/2.0, xwiki/2.1, confluence/1.0, jspwiki/1.0, creole/1.0,  mediawiki/1.0, twiki/1.0, xhtml/1.0, html/4.01, plain/1.0
+xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0, xwiki/2.1
 
 #-# List of groups that a new user should be added to by default after registering. Comma-separated list of group document
 #-# names.
@@ -290,10 +290,10 @@ xwiki.authentication.unauthorized_code=200
 
 
 #---------------------------------------
-# Rendering
+# XWiki Syntax 1.0 Rendering Engine
 #
 
-#-# Disable particular renderers (in the old rendering engine).
+#-# Disable particular renderers.
 #-# Macro mapping
 # xwiki.render.macromapping=1
 #-# Velocity interpreter
@@ -306,6 +306,10 @@ xwiki.authentication.unauthorized_code=200
 # xwiki.render.wiki=1
 #-# Simple wiki syntax rendering 
 # xwiki.render.wikiwiki=0
+
+#-# [Since 2.4M1]
+#-# Rendering order: content will be rendered by the first renderer on the list, output rendered by the second, etc.
+#xwiki.render.renderingorder=macromapping, groovy, velocity, plugin, wiki, wikiwiki
 
 #-# Maximum number of documents to keep in the rendered cache
 # xwiki.render.cache.capacity=100
@@ -341,12 +345,13 @@ xwiki.editcomment.mandatory=0
 # LDAP
 #-------------------------------------------------------------------------------------
 
-#-# new LDAP authentication service
+#-# LDAP authentication service
 # xwiki.authentication.authclass=com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl
 
 #-# Turn LDAP authentication on - otherwise only XWiki authentication
-#-# 0: disable
-#-# 1: enable
+#-# - 0: disable
+#-# - 1: enable
+#-# The default is 1
 # xwiki.authentication.ldap=1
 
 #-# LDAP Server (Active Directory, eDirectory, OpenLDAP, etc.)
@@ -354,32 +359,29 @@ xwiki.authentication.ldap.server=127.0.0.1
 xwiki.authentication.ldap.port=389
 
 #-# LDAP login, empty = anonymous access, otherwise specify full dn
-#-# {0} is replaced with the username, {1} with the password
+#-# {0} is replaced with the user name, {1} with the password
 xwiki.authentication.ldap.bind_DN=cn={0},department=USER,department=INFORMATIK,department=1230,o=MP
 xwiki.authentication.ldap.bind_pass={1}
 
-#-# Force to check password after LDAP connection
-#-# 0: disable
-#-# 1: enable
-xwiki.authentication.ldap.validate_password=0
+#-# LDAP query to search the user in the LDAP database (in case a static admin user is provided in xwiki.authentication.ldap.bind_DN)
+#-# {0} is replaced with the user uid field name and {1} with the user name
+#-# The default is ({0}={1})
+# xwiki.authentication.ldap.ldap_user_search_fmt=({0}={1})
 
-#-# only members of the following group will be verified in the LDAP
+#-# Only members of the following group will be verified in the LDAP
 #-# otherwise only users that are found after searching starting from the base_DN
 # xwiki.authentication.ldap.user_group=cn=developers,ou=groups,o=MegaNova,c=US
 
 #-# [Since 1.5RC1, XWikiLDAPAuthServiceImpl]
-#-# only users not member of the following group can autheticate
+#-# Only users not member of the following group can autheticate
 # xwiki.authentication.ldap.exclude_group=cn=admin,ou=groups,o=MegaNova,c=US
 
-#-# base DN for searches
+#-# The Base DN used in LDAP searches
 xwiki.authentication.ldap.base_DN=
 
-#-# Specifies the LDAP attribute containing the identifier to be used as the XWiki name (default=cn)
+#-# Specifies the LDAP attribute containing the identifier to be used as the XWiki name
+#-# The default is cn
 # xwiki.authentication.ldap.UID_attr=cn
-
-#-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
-#-# Specifies the LDAP attribute containing the password to be used "when xwiki.authentication.ldap.validate_password" is set to 1
-# xwiki.authentication.ldap.password_field=userPassword
 
 #-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
 #-# The potential LDAP groups classes. Separated by commas.
@@ -393,31 +395,38 @@ xwiki.authentication.ldap.base_DN=
 xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email=mail
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# on every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki account is created.
-xwiki.authentication.ldap.update_user=1
+#-# On every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki account is created.
+#-# - 0: only when creating user
+#-# - 1: at each authentication
+#-# The default is 1
+# xwiki.authentication.ldap.update_user=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# mapps XWiki groups to LDAP groups, separator is "|"
+#-# Mapps XWiki groups to LDAP groups, separator is "|"
 # xwiki.authentication.ldap.group_mapping=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=MegaNova,c=US|\
 #                                         XWiki.Organisation=cn=testers,ou=groups,o=MegaNova,c=US
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# time in s after which the list of members in a group is refreshed from LDAP (default=3600*6)
+#-# Time in s after which the list of members in a group is refreshed from LDAP
+#-# The default is 2800
 # xwiki.authentication.ldap.groupcache_expiration=21800
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# - create : synchronize group membership only when the user is first created
 #-# - always: synchronize on every login
+#-# The default is always
 # xwiki.authentication.ldap.mode_group_sync=always
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# if ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
+#-# The default is 1
 xwiki.authentication.ldap.trylocal=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# SSL connection to LDAP server
-#-# 0: normal
-#-# 1: SSL
+#-# - 0: normal
+#-# - 1: SSL
+#-# The default is 0
 # xwiki.authentication.ldap.ssl=0
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
@@ -426,8 +435,19 @@ xwiki.authentication.ldap.trylocal=1
 
 #-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
 #-# The java secure provider used in SSL connection
+#-# The default is com.sun.net.ssl.internal.ssl.Provider
 # xwiki.authentication.ldap.ssl.secure_provider=com.sun.net.ssl.internal.ssl.Provider
 
+#-# Bypass standard LDAP bind validation by doing a direct password comparison.
+#-# If you don't know what you do, don't use that. It's covering very rare and bad use cases.
+#-# - 0: disable
+#-# - 1: enable
+#-# The default is 0
+# xwiki.authentication.ldap.validate_password=0
+
+#-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
+#-# Specifies the LDAP attribute containing the password to be used "when xwiki.authentication.ldap.validate_password" is set to 1
+# xwiki.authentication.ldap.password_field=userPassword
 
 #---------------------------------------
 # Cache
@@ -468,12 +488,21 @@ xwiki.defaultskin=colibri
 
 #-# The default base for skins that don't specify a base skin. This is also the last place where a skin file is searched
 #-# if not found in the more specific skins.
-xwiki.defaultbaseskin=albatross
+xwiki.defaultbaseskin=colibri
 
 #-# Defines whether title handling should be using the compatibility mode or not. When the compatibility
 #-# mode is active, if the document's content first header (level 1 or level 2) matches the document's title
 #-# the first header is stripped.
 xwiki.title.compatibility=1
+
+#-# Defines the maximum header depth to look for when computing a document's title from its content. If no header
+#-# equal or lower to the specified depth is found then the computed title falls back to the document name.
+#-# The default value is 2.
+# xwiki.title.headerdepth=2
+
+#-# Defines if setting the title field must be mandatory in the WYSIWYG and Wiki editors. It is mandatory when this
+#-# property is set to 1. The default value is 0 (not mandatory).
+# xwiki.title.mandatory=0
 
 #---------------------------------------
 # Extensions
@@ -512,7 +541,6 @@ xwiki.plugins=\
                     com.xpn.xwiki.plugin.tag.TagPlugin,\
                     com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin,\
                     com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin
-                    
 
 #-# Enable light monitoring of the wiki performance. Records various statistics, like number of requests processed,
 #-# time spent in rendering or in the database, medium time for a request, etc. Disable for a minor increase of
@@ -528,6 +556,25 @@ xwiki.plugins=\
 #-# When statistics are globally enabled, storage can be enabled/disabled by wiki using the XWikiPreference property "statistics".
 #-# Note: Statistics are disabled by default for improved performances/space.
 xwiki.stats.default=0
+
+#-# Deprecated since 2.5M1. Use "xwiki.stats.request.excludedUsersAndGroups" instead.
+# xwiki.stats.excludedUsersAndGroups=XWiki.Admin,XWiki.XWikiGuest
+
+#-# [Since 2.5M1]
+#-# List of users and groups to filter from the visit search request result. Entities are comma separated and can be relative.
+#-# "XWiki.Admin" means "XWiki.Admin" user on the wiki where the search is done and "xwiki:XWiki.Admin" only filter admin user
+#-# from main wiki.
+#-# For example, the following filter default admin user and unregistered user from the most active contributor graph
+#-# on Stats.WebHome page:
+# xwiki.stats.request.excludedUsersAndGroups
+
+#-# [Since 2.5M1]
+#-# List of users and groups to skip when storing statistics to the database. Entities are comma separated and can be relative.
+#-# "XWiki.Admin" means "XWiki.Admin" user on the wiki where the search is done and "xwiki:XWiki.Admin" only filter admin user
+#-# from main wiki.
+#-# For example, the following filter avoid storing statistics for the user "HiddenUser":
+# xwiki.stats.excludedUsersAndGroups=XWiki.HiddenUser
+
 #-# It is also possible to choose a different stats service to record statistics separately from XWiki.
 # xwiki.stats.class=com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl
 
@@ -565,8 +612,8 @@ xwiki.plugin.image.cache.capacity=30
 
 #-# [Since 2.0RC1]
 #-# Activity Stream plugin. 
-#-# The Activity Stream plugin stores data in a dedicated table in the database. In virtual mode each wiki has it's own 
-#-# database, the plugin can be configured to store its data into the database corresponding to the wiki, into the main 
+#-# The Activity Stream plugin stores data in a dedicated table in the database. In virtual mode each wiki has its own 
+#-# database. The plugin can be configured to store its data into the database corresponding to the wiki, into the main 
 #-# database (default: xwiki) or both. If the wiki is not running in virtual mode these options will not have any 
 #-# effect. These options should not be both set to 0 (in this case the local store will be forced).
 #-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
@@ -583,6 +630,15 @@ xwiki.plugin.image.cache.capacity=30
 #-# Default: 0
 # xwiki.plugin.activitystream.daystokeepevents=0
 
+#-# [Since 3.1M1]
+#-# Indicate which mode to use for automatic document watching.
+#-# The possibles modes are the following:
+#-# * none: never automatically add document in watchlist
+#-# * all: add to watchlist any modified document
+#-# * major: add to watchlist only document which are not edited as minor edit. That's the default mode.
+#-# * new: add to watchlist only newly created documents
+# xwiki.plugin.watchlist.automaticwatch=major
+
 #---------------------------------------
 # Misc
 #
@@ -592,4 +648,4 @@ xwiki.plugin.image.cache.capacity=30
 #-# XWiki work directory
 # xwiki.work.dir=/usr/local/xwiki
 
-xwiki.work.dir=work
+
