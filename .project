@@ -141,4 +141,10 @@
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-toucan/src/main/resources/toucan</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>XWIKIPLATFORM</name>
+			<value>$%7BPARENT-1-PROJECT_LOC%7D/xwiki-platform</value>
+		</variable>
+	</variableList>
 </projectDescription>

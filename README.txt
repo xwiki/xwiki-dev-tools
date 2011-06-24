@@ -8,8 +8,7 @@ This is a Eclipse project used to easily debug a complete XWiki Enterprise (it c
 
 Make sure to import the project as existing Eclipse project and not as Maven project otherwise M2Eclipse will try to rebuild the configuration and could break some things.
 
-There is still some things to do once the project is imported into Eclipse workspace:
-- create a XWIKIPLATFORM shared resource which is targeting xwiki-platform git repository you cloned
+[OPTIONAL] By default xwiki-debug-eclipse find xwiki-platform repository in ${PROJECT_LOC}/../xwiki-platform (which mean in the same parent folder than where you cloned xwiki-debug-eclipse). If that's not true for you, you can change it by going to project Properties -> Resources -> Linked Resources.
 
 == Set configuration ==
 
@@ -20,4 +19,4 @@ This project comes with some example configuration you need to copy/past and set
 
 = TODO =
 
-* add support for GWT WYSIWYG (any any other GWT based module)
+* add support for GWT WYSIWYG (and any other GWT based module)
