@@ -63,29 +63,10 @@
     <!-- XWiki Enterprise -->
     <!--  -->
 
-    <!-- Dependencies we need inside the XE WAR -->
-    <!-- Legacy packages -->
+    <!-- Old core -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-legacy-oldcore</artifactId>
-      <version>${platform.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-legacy-observation</artifactId>
-      <version>${platform.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-legacy-annotation</artifactId>
-      <version>${platform.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-legacy-bridge</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${platform.version}</version>
       <scope>runtime</scope>
     </dependency>
