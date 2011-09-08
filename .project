@@ -3,7 +3,6 @@
 	<name>xwiki-debug-eclipse</name>
 	<comment></comment>
 	<projects>
-		<project>xwiki-platform-oldcore</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
