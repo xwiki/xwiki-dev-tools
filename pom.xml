@@ -71,6 +71,13 @@
       <scope>runtime</scope>
     </dependency>
     
+    <!-- Make sure to include the proper version of antlr for hibernate-core -->
+    <dependency>
+      <groupId>antlr</groupId>
+      <artifactId>antlr</artifactId>
+      <version>2.7.6</version>
+    </dependency>
+    
     <!-- Add the GWT JAR so that the XWiki GWT Servlet can be activated by default in web.xml -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -163,7 +170,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-repository-xwiki-client</artifactId>
+      <artifactId>xwiki-platform-extension-repository-xwiki-handler</artifactId>
       <version>${platform.version}</version>
       <scope>runtime</scope>
     </dependency>
