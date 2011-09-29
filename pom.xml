@@ -56,6 +56,13 @@
       <version>8.2-504.jdbc3</version>
     </dependency>
 
+    <!-- Use normal instead of legacy -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+
     <!--  -->
     <!-- XWiki Enterprise -->
     <!--  -->
@@ -67,10 +74,27 @@
       <type>pom</type>
       <scope>import</scope>
       <exclusions>
-        <!-- M2Eclipse does not support very well war dependencies -->
+        <!-- Only deal with jar dependencies to be able to overwrite them by Eclipse project -->
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-wysiwyg-war</artifactId>
+        </exclusion>
+        <!-- Exclude legacy -->
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-annotation</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-bridge</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-observation</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-oldcore</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -86,7 +110,7 @@
       <type>pom</type>
       <scope>import</scope>
       <exclusions>
-        <!-- M2Eclipse does not support very well war dependencies -->
+        <!-- Only deal with jar dependencies to be able to overwrite them by Eclipse project -->
         <exclusion>
           <groupId>org.xwiki.enterprise</groupId>
           <artifactId>xwiki-enterprise-web</artifactId>
@@ -101,14 +125,10 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-client</artifactId>
-      <version>${project.version}</version>
-      <classifier>shared</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-server</artifactId>
-      <version>${project.version}</version>
+      <artifactId>xwiki-platform-wysiwyg-war</artifactId>
+      <version>${platform.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
     </dependency>
   </dependencies>
 
