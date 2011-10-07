@@ -79,6 +79,10 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-wysiwyg-war</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-web</artifactId>
+        </exclusion>
         <!-- Exclude legacy -->
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
