@@ -1,3 +1,23 @@
+# ---------------------------------------------------------------------------
+# See the NOTICE file distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as
+# published by the Free Software Foundation; either version 2.1 of
+# the License, or (at your option) any later version.
+#
+# This software is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this software; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+# ---------------------------------------------------------------------------
+
 # This is the new XWiki configuration file. In the future it'll replace the old
 # xwiki.cfg file. However right now it's only used by some XWiki components.
 # As time progresses more and more component will get their configurations from
@@ -33,6 +53,14 @@
 #-# produces a unique rendering result)
 #-# Default value is 100.
 # core.renderingcache.size=100
+
+#-------------------------------------------------------------------------------------
+# Container
+#-------------------------------------------------------------------------------------
+
+#-# [Since 3.2M3]
+#-# Directory used to store persistent data.
+# container.persistentDirectory=/var/local/xwiki/
 
 #-------------------------------------------------------------------------------------
 # Rendering
@@ -131,20 +159,20 @@
 
 #-# [Since 1.7M1]
 #-# The standard cache component implementation to use (can be local or distributed depending on the implementation).
-#-# The default standard cache implementation is JBoss Cache.
-# cache.defaultCache=jbosscache
+#-# The default standard cache implementation is Infinispan.
+# cache.defaultCache=infinispan
 
 #-# [Since 1.7M1]
 #-# The local cache implementation to use.
-#-# The default local cache implementation is JBoss Cache.
-# cache.defaultLocalCache=jbosscache/local
+#-# The default local cache implementation is Infinispan.
+# cache.defaultLocalCache=infinispan/local
 
-#----------------------------------------------------------------------------------
-# Settings for the OpenOffice server instance consumed by the OfficeImporter plugin
-#----------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+# Settings for the OpenOffice server instance consumed by the OfficeImporter component
+#-------------------------------------------------------------------------------------
  
 #-# [Since 1.9M2]
-#-# Type of the openoffice server instance used by officeimporter plugin.
+#-# Type of the openoffice server instance used by officeimporter component.
 #-# 0 - Internally managed server instance. (Default)
 #-# 1 - Externally managed (local) server instance.
 # openoffice.serverType=0
@@ -221,9 +249,9 @@
 #-# The list of events communication channels to start when the application starts.
 #-# By default no channel is configured.
 #-#
-#-# The default remote event distribution implementation is using JGroups and you'll need to drop your JGroups channel
-#-# xml files in the WEB-INF/observation/remote/jgroups/ directory. There's a README file in that directory with more
-#-# information.
+#-# The default remote event distribution implementation is using JGroups and you'll need to either use embedded JGroups configuration
+#-# files or drop your custom configuration in the WEB-INF/observation/remote/jgroups/ directory.
+#-# There's a README file in that directory with more information.
 #-# Example: observation.remote.channels = public, cluster
 
 #-# [Since 2.0M4]
@@ -321,6 +349,27 @@
 #-#   true : Enabled
 #-#   false: Disabled
 #-#
-#-# Default value is false
-# csrf.enabled = false
+#-# Default value is true
+# csrf.enabled = true
+
+#-------------------------------------------------------------------------------------
+# Extension Manager
+#-------------------------------------------------------------------------------------
+
+#-# [Since 2.5]
+#-# Repositories to use when searching and downloading extensions.
+#-# 
+#-# The format is <id>:<type>:<url> where
+#-# * id can be anything as long as there is only one
+#-# * type is the type of the repository (maven, xwiki, etc.)
+#-# * url is thee URL or the root of the repository
+#-# 
+#-# The default is:
+# extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
+
+#-# [Since 2.5]
+#-# The directory where extensions are stored after being downloaded.
+#-# 
+#-# The default is extension/repository in whatever is the general persistent directory.
+# extension.localRepository=extension/repository
 
