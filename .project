@@ -126,11 +126,6 @@
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/web.xml</locationURI>
 		</link>
 		<link>
-			<name>src/main/webapp/skins/albatross</name>
-			<type>2</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-albatross/src/main/resources/albatross</locationURI>
-		</link>
-		<link>
 			<name>src/main/webapp/skins/colibri</name>
 			<type>2</type>
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-colibri/src/main/resources/colibri</locationURI>
