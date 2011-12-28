@@ -132,7 +132,7 @@ function authenticate_xwiki() {
     fi
 
     # HTTP request, send credentials as form data, store cookies in a file
-    curl -c /tmp/xwo.cookies -f -v -X POST --data "j_username=${X_U}&j_password=${X_P}" http://www.xwiki.org/xwiki/bin/loginsubmit/XWiki/XWikiLogin  2>&1
+    curl -c /tmp/xwo.cookies -f -s -X POST --data "j_username=${X_U}&j_password=${X_P}" http://www.xwiki.org/xwiki/bin/loginsubmit/XWiki/XWikiLogin  2>&1
     if [[ $? == 0 ]]
     then
       X_AUTH="OK"

@@ -76,7 +76,7 @@ function pre_cleanup() {
   git reset --hard -q
   git co master -q
   git reset --hard -q
-  git clean -dxf
+  git clean -dxfq
 }
 
 # Fetch sources to synchronize the local git clone with the upstream repository.
@@ -220,9 +220,9 @@ function post_cleanup() {
   git reset --hard -q
   git co master -q
   # Delete the release branch
-  git branch -D release-${VERSION} -q
+  git branch -D release-${VERSION}
   git reset --hard -q
-  git clean -dxf
+  git clean -dxfq
   # Move back the clirr report
   mv /tmp/clirr.txt clirr.txt
 }
