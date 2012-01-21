@@ -462,12 +462,12 @@ function announce_freecode() {
   echo -e "\033[0;32m* Announcing the release on Freecode\033[0m"
   authenticate_freecode
 
-  curl -v -f -o /tmp/resp -X POST -b /tmp/fm.cookies \
+  CREATED=$(curl -v -X POST -b /tmp/fm.cookies \
     --data-urlencode "release[version]=${PRETTY_VERSION}" \
     --data-urlencode "release[changelog]=`cat ${RELEASE_NOTES} | grep -v RseleaseNotes`" \
     --data-urlencode "release[tag_list]=`echo ${VERSION} | cut -d- -f1 | cut -d. -f1,2`" \
-    http://freecode.net/projects/xwiki/releases
-  if [[ $? == 0 ]]
+    http://freecode.com/projects/xwiki/releases 2>&1 | grep Location)
+  if [[ -z `echo $CREATED | grep 'projects/xwiki/releases/' ` ]]
   then
     echo -e "\033[0;93mFailed to push the announcement to Freecode, probably the release notes are too large. Giving up, you should do this manually at \033[4;93mhttp://freecode.net/projects/xwiki/releases/new\033[0m"
   fi
