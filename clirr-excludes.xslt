@@ -33,7 +33,7 @@
 
     <!-- Skip all the clirr exclude nodes following the "to be removed" comment, so that they are removed from the output XML. -->
     <xsl:template match="mvn:plugin[string(./mvn:artifactId) = 'clirr-maven-plugin']/mvn:configuration/mvn:excludes/node()">
-      <xsl:if test="not(preceding-sibling::comment()[contains(string(.), 'To be removed when we release')])">
+      <xsl:if test="not(preceding-sibling::comment()[contains(string(.), 'release')])">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
