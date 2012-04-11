@@ -209,7 +209,7 @@ function clirr_report() {
   # Run clirr
   mvn clirr:check -DfailOnError=false -DtextOutputFile=clirr-result.txt -Pintegration-tests -DskipTests -q 1>/dev/null
   # Aggregate results in one file
-  find . -name clirr-result.txt | xargs cat | grep ERROR > clirr.txt
+  find . -name clirr-result.txt | xargs cat | grep ERROR > clirr.txt ; sed -r -e 's/ERROR: [0-9]+: //g' -e 's/\s+$//g' -i clirr.txt
 }
 
 # Cleanup sources again, after the release.
