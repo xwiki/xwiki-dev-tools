@@ -207,7 +207,7 @@ function clirr_report() {
     xsltproc -o xwiki-platform-core/pom.xml ~/clirr-excludes.xslt xwiki-platform-core/pom.xml
   fi
   # Run clirr
-  mvn clirr:check -DfailOnError=false -DtextOutputFile=clirr-result.txt -DskipTests -q 1>/dev/null
+  mvn clirr:check -DfailOnError=false -DtextOutputFile=clirr-result.txt -Pintegration-tests -DskipTests -q 1>/dev/null
   # Aggregate results in one file
   find . -name clirr-result.txt | xargs cat | grep ERROR > clirr.txt
 }
