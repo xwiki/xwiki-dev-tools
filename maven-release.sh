@@ -103,7 +103,7 @@ function stabilize_branch() {
       NEXT_TRUNK_VERSION=${tmp}
     fi
     # Let maven update the version for all the submodules
-    mvn release:branch -DbranchName=stable-${VERSION_STUB}.x -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish
+    mvn release:branch -DbranchName=stable-${VERSION_STUB}.x -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests
     git up
     # We must update the root parent and commons.version manually
     mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -N -q
