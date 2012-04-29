@@ -144,7 +144,7 @@ function authenticate_xwiki() {
     fi
 
     # Get the CSRF- prevention token by looking at the source of an edit page; we're already logged in with the X_U user, so this should work
-    X_TOKEN=`curl -b /tmp/xwo.cookies -f -v http://www.xwiki.org/xwiki/bin/edit/XWiki/${X_U}?editor=wiki  2>&1 | grep form_token | sed -r -e 's/.*value="([^"]+)".*/\1/'`
+    X_TOKEN=`curl -b /tmp/xwo.cookies -f -v http://www.xwiki.org/xwiki/bin/edit/XWiki/${X_U}?editor=wiki  2>&1 | grep form_token | grep input | sed -r -e 's/.*value="([^"]+)".*/\1/'`
   done
 }
 
