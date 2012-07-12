@@ -82,7 +82,7 @@ function pre_cleanup() {
 # Fetch sources to synchronize the local git clone with the upstream repository.
 function update_sources() {
   echo -e "\033[0;32m* Fetching latest sources\033[0m"
-  git up -q
+  git pull --rebase -q
   git clean -dxf
 }
 
