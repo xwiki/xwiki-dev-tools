@@ -20,6 +20,22 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+# Initialize common variables
+function init() {
+  echo -e "\033[0;32m* Initialization\033[0m"
+  PRG="$0"
+  while [ -h "$PRG" ]; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+      PRG="$link"
+    else
+      PRG=`dirname "$PRG"`/"$link"
+    fi
+  done
+  PRGDIR=`dirname "$PRG"`
+}
+
 # Perform environment checks: git username, GPG key, right directory.
 function check_env() {
   echo -e "\033[0;32m* Checking environment\033[0m"
@@ -197,17 +213,17 @@ function release_maven() {
 function clirr_report() {
   echo -e "\033[0;32m* Generating clirr report\033[0m"
   # Process the pom, so that all the specified excludes following the "to be removed after x.y is released" comment are removed.
-  xsltproc -o pom.xml ~/clirr-excludes.xslt pom.xml
+  xsltproc -o pom.xml $PRGDIR/clirr-excludes.xslt pom.xml
   # Excludes are also specified in two other poms for xwiki-commons and xwiki-platform
   if [[ -f xwiki-commons-core/pom.xml ]]
   then
-    xsltproc -o xwiki-commons-core/pom.xml ~/clirr-excludes.xslt xwiki-commons-core/pom.xml
+    xsltproc -o xwiki-commons-core/pom.xml $PRGDIR/clirr-excludes.xslt xwiki-commons-core/pom.xml
   elif [[ -f xwiki-platform-core/pom.xml ]]
   then
-    xsltproc -o xwiki-platform-core/pom.xml ~/clirr-excludes.xslt xwiki-platform-core/pom.xml
+    xsltproc -o xwiki-platform-core/pom.xml $PRGDIR/clirr-excludes.xslt xwiki-platform-core/pom.xml
   fi
   # Run clirr
-  mvn clirr:check -DfailOnError=false -DtextOutputFile=clirr-result.txt -Pintegration-tests -DskipTests -q 1>/dev/null
+  mvn clirr:check -DfailOnError=false -DtextOutputFile=clirr-result.txt -Plegacy,integration-tests -DskipTests -q 1>/dev/null
   # Aggregate results in one file
   find . -name clirr-result.txt | xargs cat | grep ERROR > clirr.txt ; sed -r -e 's/ERROR: [0-9]+: //g' -e 's/\s+$//g' -i clirr.txt
 }
@@ -252,6 +268,7 @@ function release_project() {
 # Wrapper function that calls release_project for each XWiki project in order: commons, rendering, platform, enterprise, manager.
 # This is the main function that is called when running the script.
 function release_all() {
+  init
   check_env
   check_version
   echo              "*****************************"
