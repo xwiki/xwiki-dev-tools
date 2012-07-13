@@ -3,7 +3,26 @@
 # Read the credentials from the file passed as the first argument, if any.
 # See example.passwords for more details on the credentials file.
 function read_credentials() {
-  source $1
+  if [[ $PASSWORDS ]]
+  then
+    source $PASSWORDS
+  fi
+}
+
+# Initialize common variables
+function init() {
+  echo -e "\033[0;32m* Initialization\033[0m"
+  PRG="$0"
+  while [ -h "$PRG" ]; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+      PRG="$link"
+    else
+      PRG=`dirname "$PRG"`/"$link"
+    fi
+  done
+  PRGDIR=`dirname "$PRG"`
 }
 
 #####################################################
@@ -496,7 +515,7 @@ function create_purl() {
 function announce_twitter() {
   echo -e "\033[0;32m* Announcing the release on Twitter\033[0m"
 
-  ~/twidge-1.0.6-linux-i386-bin update "#XWiki Enterprise ${PRETTY_VERSION} has been #released! Check it out: http://purl.org/xwiki/rn/XE${TINY_VERSION}"
+  $PRGDIR/twidge-1.0.6-linux-i386-bin update "#XWiki Enterprise ${PRETTY_VERSION} has been #released! Check it out: http://purl.org/xwiki/rn/XE${TINY_VERSION}"
 }
 
 #####################################################
@@ -504,10 +523,25 @@ function announce_twitter() {
 #####################################################
 trap "echo -e '\033[0m\nExiting'" EXIT
 
-if [[ $1 ]]
+if [ ! -n "$1" ]
 then
-  read_credentials $1
+  echo -e "Usage: $0 <action>, where valid actions are:"
+  echo -e "- release_jira"
+  echo -e "- push_ow2"
+  echo -e "- update_ow2"
+  echo -e "- update_download"
+  echo -e "- update_api"
+  echo -e "- announce_ow2"
+  echo -e "- announce_xwiki"
+  echo -e "- announce_freecode"
+  echo -e "- create_purl"
+  echo -e "- announce_twitter"
+  echo -e "- cleanup_auth"
+  exit -1
 fi
+
+init
+read_credentials
 
 BASE=~/public_html/releases/
 if [[ -z $VERSION ]]
@@ -537,11 +571,11 @@ fi
 while [[ -z $RELEASE_NOTES ]]
 do
   echo -e "Select a short release notes file:\033[0;32m"
-  read -e -p "~/releasenotes.txt> " RELEASE_NOTES
+  read -e -p "$PRGDIR/releasenotes.txt> " RELEASE_NOTES
   echo -n -e "\033[0m"
   if [[ -z $RELEASE_NOTES ]]
   then
-    RELEASE_NOTES=~/releasenotes.txt
+    RELEASE_NOTES=$PRGDIR/releasenotes.txt
   fi
   if [[ ! -f $RELEASE_NOTES ]]
   then
@@ -555,14 +589,5 @@ CHANGELOG=`urlencode "$JIRA_VERSION"`
 CHANGELOG="See http://jira.xwiki.org/secure/IssueNavigator.jspa?reset=true&jqlQuery=category+in+%28%22Top+Level+Projects%22%29+and+fixVersion+in+%28%22${CHANGELOG}%22%29+and+resolution+in+%28%22Fixed%22%29 for more details"
 RELSUMMARY="See http://www.xwiki.org/xwiki/bin/ReleaseNotes/ReleaseNotesXWikiEnterprise${TINY_VERSION} for more details"
 
-release_jira
-push_ow2
-update_ow2
-update_download
-update_api
-announce_ow2
-announce_xwiki
-announce_freecode
-create_purl
-announce_twitter
-cleanup_auth
+type $1 &>/dev/null && $1 || echo "'$1' action doesn't exist"
+
