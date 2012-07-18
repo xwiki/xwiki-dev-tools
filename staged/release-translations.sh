@@ -1,6 +1,6 @@
 #!/bin/bash
 BRANCH=master
-XWIKI_TRUNKS=~/releases/xwiki-trunks/
+XWIKI_TRUNKS=`pwd`
 USER=CalebJamesDeLisle
 PASS=l10npassword
 
