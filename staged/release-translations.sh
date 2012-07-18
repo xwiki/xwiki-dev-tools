@@ -1,6 +1,6 @@
 #!/bin/bash
 BRANCH=master
-XWIKI_TRUNKS=~/wrk/xwiki.git/xwiki-trunks
+XWIKI_TRUNKS=~/releases/xwiki-trunks/
 USER=CalebJamesDeLisle
 PASS=l10npassword
 
