@@ -29,10 +29,16 @@
     <artifactId>xwiki-manager</artifactId>
     <version>4.2-SNAPSHOT</version>
   </parent>
+  <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki-debug-eclipse</artifactId>
-  <name>xwiki-enterprise-manager-parent</name>
+  <name>XWiki Debug Eclipse</name>
   <packaging>war</packaging>
-  <description>xwiki-debug-eclipse</description>
+  <description>Custom Eclipse WAR project to debug XWiki</description>
+  <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.manager:xwiki-manager-web,org.xwiki.enterprise:xwiki-enterprise-web</xwiki.extension.features>
+    <xwiki.extension.distribution.ui>org.xwiki.manager:xwiki-manager-ui</xwiki.extension.distribution.ui>
+  </properties>
   <dependencies>
     <!-- Databases -->
     <dependency>
@@ -167,28 +173,15 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <!-- Override check from top level POM that prevents depending on a legacy module since we want to package
-               Legacy modules in the generated XE product -->
-          <execution>
-            <id>enforce-no-legacy-dependencies</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <xwikiBannedDependencies implementation="org.xwiki.tool.enforcer.XWikiBannedDependencies">
-                  <searchTransitive>true</searchTransitive>
-                  <excludes>
-                    <!-- Override the value from the top level POM with a value that'll not ban any dependency -->
-                    <exclude>alwaysok</exclude>
-                  </excludes>
-                </xwikiBannedDependencies>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <!-- Make some project related informations easy to find -->
+          <archive>
+            <manifestEntries>
+              <XWiki-Extension-Id>${project.groupId}:${project.artifactId}</XWiki-Extension-Id>
+            </manifestEntries>
+          </archive>
+        </configuration>
       </plugin>
     </plugins>
   </build>
