@@ -30,18 +30,26 @@ function do_all() {
 
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wiki-manager/xwiki-platform-wiki-manager-ui/src/main/resources/  || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XEM.WikiManager&app=XEM'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wiki-manager/xwiki-platform-wiki-manager-ui/ && mvn xar:format
 
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-application-manager/xwiki-platform-application-manager-ui/src/main/resources/ || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XEM.ApplicationManager&app=XEM'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-application-manager/xwiki-platform-application-manager-ui/ && mvn xar:format
+
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-repository/xwiki-platform-repository-ui/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.Repository&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-repository/xwiki-platform-repository-ui/ && mvn xar:format
 
     cd ${XWIKI_TRUNKS}/xwiki-manager/xwiki-manager-ui/src/main/resources/ || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XEM.XEMtranslations&app=XEM'
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XEM.XEMWebHome&app=XEM'
+    cd ${XWIKI_TRUNKS}/xwiki-manager/xwiki-manager-ui/ && mvn xar:format
 
     cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/src/main/resources/ || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XE.MainWelcome&app=XE'
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XE.SandboxWebHome&app=XE'
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XE.XWikiXWikiSyntax&app=XE'
+    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/ && mvn xar:format
 
     cd ${XWIKI_TRUNKS}/xwiki-enterprise/ || exit -1
     git status
