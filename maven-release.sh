@@ -119,7 +119,7 @@ function stabilize_branch() {
       NEXT_TRUNK_VERSION=${tmp}
     fi
     # Let maven update the version for all the submodules
-    mvn release:branch -DbranchName=stable-${VERSION_STUB}.x -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,legacy
+    mvn release:branch -DbranchName=stable-${VERSION_STUB}.x -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,legacy,standalone
     git up
     # We must update the root parent and commons.version manually
     mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -N -q
@@ -199,10 +199,10 @@ function release_maven() {
   fi
 
   echo -e "\033[0;32m* release:prepare\033[0m"
-  mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${CURRENT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
+  mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${CURRENT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,standalone -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
   echo -e "\033[0;32m* release:perform\033[0m"
-  mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests ${TEST_SKIP} -Dgpg.passphrase='${GPG_PASSPHRASE}'" -Dgpg.passphrase="${GPG_PASSPHRASE}" || exit -2
+  mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,standalone ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests ${TEST_SKIP} -Dgpg.passphrase='${GPG_PASSPHRASE}'" -Dgpg.passphrase="${GPG_PASSPHRASE}" || exit -2
 
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git co ${TAG_NAME} -q
