@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.manager</groupId>
+    <artifactId>xwiki-manager</artifactId>
+    <version>4.3-SNAPSHOT</version>
+  </parent>
+  <groupId>org.xwiki.dev</groupId>
+  <artifactId>xwiki-debug-idea</artifactId>
+  <name>XWiki Debug IntelliJ Idea</name>
+  <packaging>war</packaging>
+  <description>Custom IntelliJ Idea WAR project to debug XWiki</description>
+  <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.manager:xwiki-manager-web,org.xwiki.enterprise:xwiki-enterprise-web</xwiki.extension.features>
+    <xwiki.extension.distribution.ui>org.xwiki.manager:xwiki-manager-ui</xwiki.extension.distribution.ui>
+  </properties>
+  <dependencies>
+    <!-- Databases -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.21</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>2.2.8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>10.9.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>	9.1-901-1.jdbc4</version>
+    </dependency>
+
+    <!-- Use normal instead of legacy -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${platform.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>log4j</artifactId>
+          <groupId>log4j</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>batik-js</artifactId>
+          <groupId>org.apache.xmlgraphics</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!--  -->
+    <!-- XWiki Enterprise -->
+    <!--  -->
+
+    <dependency>
+      <groupId>org.xwiki.enterprise</groupId>
+      <artifactId>xwiki-enterprise-web</artifactId>
+      <version>${enterprise.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+      <exclusions>
+        <!-- Only deal with jar dependencies to be able to overwrite them by Eclipse projects -->
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-wysiwyg-war</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-web</artifactId>
+        </exclusion>
+        <!-- Exclude legacy -->
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-legacy-component</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-annotation</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-bridge</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-observation</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-legacy-oldcore</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!--  -->
+    <!-- XWiki Enterprise Manager -->
+    <!--  -->
+
+    <dependency>
+      <groupId>org.xwiki.manager</groupId>
+      <artifactId>xwiki-manager-web</artifactId>
+      <version>${manager.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+      <exclusions>
+        <!-- Only deal with jar dependencies to be able to overwrite them by Eclipse project -->
+        <exclusion>
+          <groupId>org.xwiki.enterprise</groupId>
+          <artifactId>xwiki-enterprise-web</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+    <!--  -->
+    <!-- WYSIWYG -->
+    <!-- FIXME: still not enough to make it work, just here to not stop XWiki from running at all -->
+    <!--  -->
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-war</artifactId>
+      <version>${platform.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wysiwyg-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <!-- Make some project related informations easy to find -->
+          <archive>
+            <manifestEntries>
+              <XWiki-Extension-Id>${project.groupId}:${project.artifactId}</XWiki-Extension-Id>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <repositories>
+    <repository>
+      <id>xwiki-snapshots</id>
+      <name>XWiki Nexus Snapshot Repository Proxy</name>
+      <url>http://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+    </repository>
+    <repository>
+      <id>xwiki-releases</id>
+      <name>XWiki Nexus Releases Repository Proxy</name>
+      <url>http://nexus.xwiki.org/nexus/content/groups/public</url>
+    </repository>
+  </repositories>
+</project>
