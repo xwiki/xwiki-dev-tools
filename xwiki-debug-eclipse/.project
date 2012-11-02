@@ -139,7 +139,7 @@
 	<variableList>
 		<variable>
 			<name>XWIKIPLATFORM</name>
-			<value>$%7BPARENT-1-PROJECT_LOC%7D/xwiki-platform</value>
+			<value>$%7BPARENT-2-PROJECT_LOC%7D/xwiki-platform</value>
 		</variable>
 	</variableList>
 </projectDescription>
