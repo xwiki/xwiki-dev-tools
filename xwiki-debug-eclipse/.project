@@ -81,39 +81,9 @@
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/portlet.xml</locationURI>
 		</link>
 		<link>
-			<name>src/main/webapp/WEB-INF/struts-bean.tld</name>
-			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/struts-bean.tld</locationURI>
-		</link>
-		<link>
 			<name>src/main/webapp/WEB-INF/struts-config.xml</name>
 			<type>1</type>
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/struts-config.xml</locationURI>
-		</link>
-		<link>
-			<name>src/main/webapp/WEB-INF/struts-form.tld</name>
-			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/struts-form.tld</locationURI>
-		</link>
-		<link>
-			<name>src/main/webapp/WEB-INF/struts-html.tld</name>
-			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/struts-html.tld</locationURI>
-		</link>
-		<link>
-			<name>src/main/webapp/WEB-INF/struts-logic.tld</name>
-			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/struts-logic.tld</locationURI>
-		</link>
-		<link>
-			<name>src/main/webapp/WEB-INF/struts-template.tld</name>
-			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/struts-template.tld</locationURI>
-		</link>
-		<link>
-			<name>src/main/webapp/WEB-INF/struts.tld</name>
-			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/struts.tld</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/WEB-INF/sun-web.xml</name>
