@@ -3,6 +3,48 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/" source-path="/target-eclipse/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <dependent-module archiveName="xwiki-platform-oldcore-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-oldcore/xwiki-platform-oldcore">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-extension-api-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-extension-api/xwiki-commons-extension-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-job-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-job/xwiki-commons-job">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-api-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-api/xwiki-platform-localization-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-extension-handler-xar-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-extension-handler-xar/xwiki-platform-extension-handler-xar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-extension-script-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-extension-script/xwiki-platform-extension-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-extension-repository-maven-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-extension-repository-maven/xwiki-commons-extension-repository-maven">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-rss-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-rss/xwiki-platform-rendering-macro-rss">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-rendering-syntax-plain-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-rendering-syntax-plain/xwiki-rendering-syntax-plain">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-source-legacy-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-source-legacy/xwiki-platform-localization-source-legacy">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-source-wiki-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-source-wiki/xwiki-platform-localization-source-wiki">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-syntax-messagetool-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-syntax-messagetool/xwiki-platform-localization-syntax-messagetool">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-script-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-script/xwiki-platform-localization-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-macro-4.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-macro/xwiki-platform-localization-macro">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="java-output-path"/>
         <property name="context-root" value="xwiki"/>
     </wb-module>
