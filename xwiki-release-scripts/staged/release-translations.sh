@@ -1,15 +1,16 @@
 #!/bin/bash
 BRANCH=master
+USER='XWikiTranslator'
+PASS='<password here>'
+
 XWIKI_TRUNKS=`pwd`
-USER=CalebJamesDeLisle
-PASS=l10npassword
 
 function fix_author() {
     find ./ -name '*.xml' -exec sed -i -e 's#<creator>XWiki.Admin</creator>#<creator>xwiki:XWiki.Admin</creator>#' -e 's#<author>XWiki.Admin</author>#<author>xwiki:XWiki.Admin</author>#' -e 's#<contentAuthor>XWiki.Admin</contentAuthor>#<contentAuthor>xwiki:XWiki.Admin</contentAuthor>#' {} \; -print
 }
 
 function do_one() {
-    wget $1 --user=${USER} --password=${PASS} --auth-no-challenge -O ./translations.zip &&
+    wget $1 --user="${USER}" --password="${PASS}" --auth-no-challenge -O ./translations.zip &&
     unzip -o translations.zip &&
     rm translations.zip || $(git clean -dxf && exit -1)
     fix_author
