@@ -16,7 +16,21 @@ function do_one() {
     fix_author
 }
 
+function read_user_and_password() {
+    echo -e "\033[0;32mEnter your l10n.xwiki.org credentials:\033[0m"
+    read -e -p "user> " USER
+    read -e -s -p "pass> " PASS
+    echo ""
+
+    if [[ -z "$USER" || -z "$PASS" ]]; then
+      echo -e "\033[1;31mPlease provide both user and password in order to be able to get the translations from l10n.xwiki.org.\033[0m"
+      exit -1
+    fi
+}
+
 function do_all() {
+    read_user_and_password
+
     ##
     ## XWiki Enterprise
     ##
@@ -81,14 +95,14 @@ function do_all() {
     git status
     cd ${XWIKI_TRUNKS}/xwiki-platform/ || exit -1
     git status
-    echo 'If there are untracked files, something probably went wrong.'
+    echo -e "\033[0;32mIf there are untracked files, something probably went wrong.\033[0m"
 }
 
 function check_clean() {
     cd ${XWIKI_TRUNKS}/$1
     if [[ "`git status | grep 'nothing to commit (working directory clean)'`" == "" ]]; then
         git status
-        echo "Please do something with these changes first."
+        echo -e "\033[1;31mPlease do something with these changes first.\033[0m"
         echo "in `pwd`"
         exit -1;
     fi
