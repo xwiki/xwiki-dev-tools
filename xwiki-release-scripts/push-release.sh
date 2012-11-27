@@ -508,14 +508,14 @@ function create_purl() {
   BLOGPOST_URL="http://www.xwiki.org/xwiki/bin/Blog/${BLOGPOST_URL}"
 
   curl -s -o /dev/null -X POST --data "maintainers=${P_U}" --data-urlencode "target=${BLOGPOST_URL}" --data "type=302" \
-    -H "Cookie: ${P_AUTH}" http://purl.org/admin/purl/xwiki/rn/XE${TINY_VERSION}
+    -H "Cookie: ${P_AUTH}" http://purl.org/admin/purl/xwiki/rn/XWiki${TINY_VERSION}
 }
 
 # Announce the release on twitter.
 function announce_twitter() {
   echo -e "\033[0;32m* Announcing the release on Twitter\033[0m"
 
-  $PRGDIR/twidge-1.0.6-linux-i386-bin update "#XWiki Enterprise ${PRETTY_VERSION} has been #released! Check it out: http://purl.org/xwiki/rn/XE${TINY_VERSION}"
+  $PRGDIR/twidge-1.0.6-linux-i386-bin update "#XWiki Enterprise ${PRETTY_VERSION} has been #released! Check it out: http://purl.org/xwiki/rn/XWiki${TINY_VERSION}"
 }
 
 #####################################################
