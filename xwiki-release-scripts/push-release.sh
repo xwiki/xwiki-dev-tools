@@ -167,37 +167,6 @@ function authenticate_xwiki() {
   done
 }
 
-# Login to purl.org. This function emulates a browser login by submitting a login HTTP request and storing the resulting cookie in the P_AUTH variable.
-function authenticate_purl() {
-  while [[ -z $P_AUTH ]]
-  do
-    # Prompt for credentials
-    if [[ -z $P_U ]]
-    then
-      echo -e "\033[0mPURL.org username:\033[0;32m"
-      read -e -p "> " P_U
-      echo -n -e "\033[0m"
-    fi
-    if [[ -z $P_P ]]
-    then
-      echo -e "\033[0mPURL.org password:\033[0;32m"
-      read -e -s -p "> " P_P
-      echo -e "\033[0m"
-    fi
-
-    # HTTP request sending the username and password as form data to the login page. Keep the resulting Set-Cookie header in the P_AUTH variable.
-    P_AUTH=`curl -f -o /dev/null -v --insecure -X POST --data "id=${P_U}&passwd=${P_P}" http://purl.org/admin/login/login-submit.bsh 2>&1 | grep Set-Cookie | cut -d: -f2- | cut '-d ' -f2 | cut '-d;' -f1`
-
-    # No cookie sent, failed authentication
-    if [[ -z $P_AUTH ]]
-    then
-      echo -e "\033[0;33mWrong credentials, please re-enter\033[0m"
-      P_U=
-      P_P=
-    fi
-  done
-}
-
 # Cleanup temporary cookie files holding authentication information. These files are created by the FreeCode and XWiki.org authentication mechanisms.
 function cleanup_auth() {
   rm -f /tmp/xwo.cookies
@@ -492,30 +461,11 @@ function announce_freecode() {
   fi
 }
 
-# Create a new purl entry in the format purl.org/xwiki/XE32M1 pointing to the blog post on xwiki.org.
-function create_purl() {
-  echo -e "\033[0;32m* Creating PURL for the release notes\033[0m"
-  authenticate_purl
-
-  if [[ $RELEASE_TYPE == "stable" ]]
-  then
-    BLOGPOST_URL="XWiki Enterprise and XWiki Enterprise Manager ${PRETTY_VERSION} Released"
-  else
-    BLOGPOST_URL="XWiki Enterprise ${PRETTY_VERSION} Released"
-  fi
-  BLOGPOST_URL=`echo ${BLOGPOST_URL} | sed -e 's/\.//g'`
-  BLOGPOST_URL=`urlencode "${BLOGPOST_URL}"`
-  BLOGPOST_URL="http://www.xwiki.org/xwiki/bin/Blog/${BLOGPOST_URL}"
-
-  curl -s -o /dev/null -X POST --data "maintainers=${P_U}" --data-urlencode "target=${BLOGPOST_URL}" --data "type=302" \
-    -H "Cookie: ${P_AUTH}" http://purl.org/admin/purl/xwiki/rn/XE${TINY_VERSION}
-}
-
 # Announce the release on twitter.
 function announce_twitter() {
   echo -e "\033[0;32m* Announcing the release on Twitter\033[0m"
 
-  $PRGDIR/twidge-1.0.6-linux-i386-bin update "#XWiki Enterprise ${PRETTY_VERSION} has been #released! Check it out: http://purl.org/xwiki/rn/XE${TINY_VERSION}"
+  $PRGDIR/twidge-1.0.6-linux-i386-bin update "#XWiki Enterprise ${PRETTY_VERSION} has been #released! Check it out: http://www.xwiki.org/xwiki/bin/view/ReleaseNotes/ReleaseNotesXWiki${TINY_VERSION}"
 }
 
 #####################################################
@@ -534,7 +484,6 @@ then
   echo -e "- announce_ow2"
   echo -e "- announce_xwiki"
   echo -e "- announce_freecode"
-  echo -e "- create_purl"
   echo -e "- announce_twitter"
   echo -e "- cleanup_auth"
   exit -1
