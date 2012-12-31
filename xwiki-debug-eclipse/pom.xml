@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.manager</groupId>
     <artifactId>xwiki-manager</artifactId>
-    <version>4.4-SNAPSHOT</version>
+    <version>4.5-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki-debug-eclipse</artifactId>
