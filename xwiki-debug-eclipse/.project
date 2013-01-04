@@ -100,11 +100,6 @@
 			<type>2</type>
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-colibri/src/main/resources/colibri</locationURI>
 		</link>
-		<link>
-			<name>src/main/webapp/skins/toucan</name>
-			<type>2</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-toucan/src/main/resources/toucan</locationURI>
-		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
