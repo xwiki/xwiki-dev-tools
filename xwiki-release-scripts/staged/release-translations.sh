@@ -110,7 +110,7 @@ function check_clean() {
     git checkout ${BRANCH} &&
     git reset --hard &&
     git clean -dxf &&
-    git pull || exit -1
+    git pull origin ${BRANCH} || exit -1
 }
 
 function commit() {
