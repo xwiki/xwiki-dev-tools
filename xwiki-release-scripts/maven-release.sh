@@ -202,7 +202,12 @@ function release_maven() {
   fi
 
   echo -e "\033[0;32m* release:prepare\033[0m"
-  mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${CURRENT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,standalone -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
+  ## Note: We don't pass the -DdevelopmentVersion system property since we want to let the user decide what is the new
+  ## version in development. For example if we're releasing 4.4.1-SNAPSHOT we want the next revision to be
+  ## 4.4.2-SNAPSHOT. Note that used to pass -DdevelopmentVersion=${CURRENT_VERSION} but we've then decided to
+  ## using a different version scheme for branches, see http://markmail.org/thread/pgs6l7eba462fcan
+  ## TODO: Compute it automatically in the future
+  mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,standalone -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
   echo -e "\033[0;32m* release:perform\033[0m"
   mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,standalone ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests ${TEST_SKIP} -Dgpg.passphrase='${GPG_PASSPHRASE}'" -Dgpg.passphrase="${GPG_PASSPHRASE}" || exit -2
