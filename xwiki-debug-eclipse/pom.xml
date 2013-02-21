@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.manager</groupId>
     <artifactId>xwiki-manager</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>5.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki-debug-eclipse</artifactId>
@@ -62,27 +62,6 @@
       <version>	9.1-901-1.jdbc4</version>
     </dependency>
 
-    <!-- Use normal instead of legacy -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${platform.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>log4j</artifactId>
-          <groupId>log4j</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>batik-js</artifactId>
-          <groupId>org.apache.xmlgraphics</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commons-logging</artifactId>
-          <groupId>commons-logging</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!--  -->
     <!-- XWiki Enterprise -->
     <!--  -->
@@ -103,30 +82,9 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-web</artifactId>
         </exclusion>
-        <!-- Exclude legacy -->
         <exclusion>
+          <artifactId>xwiki-commons-component-default</artifactId>
           <groupId>org.xwiki.commons</groupId>
-          <artifactId>xwiki-commons-legacy-component</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-legacy-annotation</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-legacy-bridge</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-legacy-observation</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-legacy-oldcore</artifactId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commons-logging</artifactId>
-          <groupId>commons-logging</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -165,7 +123,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wysiwyg-client</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-repository-server-api</artifactId>
+      <version>${platform.version}</version>
     </dependency>
   </dependencies>
 
