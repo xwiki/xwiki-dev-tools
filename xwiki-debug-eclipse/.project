@@ -100,6 +100,16 @@
 			<type>2</type>
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-colibri/src/main/resources/colibri</locationURI>
 		</link>
+		<link>
+			<name>src/main/webapp/resources/css/xwiki-min.css</name>
+			<type>1</type>
+			<locationURI>PROJECT_LOC/src/main/custom/css/xwiki-min.css</locationURI>
+		</link>
+		<link>
+			<name>src/main/webapp/resources/js/xwiki/xwiki-min.js</name>
+			<type>1</type>
+			<locationURI>PROJECT_LOC/src/main/custom/js/xwiki/xwiki-min.js</locationURI>
+		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
