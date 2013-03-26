@@ -82,10 +82,6 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-web</artifactId>
         </exclusion>
-        <exclusion>
-          <artifactId>xwiki-commons-component-default</artifactId>
-          <groupId>org.xwiki.commons</groupId>
-        </exclusion>
       </exclusions>
     </dependency>
 
@@ -107,7 +103,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <!--  -->
     <!-- WYSIWYG -->
     <!-- FIXME: still not enough to make it work, just here to not stop XWiki from running at all -->
