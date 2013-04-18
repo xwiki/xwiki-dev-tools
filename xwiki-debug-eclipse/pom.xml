@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.manager</groupId>
     <artifactId>xwiki-manager</artifactId>
-    <version>5.0-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki-debug-eclipse</artifactId>
@@ -38,6 +38,7 @@
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.manager:xwiki-manager-web,org.xwiki.enterprise:xwiki-enterprise-web</xwiki.extension.features>
     <xwiki.extension.distribution.ui>org.xwiki.manager:xwiki-manager-ui</xwiki.extension.distribution.ui>
+    <xwiki.extension.distribution.wikiui>org.xwiki.enterprise:xwiki-enterprise-ui</xwiki.extension.distribution.wikiui>
   </properties>
   <dependencies>
     <!-- Databases -->
