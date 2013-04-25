@@ -1,0 +1,652 @@
+#!/bin/bash   
+###############################################################################
+###                 XWiki databases testing helper script                   ###
+###                                                                         ###
+###  This script allow the deployment of release and snapshot distributions ###
+###  from maven repository, configuration of them for any supported         ###
+###  databases, using independant database and user names to allow parallel ###
+###  testing, creating the database and also importing initial data,        ###
+###  starting instance using jetty with independant ports, and finally      ###
+###  exporting database of exit.                                            ###
+###                                                                         ###
+###############################################################################
+# ---------------------------------------------------------------------------
+# See the NOTICE file distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as
+# published by the Free Software Foundation; either version 2.1 of
+# the License, or (at your option) any later version.
+#
+# This software is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this software; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+# ---------------------------------------------------------------------------
+
+XWPORT=`id -u`
+
+#### CONFIGURATION ####
+
+# Port for stopping XWiki (required), default to userid + 7000, overidable by -t
+XWSTOP=$(($XWPORT+7000))
+# Port for starting XWiki, default to userid + 7080, overidable by -p
+XWPORT=$(($XWPORT+7080))
+
+#### DB Dependant parameters
+## XWDATABASE - Database passed in argument (Do not change!)
+## XWDB - Database product used by the script for conditions (Do not change!)
+## XWDBCFG - Database name used in comments of the hibernate configuration file
+## XWDBURL - JDBC url to use in configuration
+## XWDBDIALECT - Hibernate dialect to use in configuration
+## XWDBAUSR - DBA username
+## XWDBAPASS - DBA password (Export PGPASSWORD for psql)
+## XWJDBC - Path to the JDBC driver that need to copied in the lib folder
+dbparam() {
+    if [[ $XWDATABASE = "mysql" ]]; then
+        XWDATABASE="mysql-innodb"
+    fi
+
+    case $XWDATABASE in
+        mysql-myisam)
+            XWDBLABEL="MySQL MyISAM"
+            XWDB="mysql"
+            XWDBCFG="MySQL"
+            XWDBURL="jdbc:mysql://localhost/xwiki$XWDBSFX"
+            XWDBDIALECT="org.hibernate.dialect.MySQL5MyISAMDialect"
+            XWDBDIALECTCLASS="/usr/local/share/java/MySQL5MyISAMDialect.class"
+            XWJDBC="/usr/share/java/mysql-connector-java.jar"
+            XWDBAUSR="root"
+            XWDBAPASS="xwiki"
+            ;;
+        mysql-innodb)
+            XWDBLABEL="MySQL innoDB"
+            XWDB="mysql"
+            XWDBCFG="MySQL"
+            XWDBURL="jdbc:mysql://localhost/xwiki$XWDBSFX"
+            XWDBDIALECT="org.hibernate.dialect.MySQL5InnoDBDialect"
+            XWJDBC="/usr/share/java/mysql-connector-java.jar"
+            XWDBAUSR="root"
+            XWDBAPASS="xwiki"
+            ;;
+        postgresql|psql)
+            XWDBLABEL="PostgreSQL (schema mode)"
+            XWDB="psql"
+            XWDBCFG="PostgreSQL"
+            XWDBURL="jdbc:postgresql:xwiki$XWDBSFX"
+            XWDBDIALECT="org.hibernate.dialect.PostgreSQLDialect"
+            XWJDBC="/usr/share/java/postgresql-jdbc4.jar"
+            XWDBAUSR="postgres"
+            export PGPASSWORD="xwiki"
+            ;;
+        oracle|ora)
+            XWDBLABEL="Oracle"
+            XWDB="oracle"
+            XWDBCFG="Oracle"
+            XWDBURL="jdbc:oracle:oci:@"
+            XWDBDIALECT="org.hibernate.dialect.Oracle10gDialect"
+            XWJDBC="/usr/local/share/java/ojdbc6.jar"
+            XWDBAUSR="SYS/xwiki"
+            XWDBAPASS="xwiki"
+            ;;
+        hsqldb|hsql)
+            XWDBLABEL="HSQLDB"
+            XWDB="hsqldb"
+            XWDBPFX="hsqldb"
+            ;;
+        *)
+            echo "Invalid or unsupported database $XWDATABASE." >&2
+            usage
+    esac
+}
+
+### DEFAULT VALUES ###
+
+# Snapshot version, use release by default
+XWRELEASE=""
+# Distribution, use manager by default
+XWDISTRIB="enterprise"
+# Database name to used to retrieve the distribution package
+XWDBPFX=""
+# XWiki version
+XWVERSION="4.5.3"
+# Should we download if missing
+XWDOWNLOAD="no"
+# Should we deploy and configure
+XWUNZIP="yes"
+# Suffix used for user databases, default to current user name
+XWDBSFX=${USER,,}
+# Database to deploy for
+XWDATABASE="mysql-innodb"
+# Clear database on startup, default is true, overidable by -k
+XWCLEAR="yes"
+# Start XWiki, default is true, overidable by -n
+XWSTART="yes"
+# Startup script name
+XWIKISTART="start_xwiki.sh"
+# Stop script name
+XWIKISTOP="stop_xwiki.sh"
+# Hibernate config file name
+XWHIBCFG="webapps/xwiki/WEB-INF/hibernate.cfg.xml"
+# XWiki config file name
+XWIKICFG="webapps/xwiki/WEB-INF/xwiki.cfg"
+# XWiki properties file name
+XWIKIPROPS="webapps/xwiki/WEB-INF/xwiki.properties"
+# XWiki lib folder name
+XWIKILIB="webapps/xwiki/WEB-INF/lib"
+# XWiki classes folder name
+XWIKICLASSES="webapps/xwiki/WEB-INF/classes"
+# XWiki hibernate dialect classes
+XWIKIDIALECTCLASSES="$XWIKICLASSES/org/hibernate/dialect"
+# XWiki data folder
+XWIKIDATA="data"
+# XWiki HSQLDB database folder 
+XWIKIDATABASE="database"
+
+#### END OF CONFIGURATION ####
+
+# Program name for usage
+PRGNAME=`basename $0`
+#################
+### Display help
+usage() {
+    echo "Usage: $PRGNAME [OPTIONS]"
+    echo ""
+    echo " This script can do the following steps easily to help you testing xwiki distribution:"
+    echo "   - Download a distribution package, either release or snapshot (using mysql/jetty or hsql/jetty distribution)."
+    echo "   - Deploy that package, and configure it for a requested database."
+    echo "   - Create the needed database."
+    echo "   - Restore a saved permanent directory."
+    echo "   - Import a database dump, previously exported with this same tool."
+    echo "   - Launch the configured XWiki with Jetty."
+    echo "   - Backup the database after XWiki shutdown."
+    echo "   - Backup the permanent directory."
+    echo " All operations could be done in a multiuser environment, using common databases, without conflict."
+    echo ""
+    echo "Options:"
+    echo "  -b destination      Backup database to the given destination(*) after shutdown."
+    echo "  -B destination      Backup current database to the given destination(*), same as -b -z -k -n"
+    echo "  -d database         Choose a database (mysql-myisam,mysql-innodb,psql,oracle,hsqldb). Current is $XWDATABASE."
+    echo "  -e distribution     Choose a distribution (enterprise or manager). Current is $XWDISTRIB."
+    echo "  -f package          Choose the jetty distribution base package (hsqldb or mysql). Current is $XWDBPFX."
+    echo "  -i source           Import the given source(*) in the database before startup."
+    echo "  -I source           Import the given source(*) in the database without running, same as -i -z -n"
+    echo "  -h                  Display this usage message. At the end, it shows your current arguments and alone the defaults."
+    echo "  -k                  Do not clean the database before startup."
+    echo "  -l data.zip         Restore a backup of the permanent directory from the given zip file."
+    echo "  -L data.zip         Restore a backup of the permanent directory without running, same as -l -z -k -n."
+    echo "  -n                  Do not start XWiki."
+    echo "  -p port             Port for Jetty listening. Current is $XWPORT."
+    echo "  -r snapshot         Use given snapshot (ie: 20120410.161114-97). Default to use release."
+    echo "  -s dbsuffix         Database suffix for test isolation. Current is $USER."
+    echo "  -t port             Port for Jetty termination. Current is $XWSTOP."
+    echo "  -u data.zip         Save a backup of the permanent directory into the given zip file after shutdown."
+    echo "  -U data.zip         Save a backup of the permanent directory, same as -u -z -k -n."
+    echo "  -v version          Choose a XWiki version. Current is $XWVERSION."
+    echo "  -w                  Download from maven.xwiki.org. Default is to search current folder."
+    echo "  -z                  Do not redeploy and reconfigure (use with care)."
+    echo ""
+    echo "(*) Backup source/destination format depends on the database:"
+    echo "     - mysql : an sql file (ie: dump.sql) containing all databases (wiki/subwikis)"
+    echo "     - psql :  an sql file (ie: dump.sql) containing a dump of the database (subwikis are schemas)"
+    echo "     - hsqldb : an zip file (ie: dump.zip) containing files of the database folder"
+    echo "     - oracle : a folder containing a database.dmp file (ie: dump) containing all databases (wiki/subwikis)"
+    echo ""
+    exit 1
+}
+
+###################################################
+### Unzip distribution package and check integrity
+unzippkg() {
+
+    if [[ ! -r $XWZIPNAME ]]; then
+        echo "Unable to read install ZIP file: $XWZIPNAME" >&2
+        usage
+    fi
+
+    if [[ -d $XWFOLDER ]]; then
+        rm -rf $XWFOLDER
+    fi
+    if [[ -d $XWFOLDER ]]; then
+        echo "Unable to delete destination folder: $XWFOLDER" >&2
+        exit 1
+    fi
+
+    echo "## Unzipping $XWZIPNAME..."
+    unzip -q $XWZIPNAME
+
+    if [[ ! -d $XWFOLDER ]]; then
+        echo "Unzipped distribution cannot be found in $XWFOLDER" >&2
+    fi
+
+    if [[ ! -r $XWFOLDER/$XWIKISTART ]]; then
+        echo "Unzipped distribution does no contain $XWIKISTART" >&2
+    fi
+
+    if [[ ! -r $XWFOLDER/$XWIKISTOP ]]; then
+        echo "Unzipped distribution does no contain $XWIKISTOP" >&2
+    fi
+
+    if [[ ! -r $XWFOLDER/$XWHIBCFG ]]; then
+        echo "Unzipped distribution does no contain $XWHIBCFG" >&2
+    fi
+
+    if [[ ! -r $XWFOLDER/$XWIKICFG ]]; then
+        echo "Unzipped distribution does no contain $XWIKICFG" >&2
+    fi
+
+    if [[ ! -r $XWFOLDER/$XWIKIPROPS ]]; then
+        echo "Unzipped distribution does no contain $XWIKIPROPS" >&2
+    fi
+
+    if [[ ! -d $XWFOLDER/$XWIKILIB ]]; then
+        echo "Unzipped distribution does no contain $XWFOLDER/$XWIKILIB" >&2
+    fi
+
+    if [[ ! -d $XWFOLDER/$XWIKICLASSES ]]; then
+        echo "Unzipped distribution does no contain $XWFOLDER/$XWIKICLASSES" >&2
+    fi
+
+}
+
+###################################################
+### Init export/import folder for Oracle Data Pump
+### $1 - folder name
+### $2 - if equals to "clean", remove existing folder first
+initoradump() {
+    local expdir="`pwd`/$1"
+    # Prevent bad deletion (may be improved)
+    if [[ $1 = "." || $1 = ".." ]]; then
+        return
+    fi
+
+    # Delete target folder and/or create it
+    if [[ ! -d $expdir ]]; then
+        mkdir $expdir
+    elif [[ $2 == "clean" ]]; then
+        rm -rf $expdir
+        mkdir $expdir
+    fi
+
+    # Ensure that the oracle server may write to it
+    chmod 777 $expdir
+
+    # Define the folder in Oracle server and grant user access
+    sqlplus -s $XWDBAUSR AS SYSDBA << EOF 
+CREATE OR REPLACE DIRECTORY xwiki${XWDBSFX}dir AS '$expdir';
+GRANT READ, WRITE ON DIRECTORY xwiki${XWDBSFX}dir TO xwiki${XWDBSFX};
+EOF
+}
+
+###############################################################################
+### Reset or create database and/or database useri, proceed to database import
+resetdb() {
+    case $XWDB in
+        mysql)
+            XWDBLIST=`mysql -u$XWDBAUSR -p$XWDBAPASS -e "show databases" -s -s | grep xwiki$XWDBSFX | xargs`
+            if [[ ! -z $XWDBLIST ]]; then
+                echo "## Dropping databases $XWDBLIST"
+                for XWDBS in $XWDBLIST; do
+                    mysql -u$XWDBAUSR -p$XWDBAPASS -e "drop database $XWDBS;"
+                done
+            fi
+            echo "## Creating database xwiki$XWDBSFX"
+            mysql -u$XWDBAUSR -p$XWDBAPASS -e "create database xwiki$XWDBSFX default character set utf8;grant all privileges on xwiki$XWDBSFX.* to 'xwiki$XWDBSFX'@'localhost' identified by 'xwiki$XWDBSFX';"
+            ;;
+        psql)
+            echo "## Dropping database and user xwiki$XWDBSFX"
+            psql -U $XWDBAUSR -c "DROP DATABASE xwiki$XWDBSFX;"
+            psql -U $XWDBAUSR -c "DROP USER xwiki$XWDBSFX;"
+            echo "## Creating user and database xwiki$XWDBSFX"
+            psql -U $XWDBAUSR -c "CREATE USER xwiki$XWDBSFX PASSWORD 'xwiki$XWDBSFX' VALID UNTIL 'infinity';"
+            psql -U $XWDBAUSR -c "CREATE DATABASE xwiki$XWDBSFX WITH OWNER = xwiki$XWDBSFX ENCODING = 'UNICODE' TABLESPACE = pg_default;" 
+            ;;
+        oracle)
+            XWDBLIST=`sqlplus -s $XWDBAUSR AS SYSDBA << EOF | xargs
+SET HEADING OFF
+SET PAGESIZE 0
+SET NEWPAGE 0
+select username from all_users where username like 'XWIKI${XWDBSFX^^}%';
+EOF`
+            if [[ ! -z $XWDBLIST ]]; then
+                echo "## Dropping users $XWDBLIST"
+                for XWDBS in $XWDBLIST; do
+                    sqlplus -s $XWDBAUSR AS SYSDBA << EOF 
+drop user $XWDBS cascade;
+EOF
+                done
+            fi
+            if [[ ! -r $XWIMPORT ]]; then
+                echo "## Creating user xwiki$XWDBSFX"
+                sqlplus -s $XWDBAUSR AS SYSDBA << EOF 
+create user xwiki$XWDBSFX identified by xwiki$XWDBSFX;
+grant all privileges to xwiki$XWDBSFX;
+EOF
+            fi
+            ;;
+    esac
+
+    if [[ -r $XWIMPORT ]]; then
+        echo "## Import $XWIMPORT dump"
+        case $XWDB in
+            mysql)
+                mysql -u$XWDBAUSR -p$XWDBAPASS < $XWIMPORT
+                ;;
+            psql)
+                psql -U $XWDBAUSR -d xwiki$XWDBSFX -f $XWIMPORT
+                ;;
+            oracle)
+                initoradump $XWIMPORT
+                impdp system/xwiki directory=xwiki${XWDBSFX}dir dumpfile=database.dmp
+                ;;
+            hsqldb)
+                rm -rf $XWFOLDER/$XWIKIDATA/$XWIKIDATABASE
+                mkdir $XWFOLDER/$XWIKIDATA/$XWIKIDATABASE
+                unzip -q $XWIMPORT -d $XWFOLDER/$XWIKIDATA/$XWIKIDATABASE
+                ;;
+        esac
+    fi
+}
+
+####################
+### Export database
+exportdb() {
+    case $XWDB in
+        mysql)
+            XWDBLIST=`mysql -u$XWDBAUSR -p$XWDBAPASS -e "show databases" -s -s | grep xwiki$XWDBSFX | xargs`
+            echo "## Backing up databases $XWDBLIST into $XWBACKUP"
+            mysqldump -u$XWDBAUSR -p$XWDBAPASS --opt -B $XWDBLIST > $XWBACKUP
+            ;;
+        psql)
+            echo "## Backing up database xwiki$XWDBSFX into $XWBACKUP"
+            pg_dump -U $XWDBAUSR xwiki$XWDBSFX > $XWBACKUP
+            ;;
+        oracle)
+            XWDBLIST=`sqlplus -s $XWDBAUSR AS SYSDBA << EOF | xargs
+SET HEADING OFF
+SET PAGESIZE 0
+SET NEWPAGE 0
+select username from all_users where username like 'XWIKI${XWDBSFX^^}%';
+EOF`
+            echo "## Backing up databases ${XWDBLIST// /,} into $XWBACKUP"
+            initoradump $XWBACKUP "clean"
+            expdp system/xwiki schemas=${XWDBLIST// /,} directory=xwiki${XWDBSFX}dir dumpfile=database.dmp
+            ;;
+        hsqldb)
+            echo "## Backing up databases $XWFOLDER/data/database into $XWBACKUP"
+            rm -f $XWBACKUP
+            zip -q -j $XWBACKUP $XWFOLDER/$XWIKIDATA/$XWIKIDATABASE/*
+            ;;
+    esac
+}
+
+#################################
+### Edit hibernate configuration
+configdb() {
+    echo "## Configuring database into $XWFOLDER/$XWHIBCFG"
+    mv $XWFOLDER/$XWHIBCFG $XWFOLDER/$XWHIBCFG.orig
+
+    ## Comment default configuration
+    ## Uncomment required DB configuration
+    ## Replace url, username, password and dialect appropriately
+    sed -e '/<!-- Configuration for the default database./,/<!-- MySQL configuration./ {
+        /-->/ d
+        /<!-- MySQL configuration./ i\
+    -->
+    }' -e '/<!-- '$XWDBCFG' configuration./,/-->/ {
+        /<!-- '$XWDBCFG' configuration./,/<property / {
+            /<property / i\
+    -->
+        }
+        /<property name="connection.url">/ c\
+    <property name="connection.url">'$XWDBURL'</property>
+        /<property name="connection.username">/ c\
+    <property name="connection.username">xwiki'$XWDBSFX'</property>
+        /<property name="connection.password">/ c\
+    <property name="connection.password">xwiki'$XWDBSFX'</property>
+        /<property name="dialect">/ c\
+    <property name="dialect">'$XWDBDIALECT'</property>
+        /-->/ d
+    }' <$XWFOLDER/$XWHIBCFG.orig >$XWFOLDER/$XWHIBCFG
+}
+
+#############################
+### Edit XWiki configuration
+configxwiki() {
+    if [[ $XWDB != "psql" ]]; then
+        # Use empty main db name, and set db.prefix
+        mv $XWFOLDER/$XWIKICFG $XWFOLDER/$XWIKICFG.orig
+        echo "## Configuring $XWIKICFG to prefix db names (for tester isolation)"
+        sed -e '/# xwiki.db=xwiki/ c\
+xwiki.db=
+            /# xwiki.db.prefix=/ c\
+xwiki.db.prefix=xwiki'$XWDBSFX'
+            ' <$XWFOLDER/$XWIKICFG.orig >$XWFOLDER/$XWIKICFG
+    fi
+    if [[ ! -z $XWRELEASE ]]; then
+        # configure the snapshot repository 
+        mv $XWFOLDER/$XWIKIPROPS $XWFOLDER/$XWIKIPROPS.orig
+        echo "## Configuring $XWIKIPROPS to use snapshot repository"
+        sed -e 's/# extension\.repositories=maven-xwiki-snapshot:/extension\.repositories=maven-xwiki-snapshot:/' <$XWFOLDER/$XWIKIPROPS.orig >$XWFOLDER/$XWIKIPROPS
+    fi
+}
+
+# Parse command line arguments
+while getopts ":hb:B:d:e:f:i:I:kl:L:np:r:s:tu:U:v:wz" OPT; do
+    case $OPT in
+        b)  # Set export backup file (or folder for oracle)
+            XWBACKUP=$OPTARG
+            ;;
+        B)  # Set export backup file (or folder for oracle) and prevent anything but export
+            XWBACKUP=$OPTARG
+            XWSTART="no"
+            XWCLEAR="no"
+            XWUNZIP="no"
+            ;;
+        d)  # Set database product to use
+            XWDATABASE=$OPTARG
+            ;;
+        e)  # Set distribution (enterprise or manager)
+            XWDISTRIB=$OPTARG
+            ;;
+        f)  # Set distribution database package (hsqldb or mysql)
+            XWDBPFX=$OPTARG
+            ;;
+        i)  # Set import file (or folder for oracle)
+            XWIMPORT=$OPTARG
+            ;;
+        I)  # Set import file (or folder for oracle) and prevent anything but import
+            XWIMPORT=$OPTARG
+            XWSTART="no"
+            XWUNZIP="no"
+            ;;
+        h)  # Display usage and current atgument values
+            usage
+            exit 0
+            ;;
+        k)  # Prevent database clearing or import
+            XWCLEAR="no"
+            ;;
+        l)  # Install a saved version of the data folder
+            XWDATAIMP=$OPTARG
+            ;;
+        L)  # Install a saved version of the data folder (not starting the wiki)
+            XWDATAIMP=$OPTARG
+            XWCLEAR="no"
+            XWSTART="no"
+            XWUNZIP="no"
+            ;;
+        n)  # Prevent running XWiki
+            XWSTART="no"
+            ;;
+        p)  # Set jetty listening port
+            XWPORT=$OPTARG
+            ;;
+        r)  # Set snapshot version
+            XWRELEASE=$OPTARG
+            ;;
+        s)  # Set suffix used for database name
+            XWDBSFX=$OPTARG
+            ;;
+        t)  # Set jetty stop port
+            XWSTOP=$OPTARG
+            ;;
+        u)  # Save the data folder
+            XWDATABKP=$OPTARG
+            ;;
+        U)  # Save the data folder (not doing anything elsei but export)
+            XWDATABKP=$OPTARG
+            XWSTART="no"
+            XWCLEAR="no"
+            XWUNZIP="no"
+            ;;
+        v)  # Set XWiki version
+            XWVERSION=$OPTARG
+            ;;
+        w)  # Allow downloading package
+            XWDOWNLOAD="yes"
+            ;;
+        z)  # Prevent zip deployment and configuration
+            XWUNZIP="no"
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            usage
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." >&2
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+# Init DB parameters
+dbparam
+
+# Choose package
+if [[ -z $XWDBPFX ]]; then
+    if [[ $XWDISTRIB == "enterprise" ]]; then
+        XWDBPFX="hsqldb"
+    else
+        XWDBPFX="mysql"
+    fi
+fi
+
+# Folder the zip is supposed to create
+XWFOLDER="xwiki-$XWDISTRIB-jetty-$XWDBPFX-$XWVERSION"
+# Name fo the zip
+XWZIPNAME="xwiki-$XWDISTRIB-jetty-$XWDBPFX-$XWVERSION"
+
+# Add snapshot version to folder and zip name
+if [[ -z $XWRELEASE ]]; then
+    XWZIPNAME="$XWZIPNAME.zip"
+    XWVERSIONLABEL="release $XWVERSION"
+else
+    XWZIPNAME="$XWZIPNAME-$XWRELEASE.zip"
+    XWFOLDER="$XWFOLDER-SNAPSHOT"
+    XWVERSIONLABEL="snapshot $XWVERSION-$XWRELEASE"
+fi
+
+# Check that an existing XWiki instance is not already running in target folder
+if [[ -f $XWFOLDER/xwiki.lck ]]; then
+    echo "XWiki is running in $XWFOLDER and cannot be reinstalled. Stop it first!"
+    exit 1
+fi
+
+echo "# Testing XWiki $XWVERSIONLABEL (jetty-$XWDBPFX distribution) on $XWDBLABEL database"
+
+# Download the Zip file if missing and download is allowed
+if [[ $XWDOWNLOAD = "yes" && ! -r $XWZIPNAME ]]; then
+    echo "## Downloading $XWZIPNAME..."
+    if [[ -z $XWRELEASE ]]; then
+        wget http://maven.xwiki.org/releases/org/xwiki/$XWDISTRIB/xwiki-$XWDISTRIB-jetty-$XWDBPFX/$XWVERSION/$XWZIPNAME
+    else
+        wget http://maven.xwiki.org/snapshots/org/xwiki/$XWDISTRIB/xwiki-$XWDISTRIB-jetty-$XWDBPFX/$XWVERSION-SNAPSHOT/$XWZIPNAME
+    fi
+fi
+
+# Unzip and check integrity
+if [[ $XWUNZIP != "no" ]]; then
+    unzippkg
+    if [[ $XWDB != "hsqldb" && $XWDBPFX == "hsqldb" && -d $XWFOLDER/$XWIKIDATA ]]; then
+        echo "## Removing HSQLDB data folder since we are testing another database"
+        rm -rf $XWFOLDER/$XWIKIDATA
+    fi
+elif [[ ! -d $XWFOLDER ]]; then
+    echo "Cannot found a deployed application in $XWFOLDER"
+fi
+
+# Unzip data folder
+if [[ -r $XWDATAIMP ]]; then
+    echo "## Restoring permanent directory $XWFOLDER/$XWIKIDATA from $XWDATAIMP"
+    if [[ $XWDB == "hsqldb" && -d $XWFOLDER/$XWIKIDATA/$XWIKIDATABASE ]]; then
+        echo "## (Existing HSQLDB is preserved during this operation)"
+        mv $XWFOLDER/$XWIKIDATA/$XWIKIDATABASE $XWFOLDER
+    fi
+    rm -rf $XWFOLDER/$XWIKIDATA
+    unzip -q $XWDATAIMP -d $XWFOLDER/$XWIKIDATA
+    if [[ $XWDB == "hsqldb" && -d $XWFOLDER/$XWIKIDATABASE ]]; then
+        mv $XWFOLDER/$XWIKIDATABASE $XWFOLDER/$XWIKIDATA
+    fi
+fi
+
+# Configure database
+if [[ $XWCLEAR = "yes" ]]; then
+    resetdb
+fi
+if [[ $XWDB != "hsqldb" ]]; then
+    if [[ $XWUNZIP != "no" ]]; then
+        configdb
+        configxwiki
+        if [[ $XWDB != $XWDBPFX ]]; then
+            echo "## Copying required JDBC driver..."
+            cp $XWJDBC $XWFOLDER/$XWIKILIB
+        fi
+        if [[ $XWDATABASE == "mysql-myisam" ]]; then
+            echo "## Copying required MySQL5 MyISAM dialect..."
+            mkdir -p $XWFOLDER/$XWIKIDIALECTCLASSES
+            cp $XWDBDIALECTCLASS $XWFOLDER/$XWIKIDIALECTCLASSES
+        fi
+    fi
+fi
+
+# Start XWiki and wait
+if [[ $XWSTART = "yes" ]]; then
+    echo "## Starting the wiki..."
+    ($XWFOLDER/$XWIKISTART $XWPORT $XWSTOP) & XWIKIPID=$!
+
+    trap stopxwiki INT HUP TERM
+
+    stopxwiki() {
+        ($XWFOLDER/$XWIKISTOP $XWSTOP)
+    }
+
+    wait $XWIKIPID
+    echo "## XWiki has ended."
+fi
+
+# Proceed to export
+if [[ ! -z $XWBACKUP ]]; then
+    exportdb
+fi
+
+# Backup data folder
+if [[ ! -z $XWDATABKP ]]; then
+    echo "## Saving permanent directory $XWFOLDER/$XWIKIDATA to $XWDATABKP"
+    rm -f $XWDATABKP
+    XWDATAZIP=`pwd`/$XWDATABKP
+    cd $XWFOLDER/$XWIKIDATA
+    zip -q -r $XWDATAZIP * -x $XWIKIDATABASE/\*
+fi
+
+# Cleanup PostgreSQL password
+export PGPASSWORD=
+
+exit 0
