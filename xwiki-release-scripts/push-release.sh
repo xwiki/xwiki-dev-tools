@@ -497,25 +497,20 @@ function create_purl() {
   echo -e "\033[0;32m* Creating PURL for the release notes\033[0m"
   authenticate_purl
 
-  if [[ $RELEASE_TYPE == "stable" ]]
-  then
-    BLOGPOST_URL="XWiki Enterprise and XWiki Enterprise Manager ${PRETTY_VERSION} Released"
-  else
-    BLOGPOST_URL="XWiki Enterprise ${PRETTY_VERSION} Released"
-  fi
+  BLOGPOST_URL="XWiki ${PRETTY_VERSION} Released"
   BLOGPOST_URL=`echo ${BLOGPOST_URL} | sed -e 's/\.//g'`
   BLOGPOST_URL=`urlencode "${BLOGPOST_URL}"`
   BLOGPOST_URL="http://www.xwiki.org/xwiki/bin/Blog/${BLOGPOST_URL}"
 
   curl -s -o /dev/null -X POST --data "maintainers=${P_U}" --data-urlencode "target=${BLOGPOST_URL}" --data "type=302" \
-    -H "Cookie: ${P_AUTH}" http://purl.org/admin/purl/xwiki/rn/XWiki${TINY_VERSION}
+    -H "Cookie: ${P_AUTH}" http://purl.org/admin/purl/xwiki/rn/${TINY_VERSION}
 }
 
 # Announce the release on twitter.
 function announce_twitter() {
   echo -e "\033[0;32m* Announcing the release on Twitter\033[0m"
 
-  $PRGDIR/twidge-1.0.6-linux-i386-bin update "#XWiki ${PRETTY_VERSION} has been #released! Check it out: http://purl.org/xwiki/rn/XWiki${TINY_VERSION}"
+  $PRGDIR/twidge-1.0.6-linux-i386-bin update "#XWiki ${PRETTY_VERSION} has been #released! Check it out: http://purl.org/xwiki/rn/${TINY_VERSION}"
 }
 
 #####################################################
