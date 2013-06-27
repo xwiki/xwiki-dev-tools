@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.manager</groupId>
     <artifactId>xwiki-manager</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki-debug-eclipse</artifactId>
@@ -45,7 +45,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.21</version>
+      <version>5.1.25</version>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -55,12 +55,12 @@
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
-      <version>10.9.1.0</version>
+      <version>10.10.1.1</version>
     </dependency>
     <dependency>
-      <groupId>postgresql</groupId>
+      <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>	9.1-901-1.jdbc4</version>
+      <version>9.2-1003-jdbc4</version>
     </dependency>
 
     <!--  -->
