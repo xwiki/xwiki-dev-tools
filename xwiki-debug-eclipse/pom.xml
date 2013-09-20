@@ -25,8 +25,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.manager</groupId>
-    <artifactId>xwiki-manager</artifactId>
+    <groupId>org.xwiki.enterprise</groupId>
+    <artifactId>xwiki-enterprise</artifactId>
     <version>5.2-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
@@ -82,25 +82,6 @@
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-platform-web</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!--  -->
-    <!-- XWiki Enterprise Manager -->
-    <!--  -->
-
-    <dependency>
-      <groupId>org.xwiki.manager</groupId>
-      <artifactId>xwiki-manager-web</artifactId>
-      <version>${manager.version}</version>
-      <type>pom</type>
-      <scope>import</scope>
-      <exclusions>
-        <!-- Only deal with jar dependencies to be able to overwrite them by Eclipse project -->
-        <exclusion>
-          <groupId>org.xwiki.enterprise</groupId>
-          <artifactId>xwiki-enterprise-web</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
