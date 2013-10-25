@@ -68,7 +68,7 @@ function check_env() {
   fi
 
   # Check that we're in the right directory
-  if [[ ! -d xwiki-commons || ! -d xwiki-rendering || ! -d xwiki-platform || ! -d xwiki-rendering || ! -d xwiki-enterprise || ! -d xwiki-manager ]]
+  if [[ ! -d xwiki-commons || ! -d xwiki-rendering || ! -d xwiki-platform || ! -d xwiki-enterprise ]]
   then
     echo -e "\033[1;31mPlease go to the xwiki-trunks directory where the XWiki sources are checked out\033[0m"
     exit -1
@@ -189,14 +189,7 @@ function update_parent_versions() {
 function release_maven() {
   TEST_SKIP=""
   DB_PROFILE=hsqldb
-  if [[ $PROJECT_NAME == 'xwiki-manager' ]]
-  then
-    DB_PROFILE=mysql
-    TEST_SKIP=-DskipTests
-  elif [[ $PROJECT_NAME == 'xwiki-enterprise' ]]
-  then
-    TEST_SKIP=-DskipTests
-  elif [[ $PROJECT_NAME == 'xwiki-platform' ]]
+  if [[ $PROJECT_NAME == 'xwiki-platform' || $PROJECT_NAME == 'xwiki-enterprise' ]]
   then
     TEST_SKIP=-DskipTests
   fi
@@ -273,7 +266,7 @@ function release_project() {
   cd ..
 }
 
-# Wrapper function that calls release_project for each XWiki project in order: commons, rendering, platform, enterprise, manager.
+# Wrapper function that calls release_project for each XWiki project in order: commons, rendering, platform, enterprise.
 # This is the main function that is called when running the script.
 function release_all() {
   init
@@ -295,10 +288,6 @@ function release_all() {
   echo -e "\033[1;32m    Releasing xwiki-enterprise\033[0m"
   echo              "*****************************"
   release_project xwiki-enterprise
-  echo              "*****************************"
-  echo -e "\033[1;32m    Releasing xwiki-manager\033[0m"
-  echo              "*****************************"
-  release_project xwiki-manager
   echo -e "\033[1;32mAll done!\033[0m"
 }
 
@@ -317,7 +306,7 @@ function display_help() {
   echo "Prerequisite steps:"
   echo "* Configure a proper global .giconfig file holding the release manager's username/email address"
   echo "* Setup a GPG signing key corresponding to the email address above"
-  echo "* Change to the xwiki-trunks directory, where the xwiki-commons, xwiki-rendering, xwiki-platform, xwiki-enterprise and xwiki-manager have been checked out"
+  echo "* Change to the xwiki-trunks directory, where the xwiki-commons, xwiki-rendering, xwiki-platform and xwiki-enterprise have been checked out"
   echo "* [Optional] Export a VERSION shell variable holding the name of the version being released, in the X.Y-milestone-Z format"
   echo "The release script will check and refuse to proceed if these steps haven't been performed."
 }

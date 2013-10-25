@@ -35,19 +35,9 @@ function do_all() {
     ## XWiki Enterprise
     ##
 
-    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/src/main/resources/ || exit -1
+    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/xwiki-enterprise-ui-common/src/main/resources/ || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XE.MainWelcome&app=XE'
-    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/ && mvn xar:format
-
-    ##
-    ## XWiki Enterprise Manager
-    ##
-
-    cd ${XWIKI_TRUNKS}/xwiki-manager/xwiki-manager-ui/src/main/resources/ || exit -1
-    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XEM.XEMtranslations&app=XEM'
-    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XEM.XEMDashboard&app=XEM'
-    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XEM.XEMWelcome&app=XEM'
-    cd ${XWIKI_TRUNKS}/xwiki-manager/xwiki-manager-ui/ && mvn xar:format
+    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/xwiki-enterprise-ui-common/ && mvn xar:format
 
     ##
     ## Wysiwyg 2.0
@@ -116,8 +106,6 @@ function do_all() {
 
     cd ${XWIKI_TRUNKS}/xwiki-enterprise/ || exit -1
     git status
-    cd ${XWIKI_TRUNKS}/xwiki-manager/ || exit -1
-    git status
     cd ${XWIKI_TRUNKS}/xwiki-platform/ || exit -1
     git status
     echo -e "\033[0;32mIf there are untracked files, something probably went wrong.\033[0m"
@@ -142,8 +130,6 @@ function commit() {
     MSG="[release] Updated translations."
     cd ${XWIKI_TRUNKS}/xwiki-enterprise/
     git add . && git commit  -m "${MSG}" && git push
-    cd ${XWIKI_TRUNKS}/xwiki-manager/
-    git add . && git commit  -m "${MSG}" && git push
     cd ${XWIKI_TRUNKS}/xwiki-platform/
     git add . && git commit  -m "${MSG}" && git push
 }
@@ -153,13 +139,10 @@ if [[ $1 == 'commit' ]]; then
 elif [[ $1 == 'clean' ]]; then
     cd ${XWIKI_TRUNKS}/xwiki-enterprise/
     git reset --hard && git clean -dxf
-    cd ${XWIKI_TRUNKS}/xwiki-manager/
-    git reset --hard && git clean -dxf
     cd ${XWIKI_TRUNKS}/xwiki-platform/
     git reset --hard && git clean -dxf
 else
     check_clean xwiki-enterprise
-    check_clean xwiki-manager
     check_clean xwiki-platform
     do_all
 fi
