@@ -280,12 +280,7 @@ function push_ow2() {
   push_ow2_file ${O_U} ${BASE}/org/xwiki/enterprise/xwiki-enterprise-installer-windows/${VERSION}/xwiki-enterprise-installer-windows-${VERSION}.exe
   push_ow2_file ${O_U} ${BASE}/org/xwiki/enterprise/xwiki-enterprise-jetty-hsqldb/${VERSION}/xwiki-enterprise-jetty-hsqldb-${VERSION}.zip
   push_ow2_file ${O_U} ${BASE}/org/xwiki/enterprise/xwiki-enterprise-web/${VERSION}/xwiki-enterprise-web-${VERSION}.war
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/enterprise/xwiki-enterprise-ui-all/${VERSION}/xwiki-enterprise-ui-all-${VERSION}.xar
-
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/manager/xwiki-manager-jetty-mysql/${VERSION}/xwiki-manager-jetty-mysql-${VERSION}.zip
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/manager/xwiki-manager-web/${VERSION}/xwiki-manager-web-${VERSION}.war
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/manager/xwiki-manager-ui/${VERSION}/xwiki-manager-ui-${VERSION}.xar
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/manager/xwiki-manager-ui-all/${VERSION}/xwiki-manager-ui-all-${VERSION}.xar
+  push_ow2_file ${O_U} ${BASE}/org/xwiki/enterprise/xwiki-enterprise-ui-mainwiki-all/${VERSION}/xwiki-enterprise-ui-mainwiki-all-${VERSION}.xar
 }
 
 # Create the releases on OW2.
@@ -335,42 +330,7 @@ function update_ow2() {
 
   # XE XAR
   curl -s -o /dev/null -X POST --form-string "step2=1" \
-    --form-string "userfile2=xwiki-enterprise-ui-all-${VERSION}.xar" \
-    --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
-    -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
-
-  # XEM
-  # Create the package while uploading the first file, the standalone distribution
-  EDIT_RELEASE_URL=`curl -s -X POST --form-string "package_id=428" \
-    --form-string "release_name=xwiki-manager-${VERSION}" \
-    --form-string "release_date=${DATE}" \
-    --form-string "userfile2=xwiki-manager-jetty-mysql-${VERSION}.zip" \
-    --form-string "userfile=" \
-    --form-string "type_id=3000" \
-    --form-string "processor_id=8000" \
-    --form-string "release_notes=${CHANGELOG}" \
-    --form-string "release_changes=${CHANGELOG}" \
-    --form-string "submit=Release File" \
-    -H "Cookie: ${O_AUTH}" \
-    http://forge.ow2.org/project/admin/qrs.php?group_id=170 | grep "editrelease"  | sed -r -e 's/.*You can now <a href="//' -e 's/">.*//' -e 's/&amp;/\&/g'`
-
-  EDIT_RELEASE_URL="http://forge.ow2.org${EDIT_RELEASE_URL}"
-
-  # XEM specific XAR
-  curl -s -o /dev/null -X POST --form-string "step2=1" \
-    --form-string "userfile2=xwiki-manager-ui-${VERSION}.xar" \
-    --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
-    -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
-
-  # XEM full XAR
-  curl -s -o /dev/null -X POST --form-string "step2=1" \
-    --form-string "userfile2=xwiki-manager-ui-all-${VERSION}.xar" \
-    --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
-    -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
-
-  # XEM WAR
-  curl -s -o /dev/null -X POST --form-string "step2=1" \
-    --form-string "userfile2=xwiki-manager-web-${VERSION}.war" \
+    --form-string "userfile2=xwiki-enterprise-ui-mainwiki-all-${VERSION}.xar" \
     --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
     -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
 }
@@ -417,15 +377,8 @@ function announce_ow2() {
   echo -e "\033[0;32m* Announcing the release on OW2\033[0m"
   authenticate_ow2
 
-  if [[ $RELEASE_TYPE == "stable" ]]
-  then
-    SUMMARY="XWiki Enterprise and Enterprise Manager ${PRETTY_VERSION} Released"
-  else
-    SUMMARY="XWiki Enterprise ${PRETTY_VERSION} Released"
-  fi
-
   curl -s -o /tmp/resp -X POST --data "group_id=170" --data "post_changes=1" \
-    --data-urlencode "summary=${SUMMARY}" \
+    --data-urlencode "summary=XWiki ${PRETTY_VERSION} Released" \
     --data-urlencode "description=The XWiki development team is proud to announce the availability of XWiki Enterprise ${PRETTY_VERSION}. ${RELSUMMARY}. " \
     --data-urlencode "details=The XWiki development team is proud to announce the availability of XWiki Enterprise ${PRETTY_VERSION}. $RELNOTES" \
     --data "submit=SUBMIT" \
@@ -437,13 +390,7 @@ function announce_xwiki() {
   echo -e "\033[0;32m* Announcing the release on XWiki.org\033[0m"
   authenticate_xwiki
 
-  if [[ $RELEASE_TYPE == "stable" ]]
-  then
-    SUMMARY="XWiki Enterprise and XWiki Enterprise Manager ${PRETTY_VERSION} Released"
-  else
-    SUMMARY="XWiki Enterprise ${PRETTY_VERSION} Released"
-  fi
-
+  SUMMARY="XWiki ${PRETTY_VERSION} Released"
   BLOGPOST_URL=`echo $SUMMARY | sed -e 's/\.//g'`
   BLOGPOST_URL=`urlencode "$BLOGPOST_URL"`
   # If the blog post exists already, skip this step
@@ -469,9 +416,9 @@ function announce_xwiki() {
     --data-urlencode "Blog.BlogPostClass_hidden=0" \
     --data-urlencode "Blog.BlogPostClass_published=1" \
     --data-urlencode "Blog.BlogPostClass_title=${SUMMARY}" \
-    --data-urlencode "Blog.BlogPostClass_content=The XWiki development team is proud to announce the [[availability>>Main.Download]] of XWiki Enterprise ${PRETTY_VERSION}. `cat ${RELEASE_NOTES} | grep -v ReleaseNotes`
+    --data-urlencode "Blog.BlogPostClass_content=The XWiki development team is proud to announce the [[availability>>Main.Download]] of XWiki ${PRETTY_VERSION}. `cat ${RELEASE_NOTES} | grep -v ReleaseNotes`
 
-See [[the full release notes>>ReleaseNotes.ReleaseNotesXWikiEnterprise${TINY_VERSION}]] for more details." \
+See [[the full release notes>>ReleaseNotes.ReleaseNotesXWiki${TINY_VERSION}]] for more details." \
     ${BLOGPOST_URL}
 }
 
@@ -582,7 +529,7 @@ done
 RELNOTES=`cat $RELEASE_NOTES`
 CHANGELOG=`urlencode "$JIRA_VERSION"`
 CHANGELOG="See http://jira.xwiki.org/secure/IssueNavigator.jspa?reset=true&jqlQuery=category+in+%28%22Top+Level+Projects%22%29+and+fixVersion+in+%28%22${CHANGELOG}%22%29+and+resolution+in+%28%22Fixed%22%29 for more details"
-RELSUMMARY="See http://www.xwiki.org/xwiki/bin/ReleaseNotes/ReleaseNotesXWikiEnterprise${TINY_VERSION} for more details"
+RELSUMMARY="See http://www.xwiki.org/xwiki/bin/ReleaseNotes/ReleaseNotesXWiki${TINY_VERSION} for more details"
 
 type $1 &>/dev/null && $1 || echo "'$1' action doesn't exist"
 
