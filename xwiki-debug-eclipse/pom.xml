@@ -36,9 +36,15 @@
   <description>Custom Eclipse WAR project to debug XWiki</description>
   <properties>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.manager:xwiki-manager-web,org.xwiki.enterprise:xwiki-enterprise-web</xwiki.extension.features>
-    <xwiki.extension.distribution.ui>org.xwiki.manager:xwiki-manager-ui</xwiki.extension.distribution.ui>
-    <xwiki.extension.distribution.wikiui>org.xwiki.enterprise:xwiki-enterprise-ui</xwiki.extension.distribution.wikiui>
+    <xwiki.extension.features>
+        com.xpn.xwiki.products:xwiki-enterprise-web,
+        org.xwiki.manager:xwiki-manager-web,
+        com.xpn.xwiki.products:xwiki-enterprise-manager-web
+    </xwiki.extension.features>
+
+    <!-- The default UI associated to this WAR -->
+    <xwiki.extension.distribution.ui>org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki</xwiki.extension.distribution.ui>
+    <xwiki.extension.distribution.wikiui>org.xwiki.enterprise:xwiki-enterprise-ui-wiki</xwiki.extension.distribution.wikiui>
   </properties>
   <dependencies>
     <!-- Databases -->
