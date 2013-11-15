@@ -61,14 +61,6 @@ function do_all() {
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiCoreResources&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-oldcore/ && mvn xar:format
 
-    ## Workspace
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-workspace/xwiki-platform-workspace-ui/src/main/resources/ || exit -1
-    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.WorkspaceApplication&app=Platform'
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-workspace/xwiki-platform-workspace-ui/ && mvn xar:format
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-workspace/xwiki-platform-workspace-template-features/src/main/resources/ || exit -1
-    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.WorkspaceApplication%2DTemplateTranslations&app=Platform'
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-workspace/xwiki-platform-workspace-template-features/ && mvn xar:format
-
     ## Repository
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-repository/xwiki-platform-repository-server-ui/src/main/resources/ || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.Repository&app=Platform'
@@ -83,11 +75,6 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wiki-manager/xwiki-platform-wiki-manager-ui/src/main/resources/  || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.WikiManager&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wiki-manager/xwiki-platform-wiki-manager-ui/ && mvn xar:format
-
-    ## Wiki Manager
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-application-manager/xwiki-platform-application-manager-ui/src/main/resources/ || exit -1
-    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.ApplicationManager&app=Platform'
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-application-manager/xwiki-platform-application-manager-ui/ && mvn xar:format
 
     ## Sandbox
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-sandbox/src/main/resources/ || exit -1
