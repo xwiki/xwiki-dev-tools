@@ -59,7 +59,6 @@ function do_all() {
     ## Oldcore
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-oldcore/src/main/resources/ || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiCoreResources&app=Platform'
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-oldcore/ && mvn xar:format
 
     ## Repository
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-repository/xwiki-platform-repository-server-ui/src/main/resources/ || exit -1
@@ -119,11 +118,26 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-wiki/src/main/resources/  || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.WikiWikiManagerTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-wiki/ && mvn xar:format
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-default/src/main/resources/  || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.xwiki-platform-wiki-default&app=Platform'
 
+    ##
+    ## Commons
+    ##
+
+    ## Job
+    cd ${XWIKI_TRUNKS}/xwiki-commons/xwiki-commons-core/xwiki-commons-job/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Commons.xwiki-commons-job&app=Commons'
+
+    ## Extension
+    cd ${XWIKI_TRUNKS}/xwiki-commons/xwiki-commons-core/xwiki-commons-extension/xwiki-commons-extension-api/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Commons.xwiki-commons-extension-api&app=Commons'
 
     cd ${XWIKI_TRUNKS}/xwiki-enterprise/ || exit -1
     git status
     cd ${XWIKI_TRUNKS}/xwiki-platform/ || exit -1
+    git status
+    cd ${XWIKI_TRUNKS}/xwiki-commons/ || exit -1
     git status
     echo -e "\033[0;32mIf there are untracked files, something probably went wrong.\033[0m"
 }
