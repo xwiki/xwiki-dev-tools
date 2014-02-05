@@ -513,11 +513,11 @@ fi
 while [[ -z $RELEASE_NOTES ]]
 do
   echo -e "Select a short release notes file:\033[0;32m"
-  read -e -p "$PRGDIR/releasenotes.txt> " RELEASE_NOTES
+  read -e -p "$PRGDIR/releasenotes-${version}.txt> " RELEASE_NOTES
   echo -n -e "\033[0m"
   if [[ -z $RELEASE_NOTES ]]
   then
-    RELEASE_NOTES=$PRGDIR/releasenotes.txt
+    RELEASE_NOTES=$PRGDIR/releasenotes-${version}.txt
   fi
   if [[ ! -f $RELEASE_NOTES ]]
   then
