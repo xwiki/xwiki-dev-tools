@@ -110,6 +110,10 @@
       <version>${platform.version}</version>
     </dependency>
     
+    <!--  -->
+    <!-- Some more extensions -->
+    <!--  -->
+
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-repository-server-api</artifactId>
