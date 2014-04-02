@@ -187,12 +187,8 @@ function update_parent_versions() {
 # Perform the actual maven release.
 # Invoke mvn release:prepare, followed by mvn release:perform, then create a GPG-signed git tag.
 function release_maven() {
-  TEST_SKIP=""
+  TEST_SKIP="-DskipTests"
   DB_PROFILE=hsqldb
-  if [[ $PROJECT_NAME == 'xwiki-platform' || $PROJECT_NAME == 'xwiki-enterprise' ]]
-  then
-    TEST_SKIP=-DskipTests
-  fi
 
   echo -e "\033[0;32m* release:prepare\033[0m"
   ## Note: We don't pass the -DdevelopmentVersion system property since we want to let the user decide what is the new
