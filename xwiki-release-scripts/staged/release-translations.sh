@@ -171,6 +171,8 @@ function commit() {
     git add . && git commit  -m "${MSG}" && git push
     cd ${XWIKI_TRUNKS}/xwiki-platform/
     git add . && git commit  -m "${MSG}" && git push
+    cd ${XWIKI_TRUNKS}/xwiki-commons/
+    git add . && git commit  -m "${MSG}" && git push
 }
 
 if [[ $1 == 'commit' ]]; then
