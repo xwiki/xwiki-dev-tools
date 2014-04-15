@@ -1,7 +1,7 @@
 #!/bin/bash
 BRANCH=master
-USER='XWikiTranslator'
-PASS='<password here>'
+USER="$L10N_USER"
+PASS="$L10N_PASSWORD"
 
 XWIKI_TRUNKS=`pwd`
 
@@ -17,10 +17,12 @@ function do_one() {
 }
 
 function read_user_and_password() {
-    echo -e "\033[0;32mEnter your l10n.xwiki.org credentials:\033[0m"
-    read -e -p "user> " USER
-    read -e -s -p "pass> " PASS
-    echo ""
+    if [[ -z "$USER" || -z "$PASS" ]]; then
+        echo -e "\033[0;32mEnter your l10n.xwiki.org credentials:\033[0m"
+        read -e -p "user> " USER
+        read -e -s -p "pass> " PASS
+        echo ""
+    fi
 
     if [[ -z "$USER" || -z "$PASS" ]]; then
       echo -e "\033[1;31mPlease provide both user and password in order to be able to get the translations from l10n.xwiki.org.\033[0m"
