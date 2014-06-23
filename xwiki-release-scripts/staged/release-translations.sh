@@ -182,8 +182,11 @@ elif [[ $1 == 'clean' ]]; then
     git reset --hard && git clean -dxf
     cd ${XWIKI_TRUNKS}/xwiki-platform/
     git reset --hard && git clean -dxf
+    cd ${XWIKI_TRUNKS}/xwiki-commons/
+    git reset --hard && git clean -dxf
 else
     check_clean xwiki-enterprise
     check_clean xwiki-platform
+    check_clean xwiki-commons
     do_all
 fi
