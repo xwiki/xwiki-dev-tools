@@ -75,14 +75,29 @@ function check_env() {
   fi
 }
 
-# Check that the VERSION variable is defined, and if not, ask for its value
-function check_version() {
+# Check various version related variables
+function check_versions() {
+  # Check version to release
   if [[ -z $VERSION ]]
   then
     echo -e "Which version are you releasing?\033[0;32m"
     read -e -p "> " VERSION
     echo -n -e "\033[0m"
     export VERSION=$VERSION
+  fi
+  # Check next SNAPSHOT version
+  if [[ -z $NEXT_SNAPSHOT_VERSION ]]
+  then
+    VERSION_STUB=`echo $VERSION | cut -c1-3`
+    let NEXT_SNAPSHOT_VERSION=`echo ${VERSION_STUB} | cut -d. -f2`+1
+    NEXT_SNAPSHOT_VERSION=`echo ${VERSION_STUB} | cut -d. -f1`.${NEXT_SNAPSHOT_VERSION}-SNAPSHOT
+    echo "What is the next SNAPSHOT version?"
+    read -e -p "${NEXT_SNAPSHOT_VERSION}> " tmp
+    if [[ $tmp ]]
+    then
+      NEXT_SNAPSHOT_VERSION=${tmp}
+    fi
+    export NEXT_SNAPSHOT_VERSION=$NEXT_SNAPSHOT_VERSION
   fi
 }
 
@@ -164,7 +179,7 @@ function check_branch() {
 # Create a temporary branch to be used for the release, starting from the branch detected by check_branch() and set in the RELEASE_FROM_BRANCH variable.
 function create_release_branch() {
   echo -e "\033[0;32m* Creating release branch\033[0m"
-  git branch --no-track release-${VERSION} origin/${RELEASE_FROM_BRANCH} || exit -2
+  git branch release-${VERSION} origin/${RELEASE_FROM_BRANCH} || exit -2
   git co release-${VERSION} -q
   CURRENT_VERSION=`mvn help:evaluate -Dexpression='project.version' -N | grep -v '\[' | grep -v 'Download' | cut -d- -f1`
 }
@@ -173,7 +188,7 @@ function create_release_branch() {
 # For xwiki-commons updates the value for the commons.version variable.
 # For the other projects it changes the version of the parent in the current repository root pom.
 # The changes will be committed as a new git version.
-function update_parent_versions() {
+function pre_update_parent_versions() {
   echo -e "\033[0;32m* Preparing project for release\033[0m"
   mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$VERSION] -N -q
   sed -e "s/<commons.version>.*<\/commons.version>/<commons.version>${VERSION}<\/commons.version>/" -i pom.xml
@@ -191,12 +206,7 @@ function release_maven() {
   DB_PROFILE=hsqldb
 
   echo -e "\033[0;32m* release:prepare\033[0m"
-  ## Note: We don't pass the -DdevelopmentVersion system property since we want to let the user decide what is the new
-  ## version in development. For example if we're releasing 4.4.1-SNAPSHOT we want the next revision to be
-  ## 4.4.2-SNAPSHOT. Note that we used to pass -DdevelopmentVersion=${CURRENT_VERSION} but we've then decided to
-  ## using a different version scheme for branches, see http://markmail.org/thread/pgs6l7eba462fcan
-  ## TODO: Compute it automatically in the future
-  mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,standalone -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
+  mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,standalone -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
   echo -e "\033[0;32m* release:perform\033[0m"
   mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,standalone ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests ${TEST_SKIP} -Dgpg.passphrase='${GPG_PASSPHRASE}'" -Dgpg.passphrase="${GPG_PASSPHRASE}" || exit -2
@@ -204,6 +214,25 @@ function release_maven() {
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git co ${TAG_NAME} -q
   git tag -s -f -m "Tagging ${TAG_NAME}" ${TAG_NAME}
+}
+
+# Update the root project's parent version and version variables, if needed.
+# For xwiki-commons updates the value for the commons.version variable.
+# For the other projects it changes the version of the parent in the current repository root pom.
+# The changes will be committed as a new git version.
+function post_update_parent_versions() {
+  echo -e "\033[0;32m* Update parent after release\033[0m"
+  mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_SNAPSHOT_VERSION] -N -q
+  sed -e "s/<commons.version>${VERSION}<\/commons.version>/<commons.version>${NEXT_SNAPSHOT_VERSION}<\/commons.version>/" -i pom.xml
+
+  git add pom.xml
+  git ci -m "[release] Update parent after release ${TAG_NAME}" -q
+}
+
+# Push release branch to origin
+function push_release() {
+  echo -e "\033[0;32m* Push release branch\033[0m"
+  git push origin origin/${RELEASE_FROM_BRANCH}
 }
 
 # Generate a clirr report. Requires xsltproc to work properly.
@@ -254,8 +283,10 @@ function release_project() {
   update_sources
   check_branch
   create_release_branch
-  update_parent_versions
+  pre_update_parent_versions
   release_maven
+  post_update_parent_versions
+  push_release
   clirr_report
   post_cleanup
   push_tag
@@ -267,7 +298,7 @@ function release_project() {
 function release_all() {
   init
   check_env
-  check_version
+  check_versions
   echo              "*****************************"
   echo -e "\033[1;32m    Releasing xwiki-commons\033[0m"
   echo              "*****************************"
