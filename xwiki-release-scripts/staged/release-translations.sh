@@ -133,6 +133,14 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-skinx/src/main/resources/  || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.SkinExtensions&app=Platform'
 
+    ## Extension
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-handlers/xwiki-platform-extension-handler-xar/src/main/resources/  || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.xwiki-platform-extension-handler-xar&app=Platform'
+
+    ## Localization
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-localization/xwiki-platform-localization-macro/src/main/resources/  || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.LocalizationMacro&app=Platform'
+
     ##
     ## Commons
     ##
