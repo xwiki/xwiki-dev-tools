@@ -101,6 +101,11 @@
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-colibri/src/main/resources/colibri</locationURI>
 		</link>
 		<link>
+			<name>src/main/webapp/skins/flamingo</name>
+			<type>2</type>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-flamingo/src/main/resources/flamingo</locationURI>
+		</link>
+		<link>
 			<name>src/main/webapp/resources/css/xwiki-min.css</name>
 			<type>1</type>
 			<locationURI>PROJECT_LOC/src/main/custom/css/xwiki-min.css</locationURI>
