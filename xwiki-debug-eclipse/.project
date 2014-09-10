@@ -103,7 +103,7 @@
 		<link>
 			<name>src/main/webapp/skins/flamingo</name>
 			<type>2</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-flamingo/src/main/resources/flamingo</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/src/main/resources/flamingo</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/resources/css/xwiki-min.css</name>
