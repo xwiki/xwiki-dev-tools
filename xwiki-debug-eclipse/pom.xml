@@ -51,7 +51,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.32</version>
+      <version>5.1.33</version>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -118,6 +118,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-repository-server-api</artifactId>
       <version>${platform.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-repository-maven-snapshots</artifactId>
+      <version>${commons.version}</version>
     </dependency>
   </dependencies>
 
