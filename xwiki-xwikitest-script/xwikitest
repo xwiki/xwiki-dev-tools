@@ -620,13 +620,20 @@ fi
 # Start XWiki and wait
 if [[ $XWSTART = "yes" ]]; then
     echo "## Starting the wiki..."
-    ($XWFOLDER/$XWIKISTART $XWPORT $XWSTOP) & XWIKIPID=$!
+    if [[  "$XWVERSION" = "`echo -e "$XWVERSION\n6.2-rc-1" | sort -V | head -n1`" ]]; then
+        ($XWFOLDER/$XWIKISTART $XWPORT $XWSTOP) & XWIKIPID=$!
+        stopxwiki() {
+            ($XWFOLDER/$XWIKISTOP $XWSTOP)
+        }
+    else
+        ($XWFOLDER/$XWIKISTART -p $XWPORT -sp $XWSTOP) & XWIKIPID=$!
+        stopxwiki() {
+            ($XWFOLDER/$XWIKISTOP -p $XWPORT -sp $XWSTOP)
+        }
+    fi
 
     trap stopxwiki INT HUP TERM
 
-    stopxwiki() {
-        ($XWFOLDER/$XWIKISTOP $XWSTOP)
-    }
 
     wait $XWIKIPID
     echo "## XWiki has ended."
