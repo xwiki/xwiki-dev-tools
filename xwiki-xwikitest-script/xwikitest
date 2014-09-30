@@ -115,7 +115,7 @@ XWDISTRIB="enterprise"
 # Database name to used to retrieve the distribution package
 XWDBPFX=""
 # XWiki version
-XWVERSION="4.5.3"
+XWVERSION="6.2.1"
 # Should we download if missing
 XWDOWNLOAD="no"
 # Should we deploy and configure
@@ -123,7 +123,7 @@ XWUNZIP="yes"
 # Suffix used for user databases, default to current user name
 XWDBSFX=${USER,,}
 # Database to deploy for
-XWDATABASE="mysql-innodb"
+XWDATABASE="hsqldb"
 # Clear database on startup, default is true, overidable by -k
 XWCLEAR="yes"
 # Start XWiki, default is true, overidable by -n
