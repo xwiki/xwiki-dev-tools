@@ -115,6 +115,11 @@
 			<type>1</type>
 			<locationURI>PROJECT_LOC/src/main/custom/js/xwiki/xwiki-min.js</locationURI>
 		</link>
+		<link>
+			<name>src/main/webapp/skins/flamingo/less/bootstrap</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/src/main/custom/boostrap</locationURI>
+		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
