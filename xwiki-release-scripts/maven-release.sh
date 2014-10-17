@@ -258,7 +258,8 @@ function clirr_report() {
 function post_cleanup() {
   echo -e "\033[0;32m* Cleanup\033[0m"
   # Temporarily move the clirr report to a different place, so that we can safely clean up the whole source tree
-  mv clirr.txt /tmp/clirr.txt
+## TODO: put back when fixed
+#  mv clirr.txt /tmp/clirr.txt
   git reset --hard -q
   git co master -q
   # Delete the release branch
@@ -266,7 +267,8 @@ function post_cleanup() {
   git reset --hard -q
   git clean -dxfq
   # Move back the clirr report
-  mv /tmp/clirr.txt clirr.txt
+## TODO: put back when fixed
+#   mv /tmp/clirr.txt clirr.txt
 }
 
 # Push the signed tag to the upstream repository.
@@ -287,7 +289,8 @@ function release_project() {
   release_maven
   post_update_parent_versions
   push_release
-  clirr_report
+## TODO: put back when fixed
+#  clirr_report
   post_cleanup
   push_tag
   cd ..
@@ -326,7 +329,8 @@ function display_help() {
   echo "* Create a release branch"
   echo "* Update the root project's parent version and the commons.version variable, if needed"
   echo "* Invoke the maven release process (mvn release:prepare and mvn release:perform)"
-  echo "* Generate a clirr report"
+## TODO: put back when fixed
+#  echo "* Generate a clirr report"
   echo "* Create GPG-signed tags and push them to the upstream repository"
   echo "* [Optional] Branch the current master into a stable release and update the master to the next version"
   echo ""
