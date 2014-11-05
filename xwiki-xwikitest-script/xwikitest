@@ -438,7 +438,7 @@ xwiki.db.prefix=xwiki'$XWDBSFX'
 }
 
 # Parse command line arguments
-while getopts ":hb:B:d:e:f:i:I:kl:L:np:r:s:tu:U:v:wz" OPT; do
+while getopts ":hb:B:d:e:f:i:I:kl:L:np:r:s:t:u:U:v:wz" OPT; do
     case $OPT in
         b)  # Set export backup file (or folder for oracle)
             XWBACKUP=$OPTARG
