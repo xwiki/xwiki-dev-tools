@@ -32,44 +32,63 @@ ROOT_REP=/home/maven/public_html
 SNAPSHOTS_REP="snapshots"
 RELEASES_REP="releases"
 STABLE_REP="stable"
-SUPERSTABLE_REP="superstable"
-SUPERSTABLE_BRANCH="5.4"
+LTS_REP="lts"
+LTS_BRANCH="5.4"
 GPG_KEY="0398E391"
 
 cd "$ROOT_REP"
 
-## superstable
-if [ -d superstable ]; then
-  echo "Generates super stable index"
+function link_package ()
+{
+  local package=$1
+  local repositoryName=$2
 
-  rm -rf /tmp/superstable_scanpackages
-  mkdir -p /tmp/superstable_scanpackages/$RELEASES_REP
+  local basepath=`dirname $package`
+  local basepath=${basepath##$ROOT_REP/}
+  local basepath=${basepath%*/}
+  mkdir -p $basepath
+  local fullpath=`readlink -f $package`
+  ln -sf $fullpath "/tmp/${repositoryName}_scanpackages/$basepath"
+}
 
-  function link_package ()
-  {
-    basepath=`dirname $1`
-    basepath=${basepath##$ROOT_REP/}
-    basepath=${basepath%*/}
-    mkdir -p $basepath
-    fullpath=`readlink -f $1`
-    ln -sf $fullpath "/tmp/superstable_scanpackages/$basepath"
-  }
+function link_packages ()
+{
+  local pattern=$1
+  local repositoryName=$2
 
-  cd /tmp/superstable_scanpackages/
-
-  for i in $(find "$ROOT_REP/$RELEASES_REP/org" -name "*-$SUPERSTABLE_BRANCH.*.deb" ) ; do
-    link_package $i
+  for i in $(find "$ROOT_REP/$RELEASES_REP/org" -name $pattern ) ; do
+    link_package $i $repositoryName
   done
+}
 
-  dpkg-scanpackages -m $RELEASES_REP /dev/null > "$ROOT_REP/$SUPERSTABLE_REP/Packages.tmp" && mv -f "$ROOT_REP/$SUPERSTABLE_REP/Packages.tmp" "$ROOT_REP/$SUPERSTABLE_REP/Packages"
-  gzip -9c "$ROOT_REP/$SUPERSTABLE_REP/Packages" > "$ROOT_REP/$SUPERSTABLE_REP/Packages.gz.tmp" && mv -f "$ROOT_REP/$SUPERSTABLE_REP/Packages.gz.tmp" "$ROOT_REP/$SUPERSTABLE_REP/Packages.gz"
+function update_repository ()
+{
+  local repositoryName=$1
+  local repositoryPattern=$2
 
-  cd "$ROOT_REP"
+  if [ -d $repositoryName ]; then
+    echo "Generates $repositoryName index"
 
-  rm -rf $SUPERSTABLE_REP/Release $SUPERSTABLE_REP/Release.gpg
-  apt-ftparchive -c=$SUPERSTABLE_REP/Release.conf release $SUPERSTABLE_REP > $SUPERSTABLE_REP/Release
-  gpg -abs --default-key $GPG_KEY -o $SUPERSTABLE_REP/Release.gpg $SUPERSTABLE_REP/Release
-fi
+    rm -rf /tmp/${repositoryName}_scanpackages
+    mkdir -p /tmp/${repositoryName}_scanpackages/$RELEASES_REP
+
+    cd /tmp/${repositoryName}_scanpackages/
+
+    link_packages $repositoryPattern $repositoryName
+
+    dpkg-scanpackages -m $RELEASES_REP /dev/null > "$ROOT_REP/$repositoryName/Packages.tmp" && mv -f "$ROOT_REP/$repositoryName/Packages.tmp" "$ROOT_REP/$repositoryName/Packages"
+    gzip -9c "$ROOT_REP/$repositoryName/Packages" > "$ROOT_REP/$repositoryName/Packages.gz.tmp" && mv -f "$ROOT_REP/$repositoryName/Packages.gz.tmp" "$ROOT_REP/$repositoryName/Packages.gz"
+
+    cd "$ROOT_REP"
+
+    rm -rf $repositoryName/Release $repositoryName/Release.gpg
+    apt-ftparchive -c=$repositoryName/Release.conf release $repositoryName > $repositoryName/Release
+    gpg -abs --default-key $GPG_KEY -o $repositoryName/Release.gpg $repositoryName/Release
+  fi
+}
+
+## LTS
+update_repository $LTS_REP "*-${LTS_BRANCH}.*.deb"
 
 ## stable
 if [ -d stable ]; then
@@ -78,25 +97,10 @@ if [ -d stable ]; then
   rm -rf /tmp/stable_scanpackages
   mkdir -p /tmp/stable_scanpackages/$RELEASES_REP
 
-  function link_package ()
-  {
-    basepath=`dirname $1`
-    basepath=${basepath##$ROOT_REP/}
-    basepath=${basepath%*/}
-    mkdir -p $basepath
-    fullpath=`readlink -f $1`
-    ln -sf $fullpath "/tmp/stable_scanpackages/$basepath"
-  }
-
   cd /tmp/stable_scanpackages/
 
-  for i in $(find "$ROOT_REP/$RELEASES_REP/org" -name "*.[0-9][0-9].deb" ) ; do
-    link_package $i
-  done
-
-  for i in $(find "$ROOT_REP/$RELEASES_REP/org" -name "*.[0-9].deb" ) ; do
-    link_package $i
-  done
+  link_packages "*.[0-9][0-9].deb" $STABLE_REP
+  link_packages "*.[0-9].deb" $STABLE_REP
 
   dpkg-scanpackages -m $RELEASES_REP /dev/null > "$ROOT_REP/$STABLE_REP/Packages.tmp" && mv -f "$ROOT_REP/$STABLE_REP/Packages.tmp" "$ROOT_REP/$STABLE_REP/Packages"
   gzip -9c "$ROOT_REP/$STABLE_REP/Packages" > "$ROOT_REP/$STABLE_REP/Packages.gz.tmp" && mv -f "$ROOT_REP/$STABLE_REP/Packages.gz.tmp" "$ROOT_REP/$STABLE_REP/Packages.gz"
