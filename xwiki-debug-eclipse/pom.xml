@@ -124,6 +124,11 @@
       <artifactId>xwiki-commons-extension-repository-maven-snapshots</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-stream-confluencexml</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
