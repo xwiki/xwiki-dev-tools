@@ -76,7 +76,7 @@
     <dependency>
       <groupId>org.xwiki.enterprise</groupId>
       <artifactId>xwiki-enterprise-web</artifactId>
-      <version>${enterprise.version}</version>
+      <version>${project.version}</version>
       <type>pom</type>
       <scope>import</scope>
       <exclusions>
@@ -132,7 +132,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
