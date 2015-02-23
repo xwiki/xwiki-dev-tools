@@ -150,6 +150,11 @@ function do_all() {
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.MailTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-mail/xwiki-platform-mail-ui/ && format_xar
 
+    ## Index
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-index/xwiki-platform-index-ui/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiDocumentTreeTranslations&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-index/xwiki-platform-index-ui/ && format_xar
+
     ##
     ## Commons
     ##
