@@ -176,6 +176,11 @@ function do_all() {
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.FlamingoThemesCodeTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-theme/ && format_xar
 
+    ## Activity Stream
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-activitystream/xwiki-platform-activitystream-ui/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.MainActivityTranslations&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-activitystream/xwiki-platform-activitystream-ui/ && format_xar
+
     ##
     ## Commons
     ##
