@@ -168,7 +168,12 @@ function do_all() {
     ## Icon
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-icon/xwiki-platform-icon-ui/src/main/resources/ || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.IconThemesCodeTranslations&app=Platform'
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-icon/xwiki-platform-icon-ui && format_xar
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-icon/xwiki-platform-icon-ui/ && format_xar
+
+    ## Flamingo
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-theme/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.FlamingoThemesCodeTranslations&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-theme/ && format_xar
 
     ##
     ## Commons
