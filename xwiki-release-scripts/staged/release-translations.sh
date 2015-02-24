@@ -187,6 +187,14 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-user/xwiki-platform-user-directory/xwiki-platform-user-directory-ui/ && format_xar
 
     ##
+    ## Rendering
+    ##
+
+    ## Content Macro
+    cd ${XWIKI_TRUNKS}/xwiki-rendering/xwiki-rendering-macros/xwiki-rendering-macro-content/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Rendering.ContentMacro&app=Rendering'
+
+    ##
     ## Commons
     ##
 
