@@ -1,5 +1,5 @@
 #!/bin/bash
-BRANCH=master
+BRANCH=stable-6.4.x
 USER="$L10N_USER"
 PASS="$L10N_PASSWORD"
 
@@ -146,9 +146,11 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-localization/xwiki-platform-localization-macro/src/main/resources/  || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.LocalizationMacro&app=Platform'
 
-    ## Template
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-template/xwiki-platform-template-api/src/main/resources/  || exit -1
-    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.TemplateMacro&app=Platform'
+    ## Template (introduce in 7.0M1)
+    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-template" ]]; then
+        cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-template/xwiki-platform-template-api/src/main/resources/  || exit -1
+        do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.TemplateMacro&app=Platform'
+    fi
 
     ## Mail
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-mail/xwiki-platform-mail-ui/src/main/resources/ || exit -1
