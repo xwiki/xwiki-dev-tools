@@ -1,5 +1,5 @@
 #!/bin/bash
-BRANCH=stable-6.4.x
+BRANCH=master
 USER="$L10N_USER"
 PASS="$L10N_PASSWORD"
 
