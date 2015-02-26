@@ -216,6 +216,8 @@ function do_all() {
     git status
     cd ${XWIKI_TRUNKS}/xwiki-platform/ || exit -1
     git status
+    cd ${XWIKI_TRUNKS}/xwiki-rendering/ || exit -1
+    git status
     cd ${XWIKI_TRUNKS}/xwiki-commons/ || exit -1
     git status
     echo -e "\033[0;32mIf there are untracked files, something probably went wrong.\033[0m"
@@ -242,6 +244,8 @@ function commit() {
     git add . && git commit  -m "${MSG}" && git push
     cd ${XWIKI_TRUNKS}/xwiki-platform/
     git add . && git commit  -m "${MSG}" && git push
+    cd ${XWIKI_TRUNKS}/xwiki-rendering/
+    git add . && git commit  -m "${MSG}" && git push
     cd ${XWIKI_TRUNKS}/xwiki-commons/
     git add . && git commit  -m "${MSG}" && git push
 }
@@ -253,11 +257,14 @@ elif [[ $1 == 'clean' ]]; then
     git reset --hard && git clean -dxf
     cd ${XWIKI_TRUNKS}/xwiki-platform/
     git reset --hard && git clean -dxf
+    cd ${XWIKI_TRUNKS}/xwiki-rendering/
+    git reset --hard && git clean -dxf
     cd ${XWIKI_TRUNKS}/xwiki-commons/
     git reset --hard && git clean -dxf
 else
     check_clean xwiki-enterprise
     check_clean xwiki-platform
+    check_clean xwiki-rendering
     check_clean xwiki-commons
     do_all
 fi
