@@ -19,9 +19,13 @@
  */
 package org.xwiki.devtools.jira.template;
 
+import java.util.Arrays;
+import java.util.Map;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.atlassian.jira.bc.projectroles.ProjectRoleService;
 import com.atlassian.jira.blueprint.api.AddProjectHook;
 import com.atlassian.jira.blueprint.api.ConfigureData;
 import com.atlassian.jira.blueprint.api.ConfigureResponse;
@@ -38,6 +42,8 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectCategory;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.scheme.Scheme;
+import com.atlassian.jira.security.roles.ProjectRole;
+import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.workflow.WorkflowSchemeManager;
 
 public class XWikiAddProjectHook implements AddProjectHook
@@ -54,7 +60,6 @@ public class XWikiAddProjectHook implements AddProjectHook
     public ConfigureResponse configure(final ConfigureData configureData)
     {
         Project project = configureData.project();
-
 
         // Set Workflow Scheme
         WorkflowSchemeManager workflowSchemeManager = ComponentAccessor.getWorkflowSchemeManager();
@@ -130,6 +135,13 @@ public class XWikiAddProjectHook implements AddProjectHook
             LOGGER.warn(String.format("[XWiki] Failed to find the \"Basic Issue Creation Scheme\" scheme. "
                 + "It is not set for the new project [%s]", project.getName()));
         }
+
+        // Set project committers role to xwiki-committers and contrib-committers
+        ProjectRoleService roleService = ComponentAccessor.getComponentOfType(ProjectRoleService.class);
+        SimpleErrorCollection errorCollection = new SimpleErrorCollection();
+        ProjectRole commmitterRole = roleService.getProjectRoleByName("Committers", errorCollection);
+        roleService.addActorsToProjectRole(Arrays.asList("xwiki-committers", "contrib-committers"), commmitterRole,
+            project, "atlassian-group-role-actor", errorCollection);
 
         return ConfigureResponse.create().setRedirect("/plugins/servlet/project-config/" + project.getKey()
             + "/summary");
