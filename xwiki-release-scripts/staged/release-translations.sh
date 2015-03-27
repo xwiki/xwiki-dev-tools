@@ -146,12 +146,6 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-localization/xwiki-platform-localization-macro/src/main/resources/  || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.LocalizationMacro&app=Platform'
 
-    ## Template (introduce in 7.0M1)
-    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-template" ]]; then
-        cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-template/xwiki-platform-template-api/src/main/resources/  || exit -1
-        do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.TemplateMacro&app=Platform'
-    fi
-
     ## Mail
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-mail/xwiki-platform-mail-ui/src/main/resources/ || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.MailTranslations&app=Platform'
@@ -192,7 +186,20 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-user/xwiki-platform-user-directory/xwiki-platform-user-directory-ui/src/main/resources/ || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiUserDirectoryTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-user/xwiki-platform-user-directory/xwiki-platform-user-directory-ui/ && format_xar
-    
+
+    ## Rating
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-api/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.Ratingmodule&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-ui/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiRatingsTranslations&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-ui/ && format_xar
+
+    ## Template (introduce in 7.0M1)
+    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-template" ]]; then
+        cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-template/xwiki-platform-template-api/src/main/resources/  || exit -1
+        do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.TemplateMacro&app=Platform'
+    fi
+
     ## Skin UI (introduced in 7.0RC1)
     if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ui/" ]]; then
         cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ui/src/main/resources/  || exit -1
