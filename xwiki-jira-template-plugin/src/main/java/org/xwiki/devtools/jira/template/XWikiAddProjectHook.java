@@ -20,7 +20,6 @@
 package org.xwiki.devtools.jira.template;
 
 import java.util.Arrays;
-import java.util.Map;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -140,6 +139,9 @@ public class XWikiAddProjectHook implements AddProjectHook
         ProjectRoleService roleService = ComponentAccessor.getComponentOfType(ProjectRoleService.class);
         SimpleErrorCollection errorCollection = new SimpleErrorCollection();
         ProjectRole commmitterRole = roleService.getProjectRoleByName("Committers", errorCollection);
+        // Make sure to remove any of the groups we wish to add to the Committers role as otherwise the addition fails
+        roleService.removeActorsFromProjectRole(Arrays.asList("xwiki-committers", "contrib-committers"), commmitterRole,
+            project, "atlassian-group-role-actor", errorCollection);
         roleService.addActorsToProjectRole(Arrays.asList("xwiki-committers", "contrib-committers"), commmitterRole,
             project, "atlassian-group-role-actor", errorCollection);
 
