@@ -101,6 +101,8 @@ if [ -d stable ]; then
 
   link_packages "*.[0-9][0-9].deb" $STABLE_REP
   link_packages "*.[0-9].deb" $STABLE_REP
+  link_packages "*[0-9]-[0-9][0-9].deb" $STABLE_REP
+  link_packages "*[0-9]-[0-9].deb" $STABLE_REP
 
   dpkg-scanpackages -m $RELEASES_REP /dev/null > "$ROOT_REP/$STABLE_REP/Packages.tmp" && mv -f "$ROOT_REP/$STABLE_REP/Packages.tmp" "$ROOT_REP/$STABLE_REP/Packages"
   gzip -9c "$ROOT_REP/$STABLE_REP/Packages" > "$ROOT_REP/$STABLE_REP/Packages.gz.tmp" && mv -f "$ROOT_REP/$STABLE_REP/Packages.gz.tmp" "$ROOT_REP/$STABLE_REP/Packages.gz"
