@@ -457,7 +457,7 @@ function create_purl() {
 function announce_twitter() {
   echo -e "\033[0;32m* Announcing the release on Twitter\033[0m"
 
-  $PRGDIR/twidge-1.1.0-linux-i386-bin update "#XWiki ${PRETTY_VERSION} has been #released! Check it out: http://purl.org/xwiki/rn/${TINY_VERSION}"
+  twidge update "#XWiki ${PRETTY_VERSION} has been #released! Check it out: http://purl.org/xwiki/rn/${TINY_VERSION}"
 }
 
 #####################################################
