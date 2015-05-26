@@ -207,6 +207,12 @@ function do_all() {
         cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ui/ && format_xar
     fi
 
+    ## Jetty listener
+    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/" ]]; then
+        cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/src/main/resources/org/xwiki/tools/jetty/listener/  || exit -1
+        do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.Jettylistener&app=Platform'
+    fi
+
     ##
     ## Rendering
     ##
