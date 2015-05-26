@@ -131,7 +131,13 @@ xwiki.tags=1
 # xwiki.store.cache=1
 
 #-# Maximum number of documents to keep in the cache.
-# xwiki.store.cache.capacity=100
+#-# The default is 500.
+# xwiki.store.cache.capacity=500
+
+#-# Maximum number of documents to keep in the cache indicating if a document exist.
+#-# Since this cache contain only boolean it can be very big without taking much memory.
+#-# The default is 10000.
+# xwiki.store.cache.pageexistcapacity=10000
 
 #-# [Since 1.6M1]
 #-# Force the database name for the main wiki.
@@ -220,9 +226,11 @@ xwiki.store.migration=1
 #-# For example:
 #-# xwiki.url.protocol=https
 # xwiki.url.protocol=
-#-# The name of the webapp to use in the generated URLs. The right value is taken from the request URL, so setting this
-#-# is not recommended in most cases. If set, the value should contain a trailing /, but not a leading one. For example:
-#-# xwiki.webapppath=xwiki/
+#-# The name of the webapp to use in the generated URLs. If not specified, the value is extracted from the request URL
+#-# and thus it's generally not required to set it. However if you're deploying XWiki as root in your Servlet Container
+#-# and you're using XWiki >= 6.1 and < 7.0 you must set it to an empty value as otherwise the code cannot guess it.
+#-# For example:
+#-# xwiki.webapppath=xwiki
 # xwiki.webapppath=
 #-# The default servlet mapping name to use in the generated URLs. The right value is taken from the request URL,
 #-# preserving the requested servlet mapping, so setting this is not recommended in most cases. If set, the value should
@@ -519,6 +527,10 @@ xwiki.authentication.ldap.trylocal=1
 #-# The default is 1000
 # xwiki.authentication.ldap.timeout=1000
 
+#-# [Since 6.3M1, XWikiLDAPAuthServiceImpl]
+#-# The maximum number of search results to be returned from a search operation.
+#-# The default is 1000
+# xwiki.authentication.ldap.maxresults=1000
 
 #---------------------------------------
 # WYSIWYG Editor configuration
@@ -547,9 +559,11 @@ xwiki.defaultskin=flamingo
 xwiki.defaultbaseskin=
 
 #-# Defines whether title handling should be using the compatibility mode or not. When the compatibility
-#-# mode is active, if the document's content first header (level 1 or level 2) matches the document's title
+#-# mode is active, XWiki will try to extract a title from the document content.
+#-# If the document's content first header (level 1 or level 2) matches the document's title
 #-# the first header is stripped.
-xwiki.title.compatibility=1
+#-# The default value is 0.
+# xwiki.title.compatibility=1
 
 #-# Defines the maximum header depth to look for when computing a document's title from its content. If no header
 #-# equal or lower to the specified depth is found then the computed title falls back to the document name.
@@ -588,9 +602,9 @@ xwiki.plugins=\
   com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
   com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
   com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin, \
-  com.xpn.xwiki.plugin.watchlist.WatchListPlugin, \
   com.xpn.xwiki.plugin.tag.TagPlugin, \
-  com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin
+  com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin,\
+  com.xpn.xwiki.plugin.watchlist.WatchListPlugin
 
 #-# Enable light monitoring of the wiki performance. Records various statistics, like number of requests processed,
 #-# time spent in rendering or in the database, medium time for a request, etc. Disable for a minor increase of

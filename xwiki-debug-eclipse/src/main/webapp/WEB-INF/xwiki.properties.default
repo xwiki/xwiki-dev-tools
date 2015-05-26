@@ -278,6 +278,7 @@
 #-#   velocity.tools = jsontool = org.xwiki.velocity.tools.JSONTool
 #-#   velocity.tools = urltool = org.xwiki.velocity.tools.URLTool
 #-#   velocity.tools = cookietool = org.apache.velocity.tools.view.CookieTool
+#-#   velocity.tools = exceptiontool = org.apache.commons.lang3.exception.ExceptionUtils
 
 #-# [Since 2.0M1]
 #-# Velocity configuration properties. The format is
@@ -472,6 +473,16 @@
 #-# 
 #-# The default is:
 # extension.userAgent=XWikiExtensionManager
+
+#-------------------------------------------------------------------------------------
+# Distribution Wizard
+#-------------------------------------------------------------------------------------
+
+#-# [Since 7.1RC1] Enable or disable the automatic start of Distribution Wizard on empty/outdated wiki.
+#-#
+#-# The default is:
+# distribution.automaticStartOnMainWiki=true
+# distribution.automaticStartOnWiki=true
 
 #-------------------------------------------------------------------------------------
 # Solr Search
@@ -672,7 +683,7 @@
 # mail.sender.password = somepassword
 
 #-# [Since 6.1M2]
-#-# Password to authenticate on the SMTP server, if needed. By default no authentication is performed.
+#-# Extra Java Mail options (see https://javamail.java.net/nonav/docs/api/).
 #-# This configuration property can be overridden in XWikiPreferences objects, by using the "javamail_extra_props"
 #-# property name.
 #-# By default the following properties are set automatically:
@@ -685,3 +696,45 @@
 # mail.sender.properties = mail.smtp.starttls.enable = true
 # mail.sender.properties = mail.smtp.socks.host = someserver
 
+#-# [Since 6.4M2]
+#-# Defines which authorization checks are done when sending mails using the Mail Sender Script Service.
+#-# Example of valid values:
+#-# - "programmingrights": the current document must have Programming Rights
+#-# - "alwaysallow": no check is performed. This is useful when running XWiki in a secure environment where we
+#-#   want to allow all users to be able to send emails through the Script Service.
+#-# The default is:
+# mail.sender.scriptServiceCheckerHint = programmingrights
+
+#-# [Since 6.4M2]
+#-# optional default email addresses to add to the BCC mail header when sending email.
+# mail.sender.bcc = john@doe.com,mary@doe.com
+
+#-# [Since 6.4RC1]
+#-# The delay to wait between each mail being sent, in milliseconds. This is done to support mail throttling and not
+#-# be considered a spammer by mail servers.
+#-# The default is 8 seconds:
+# mail.sender.sendWaitTime = 8000
+
+#-# [Since 6.4.1, 7.0M1]
+#-# When using the Database Mail Listener, whether mail statuses for mails that have been sent successfully must be
+#-# discarded or not. They could be kept for tracability purpose for example.
+#-# The default is:
+# mail.sender.database.discardSuccessStatuses = true
+
+#-------------------------------------------------------------------------------------
+# WatchList
+#-------------------------------------------------------------------------------------
+
+#-# [Since 7.0RC1]
+#-# Controls if the realtime notifications feature is enabled. Default value is false.
+#-# This is currently an experimental feature which is not yet ready for producton. Enabling it right now will cause performance issues.
+#-# Once the feature stabilizes, it will be enabled by default and the option to disabled it will be removed.
+# watchlist.realtime.enabled = false
+
+#-------------------------------------------------------------------------------------
+# Debug
+#-------------------------------------------------------------------------------------
+
+#-# Indicate if web resources should be loaded minified by default.
+#-# It's enabled by default which can make js/css hard to read.
+debug.minify=false
