@@ -51,7 +51,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.34</version>
+      <version>${mysql.version}</version>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -61,12 +61,12 @@
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
-      <version>10.11.1.1</version>
+      <version>${derby.version}</version>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>9.3-1102-jdbc41</version>
+      <version>${postgresql.version}</version>
     </dependency>
 
     <!--  -->
