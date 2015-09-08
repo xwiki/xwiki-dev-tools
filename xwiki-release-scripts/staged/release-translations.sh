@@ -212,6 +212,12 @@ function do_all() {
         cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/src/main/resources/org/xwiki/tools/jetty/listener/  || exit -1
         do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.Jettylistener&app=Platform'
     fi
+    
+    ## Office UI (translations introduced in 7.2RC1)
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-office/xwiki-platform-office-ui/src/main/resources/  || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiOfficeImporterTranslations&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-office/xwiki-platform-office-ui/ && format_xar
+    
 
     ##
     ## Rendering
