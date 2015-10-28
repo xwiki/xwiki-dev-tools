@@ -171,6 +171,8 @@ function check_branch() {
     fi
   fi
 
+  RELEASE_BRANCH=release-${VERSION}
+
   echo
   echo -e "\033[0;32mReleasing version \033[1;32m${VERSION}\033[0;32m from branch \033[1;32m${RELEASE_FROM_BRANCH}\033[0m"
   echo
@@ -179,8 +181,8 @@ function check_branch() {
 # Create a temporary branch to be used for the release, starting from the branch detected by check_branch() and set in the RELEASE_FROM_BRANCH variable.
 function create_release_branch() {
   echo -e "\033[0;32m* Creating release branch\033[0m"
-  git branch release-${VERSION} origin/${RELEASE_FROM_BRANCH} || exit -2
-  git co release-${VERSION} -q
+  git branch ${RELEASE_BRANCH} origin/${RELEASE_FROM_BRANCH} || exit -2
+  git co ${RELEASE_BRANCH} -q
   CURRENT_VERSION=`mvn help:evaluate -Dexpression='project.version' -N | grep -v '\[' | grep -v 'Download' | cut -d- -f1`
 }
 
@@ -229,10 +231,14 @@ function post_update_parent_versions() {
   git ci -m "[release] Update parent after release ${TAG_NAME}" -q
 }
 
-# Push release branch to origin
+# Push changes made to the release branch (new SNAPSHOT version, etc)
 function push_release() {
-  echo -e "\033[0;32m* Push release branch\033[0m"
-  git push origin origin/${RELEASE_FROM_BRANCH}
+  echo -e "\033[0;32m* Switch to release base branch\033[0m"
+  git checkout ${RELEASE_FROM_BRANCH}
+  echo -e "\033[0;32m* Merge release branch\033[0m"
+  git merge ${RELEASE_BRANCH}
+  echo -e "\033[0;32m* Push release base branch\033[0m"
+  git push origin ${RELEASE_FROM_BRANCH}
 }
 
 # Generate a clirr report. Requires xsltproc to work properly.
