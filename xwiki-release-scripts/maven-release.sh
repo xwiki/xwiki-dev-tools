@@ -85,6 +85,10 @@ function check_versions() {
     echo -n -e "\033[0m"
     export VERSION=$VERSION
   fi
+
+  # Set the name of the release branch
+  export RELEASE_BRANCH=release-${VERSION}
+
   # Check next SNAPSHOT version
   if [[ -z $NEXT_SNAPSHOT_VERSION ]]
   then
@@ -171,8 +175,6 @@ function check_branch() {
     fi
   fi
 
-  RELEASE_BRANCH=release-${VERSION}
-
   echo
   echo -e "\033[0;32mReleasing version \033[1;32m${VERSION}\033[0;32m from branch \033[1;32m${RELEASE_FROM_BRANCH}\033[0m"
   echo
@@ -234,7 +236,7 @@ function post_update_parent_versions() {
 # Push changes made to the release branch (new SNAPSHOT version, etc)
 function push_release() {
   echo -e "\033[0;32m* Switch to release base branch\033[0m"
-  git checkout ${RELEASE_FROM_BRANCH}
+  git co ${RELEASE_FROM_BRANCH}
   echo -e "\033[0;32m* Merge release branch\033[0m"
   git merge ${RELEASE_BRANCH}
   echo -e "\033[0;32m* Push release base branch\033[0m"
@@ -269,7 +271,7 @@ function post_cleanup() {
   git reset --hard -q
   git co master -q
   # Delete the release branch
-  git branch -D release-${VERSION}
+  git branch -D ${RELEASE_BRANCH}
   git reset --hard -q
   git clean -dxfq
   # Move back the clirr report
