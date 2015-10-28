@@ -213,7 +213,7 @@ function release_maven() {
   mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,standalone -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
   echo -e "\033[0;32m* release:perform\033[0m"
-  mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,standalone ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests ${TEST_SKIP} -Dgpg.passphrase='${GPG_PASSPHRASE}'" -Dgpg.passphrase="${GPG_PASSPHRASE}" || exit -2
+  mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,standalone ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests ${TEST_SKIP} -Dgpg.passphrase='${GPG_PASSPHRASE}' -Dxwiki.checkstyle.skip=true" -Dgpg.passphrase="${GPG_PASSPHRASE}" || exit -2
 
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git co ${TAG_NAME} -q
