@@ -226,7 +226,7 @@ function release_maven() {
 # The changes will be committed as a new git version.
 function post_update_parent_versions() {
   echo -e "\033[0;32m* Update parent after release\033[0m"
-  mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_SNAPSHOT_VERSION] -N -q
+  mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_SNAPSHOT_VERSION] -N -q -DallowSnapshots=true
   sed -e "s/<commons.version>${VERSION}<\/commons.version>/<commons.version>${NEXT_SNAPSHOT_VERSION}<\/commons.version>/" -i pom.xml
 
   git add pom.xml
