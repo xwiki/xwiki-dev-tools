@@ -100,11 +100,11 @@
 			<type>2</type>
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-resources/src/main/resources/flamingo</locationURI>
 		</link>
-                <link>
-                        <name>src/main/webapp/skins/flamingo/less/bootstrap</name>
-                        <type>2</type>
-                        <locationURI>PROJECT_LOC/src/main/custom/boostrap</locationURI>
-                </link>
+		<link>
+			<name>src/main/webapp/skins/flamingo/less/bootstrap</name>
+			<type>2</type>
+			<locationURI>PROJECT_LOC/src/main/custom/boostrap</locationURI>
+		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
