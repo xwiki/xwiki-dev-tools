@@ -225,11 +225,12 @@ function release_maven() {
 # For the other projects it changes the version of the parent in the current repository root pom.
 # The changes will be committed as a new git version.
 function post_update_parent_versions() {
-  echo -e "\033[0;32m* Go back to branch ${RELEASE_FROM_BRANCH}\033[0m"
-  git co ${RELEASE_FROM_BRANCH}
+  echo -e "\033[0;32m* Go back to branch ${RELEASE_BRANCH}\033[0m"
+  git co ${RELEASE_BRANCH}
 
   echo -e "\033[0;32m* Update parent after release\033[0m"
   mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_SNAPSHOT_VERSION] -N -q -DallowSnapshots=true
+  echo -e "\033[0;32m* Update commons.version after release\033[0m"
   sed -e "s/<commons.version>${VERSION}<\/commons.version>/<commons.version>${NEXT_SNAPSHOT_VERSION}<\/commons.version>/" -i pom.xml
 
   git add pom.xml
