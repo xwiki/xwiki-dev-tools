@@ -56,7 +56,7 @@ function link_packages ()
   local pattern=$1
   local repositoryName=$2
 
-  for i in $(find "$ROOT_REP/$RELEASES_REP/org" -name $pattern ) ; do
+  for i in $(find "$ROOT_REP/$RELEASES_REP/org" -regex $pattern ) ; do
     link_package $i $repositoryName
   done
 }
@@ -88,31 +88,10 @@ function update_repository ()
 }
 
 ## LTS
-update_repository $LTS_REP "*-${LTS_BRANCH}.*.deb"
+update_repository $LTS_REP ".*-${LTS_BRANCH}.*.deb"
 
 ## stable
-if [ -d stable ]; then
-  echo "Generates stable index"
-
-  rm -rf /tmp/stable_scanpackages
-  mkdir -p /tmp/stable_scanpackages/$RELEASES_REP
-
-  cd /tmp/stable_scanpackages/
-
-  link_packages "*.[0-9][0-9].deb" $STABLE_REP
-  link_packages "*.[0-9].deb" $STABLE_REP
-  link_packages "*[0-9]-[0-9][0-9].deb" $STABLE_REP
-  link_packages "*[0-9]-[0-9].deb" $STABLE_REP
-
-  dpkg-scanpackages -m $RELEASES_REP /dev/null > "$ROOT_REP/$STABLE_REP/Packages.tmp" && mv -f "$ROOT_REP/$STABLE_REP/Packages.tmp" "$ROOT_REP/$STABLE_REP/Packages"
-  gzip -9c "$ROOT_REP/$STABLE_REP/Packages" > "$ROOT_REP/$STABLE_REP/Packages.gz.tmp" && mv -f "$ROOT_REP/$STABLE_REP/Packages.gz.tmp" "$ROOT_REP/$STABLE_REP/Packages.gz"
-
-  cd "$ROOT_REP"
-
-  rm -rf $STABLE_REP/Release $STABLE_REP/Release.gpg
-  apt-ftparchive -c=$STABLE_REP/Release.conf release $STABLE_REP > $STABLE_REP/Release
-  gpg -abs --default-key $GPG_KEY -o $STABLE_REP/Release.gpg $STABLE_REP/Release
-fi
+update_repository $STABLE_REP ".*[\.-][0-9]+.deb"
 
 ## releases
 if [ -d $RELEASES_REP ]; then
