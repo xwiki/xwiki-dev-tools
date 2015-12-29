@@ -7,8 +7,8 @@
 #
 # It also create a "virtual" stable debian repository in which is selected only
 # stable releases (filter milestonnes and release candidates).
-# It also create a "virtual" superstable debian repository in which is selected only
-# configured super stable branch releases.
+# It also create a "virtual" lts debian repository in which is selected only
+# configured lts branch releases.
 #
 # Requirements:
 # * This script is based on scna_packages. It is provided by dpkg-dev.
@@ -19,8 +19,8 @@
 #    snaphots
 # ** make sure the "stable" folder exists if you want a filtered stable debian
 #    repository
-# ** make sure the "superstable" folder exists if you want a filtered super stable debian
-#    repository. Also make sure you configured the super stable branch version
+# ** make sure the "lts" folder exists if you want a filtered lts debian
+#    repository. Also make sure you configured the lts branch version
 #
 # Setup:
 # You need to set the $ROOT_REP variable to where your maven repositories are
