@@ -73,6 +73,18 @@ function check_env() {
     echo -e "\033[1;31mPlease go to the xwiki-trunks directory where the XWiki sources are checked out\033[0m"
     exit -1
   fi
+
+  # Restart gpg-agent
+  echo -e "\033[0;32m* Setup gpg-agent\033[0m"
+  killall gpg-agent || true
+  eval $(gpg-agent --daemon) || true
+  export GPG_TTY=$(tty)
+}
+
+function clean_env() {
+  # Stop gpg-agent
+  echo -e "\033[0;32m* Stop gpg-agent\033[0m"
+  killall gpg-agent || true
 }
 
 # Check various version related variables
@@ -331,6 +343,7 @@ function release_all() {
   echo              "*****************************"
   release_project xwiki-enterprise
   echo -e "\033[1;32mAll done!\033[0m"
+  clean_env
 }
 
 # Display a help message describing this script.
