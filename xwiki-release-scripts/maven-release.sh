@@ -240,9 +240,9 @@ function post_update_parent_versions() {
   echo -e "\033[0;32m* Go back to branch ${RELEASE_BRANCH}\033[0m"
   git co ${RELEASE_BRANCH}
 
-  echo -e "\033[0;32m* Update parent after release\033[0m"
-  xsltproc -o pom.xml --stringparam parentversion "$NEXT_SNAPSHOT_VERSION" $PRGDIR/clirr-excludes.xslt pom.xml
-  echo -e "\033[0;32m* Update commons.version after release\033[0m"
+  echo -e "\033[0;32m* Update parent to ${NEXT_SNAPSHOT_VERSION} after release\033[0m"
+  xsltproc -o pom.xml --stringparam parentversion "${NEXT_SNAPSHOT_VERSION}" $PRGDIR/clirr-excludes.xslt pom.xml
+  echo -e "\033[0;32m* Update commons.version to ${NEXT_SNAPSHOT_VERSION} after release\033[0m"
   sed -e "s/<commons.version>${VERSION}<\/commons.version>/<commons.version>${NEXT_SNAPSHOT_VERSION}<\/commons.version>/" -i pom.xml
 
   git add pom.xml
