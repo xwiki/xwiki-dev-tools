@@ -177,6 +177,11 @@ function do_all() {
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.MenuApplication&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-menu/xwiki-platform-menu-ui/ && format_xar
 
+    ## Invitation
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-invitation/xwiki-platform-invitation-ui/src/main/resources || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.InvitationTranslations&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-invitation/xwiki-platform-invitation-ui/ && format_xar
+
     ## Flamingo Theme (location changed in 7.2)
     if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-themes/xwiki-platform-flamingo-theme-ui" ]]; then
       cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-themes/xwiki-platform-flamingo-theme-ui/src/main/resources/ || exit -1
