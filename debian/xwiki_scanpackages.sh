@@ -91,7 +91,7 @@ function update_repository ()
 update_repository $LTS_REP ".*-${LTS_BRANCH}\(\.[0-9]+\)*.deb"
 
 ## stable
-update_repository $STABLE_REP ".*[\.-][0-9]+.deb"
+update_repository $STABLE_REP ".*\.[0-9]+.deb"
 
 ## releases
 if [ -d $RELEASES_REP ]; then
