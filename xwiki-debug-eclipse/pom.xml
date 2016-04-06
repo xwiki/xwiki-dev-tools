@@ -43,6 +43,13 @@
     <!-- The default UI associated to this WAR -->
     <xwiki.extension.distribution.ui>org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki</xwiki.extension.distribution.ui>
     <xwiki.extension.distribution.wikiui>org.xwiki.enterprise:xwiki-enterprise-ui-wiki</xwiki.extension.distribution.wikiui>
+ 
+    <!-- Flavors known to be valid with the current distribution -->
+    <xwiki.extension.knownFlavors>
+        org.xwiki.platform:xwiki-platform-distribution-flavor/${project.version},
+        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/${project.version},
+        org.xwiki.enterprise:xwiki-enterprise-ui-wiki/${project.version}
+    </xwiki.extension.knownFlavors>
   </properties>
   <dependencies>
     <!-- Databases -->
