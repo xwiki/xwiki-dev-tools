@@ -227,8 +227,11 @@ xwiki.store.migration=1
 #-# xwiki.url.protocol=https
 # xwiki.url.protocol=
 #-# The name of the webapp to use in the generated URLs. If not specified, the value is extracted from the request URL
-#-# and thus it's generally not required to set it. However if you're deploying XWiki as root in your Servlet Container
-#-# and you're using XWiki >= 6.1 and < 7.0 you must set it to an empty value as otherwise the code cannot guess it.
+#-# and thus it's generally not required to set it. However if you're deploying XWiki as ROOT in your Servlet Container
+#-# and you're using XWiki 6.2.8+/6.4.3+/7.0+ you must set it to an empty value as otherwise the code cannot guess it.
+#-# Note that not setting this property seemed to work on previous versions when deploying as ROOT but it was actually
+#-# leading to errors from time to time, depending on what URL was used when doing the first request on the XWiki
+#-# instance.
 #-# For example:
 #-# xwiki.webapppath=xwiki
 # xwiki.webapppath=
@@ -246,8 +249,6 @@ xwiki.store.migration=1
 # xwiki.showviewaction=1
 #-# The name of the default space. This is displayed when the URL specifies a document, but not a space, or neither.
 # xwiki.defaultweb=Main
-#-# Hide the /Space/ part of the URL when the space is the default one. Warning: use 1 to hide, 0 to show.
-# xwiki.usedefaultweb=0
 #-# The name of the default page of a space. This is displayed when the URL specifies a space, but not a document, or
 #-# neither.
 # xwiki.defaultpage=WebHome
@@ -277,7 +278,7 @@ xwiki.inactiveuser.allowedpages=
 #-# Enable to allow superadmin. It is disabled by default as this could be a
 #-# security breach if it were set and you forgot about it. Should only be enabled
 #-# for recovering the Wiki when the rights are completely messed.
-xwiki.superadminpassword=system
+xwiki.superadminpassword=pass
 
 #-# Authentication type. You can use 'basic' to always use basic authentication.
 # xwiki.authentication=form
@@ -341,6 +342,10 @@ xwiki.authentication.logoutpage=(/|/[^/]+/|/wiki/[^/]+/)logout/*
 #-# HTTP status code to sent when the authentication failed.
 xwiki.authentication.unauthorized_code=200
 
+#-# Used by some authenticators (like com.xpn.xwiki.user.impl.xwiki.AppServerTrustedAuthServiceImpl)
+#-# to indicate that the users should be created. In this kind of authenticator the user are not created by default.
+#-# Must be set to "empty".
+# xwiki.authentication.createuser=empty
 
 #---------------------------------------
 # XWiki Syntax 1.0 Rendering Engine
@@ -463,6 +468,23 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 #-# The default is 0
 xwiki.authentication.ldap.update_user=1
 
+#-# [Since 8.1M2, XWikiLDAPAuthServiceImpl]
+#-# On every login update photo from LDAP to XWiki avatar otherwise photo will not be updated.
+#-# - 0: never
+#-# - 1: at each authentication
+#-# The default is 0
+# xwiki.authentication.ldap.update_photo=0
+
+#-# [Since 8.1M2, XWikiLDAPAuthServiceImpl]
+#-# Profile attachment name which will be used to save LDAP photo.
+#-# The default is ldapPhoto
+# xwiki.authentication.ldap.photo_attachment_name=ldapPhoto
+
+#-# [Since 8.1M2, XWikiLDAPAuthServiceImpl]
+#-# Specifies the LDAP attribute containing the binary photo
+#-# The default is thumbnailPhoto
+# xwiki.authentication.ldap.photo_attribute=thumbnailPhoto
+
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# Maps XWiki groups to LDAP groups, separator is "|".
 #-# The following kind of groups are supported:
@@ -486,6 +508,16 @@ xwiki.authentication.ldap.update_user=1
 #-# - always: synchronize on every login
 #-# The default is always
 # xwiki.authentication.ldap.mode_group_sync=always
+
+#-# [Since 7.2M3, XWikiLDAPAuthServiceImpl]
+#-# Indicate groups members should be resolved in case they are subgroups.
+#-# Doing so can be very expensive so it should be disabled if you know there is no subgroups
+#-# (or if you don't care about them).
+#-# If the group is actually a filter it will always be resolved since it does not make sense left alone.
+#-# - 0: disable
+#-# - 1: enable
+#-# The default is 1
+# xwiki.authentication.ldap.group_sync_resolve_subgroups=0
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# If ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
@@ -592,18 +624,18 @@ xwiki.plugins=\
   com.xpn.xwiki.plugin.mail.MailPlugin,\
   com.xpn.xwiki.plugin.packaging.PackagePlugin,\
   com.xpn.xwiki.plugin.svg.SVGPlugin,\
-  com.xpn.xwiki.plugin.charts.ChartingPlugin,\
   com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
   com.xpn.xwiki.plugin.image.ImagePlugin,\
-  com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin,\
   com.xpn.xwiki.plugin.diff.DiffPlugin,\
   com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin,\
   com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
   com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
   com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
   com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin, \
-  com.xpn.xwiki.plugin.tag.TagPlugin, \
-  com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin
+  com.xpn.xwiki.plugin.tag.TagPlugin,\
+  com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin,\
+  com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin,\
+  com.xpn.xwiki.plugin.watchlist.WatchListPlugin
 
 #-# Enable light monitoring of the wiki performance. Records various statistics, like number of requests processed,
 #-# time spent in rendering or in the database, medium time for a request, etc. Disable for a minor increase of
