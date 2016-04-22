@@ -83,7 +83,7 @@ function update_repository ()
 
     rm -rf $repositoryName/Release $repositoryName/Release.gpg
     apt-ftparchive -c=$repositoryName/Release.conf release $repositoryName > $repositoryName/Release
-    gpg -abs --default-key $GPG_KEY -o $repositoryName/Release.gpg $repositoryName/Release
+    gpg --digest-algo SHA512 -abs --default-key $GPG_KEY -o $repositoryName/Release.gpg $repositoryName/Release
   fi
 }
 
@@ -102,7 +102,7 @@ if [ -d $RELEASES_REP ]; then
 
   rm -rf $RELEASES_REP/Release $RELEASES_REP/Release.gpg
   apt-ftparchive -c=$RELEASES_REP/Release.conf release $RELEASES_REP > $RELEASES_REP/Release
-  gpg -abs --default-key $GPG_KEY -o $RELEASES_REP/Release.gpg $RELEASES_REP/Release
+  gpg --digest-algo SHA512 -abs --default-key $GPG_KEY -o $RELEASES_REP/Release.gpg $RELEASES_REP/Release
 fi
 
 ## snapshots
