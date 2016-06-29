@@ -235,7 +235,6 @@ function do_all() {
     
     ## Distribution
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/src/main/resources/ || exit -1
-    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XE.MainWelcome&app=XE'
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.MainWebHome&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/ && format_xar
 
