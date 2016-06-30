@@ -40,6 +40,14 @@ function do_all() {
     read_user_and_password
 
     ##
+    ## XWiki Enterprise
+    ##
+
+    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/xwiki-enterprise-ui-tour/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XE.TourHomepageTourTranslations&app=XE'
+    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/xwiki-enterprise-ui-tour/ && format_xar
+
+    ##
     ## Wysiwyg 2.0
     ##
 
