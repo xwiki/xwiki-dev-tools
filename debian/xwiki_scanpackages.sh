@@ -28,7 +28,7 @@
 #
 ###############################################################################
 
-ROOT_REP=/home/maven/public_html/**/*debian*
+ROOT_REP=/home/maven/public_html/
 SNAPSHOTS_REP="snapshots"
 RELEASES_REP="releases"
 STABLE_REP="stable"
@@ -56,7 +56,7 @@ function link_packages ()
   local pattern=$1
   local repositoryName=$2
 
-  for i in $(find "$ROOT_REP/$RELEASES_REP/org/xwiki" -regex $pattern ) ; do
+  for i in $(find $ROOT_REP/$RELEASES_REP/org/xwiki/**/*debian* -regex $pattern ) ; do
     link_package $i $repositoryName
   done
 }
