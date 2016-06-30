@@ -43,9 +43,10 @@ function do_all() {
     ## XWiki Enterprise
     ##
 
-    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/xwiki-enterprise-ui-tour/src/main/resources/ || exit -1
-    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XE.TourHomepageTourTranslations&app=XE'
-    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/xwiki-enterprise-ui-tour/ && format_xar
+    ## XINFRA-203 Nested page: uncomment after we upgrade l10n
+    ## cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/xwiki-enterprise-ui-tour/src/main/resources/ || exit -1
+    ## do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=XE.TourHomepageTourTranslations&app=XE'
+    ## cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/xwiki-enterprise-ui-tour/ && format_xar
 
     ##
     ## Wysiwyg 2.0
@@ -114,7 +115,8 @@ function do_all() {
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiXWikiSyntaxTextFormatting&app=Platform'
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiXWikiSyntaxVerbatim&app=Platform'
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.HelpTranslations&app=Platform'
-    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.HelpSupportPanelContent&app=Platform'
+    ## XINFRA-203 Nested page: uncomment after we upgrade l10n
+    ## do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.HelpSupportPanelContent&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/ && format_xar
 
     ## Wiki
