@@ -267,6 +267,12 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-dashboard/xwiki-platform-dashboard-ui/src/main/resources/ || exit -1
     do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.DashboardTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-dashboard/xwiki-platform-dashboard-ui/ && format_xar
+    
+    ## Administration (new in 8.3M1)
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui/src/main/resources/ || exit -1
+    do_one 'http://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiAdminTranslationsxml&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui && format_xar
+    
 
     ##
     ## Rendering
