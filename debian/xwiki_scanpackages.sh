@@ -28,7 +28,7 @@
 #
 ###############################################################################
 
-ROOT_REP=/home/maven/public_html/
+ROOT_REP=/home/maven/public_html
 SNAPSHOTS_REP="snapshots"
 RELEASES_REP="releases"
 STABLE_REP="stable"
