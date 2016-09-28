@@ -633,8 +633,7 @@ xwiki.plugins=\
   com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
   com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin, \
   com.xpn.xwiki.plugin.tag.TagPlugin, \
-  com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin,\
-  com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin
+  com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin
 
 #-# Enable light monitoring of the wiki performance. Records various statistics, like number of requests processed,
 #-# time spent in rendering or in the database, medium time for a request, etc. Disable for a minor increase of
