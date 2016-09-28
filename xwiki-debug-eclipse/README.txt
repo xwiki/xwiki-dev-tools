@@ -1,4 +1,4 @@
-This is a Eclipse project used to easily debug a complete XWiki Enterprise (it can also be used for XWiki Enterprise Manager since it comes with it dependencies).
+This is a Eclipse project used to easily debug a complete XWiki Enterprise.
 
 = PREREQUISITES =
 
@@ -19,4 +19,3 @@ This project comes with some example configuration you need to copy/past and set
 
 = TODO =
 
-* add support for GWT WYSIWYG (and any other GWT based module)
