@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.enterprise</groupId>
     <artifactId>xwiki-enterprise</artifactId>
-    <version>9.0-SNAPSHOT</version>
+    <version>9.1-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki-debug-eclipse</artifactId>
@@ -39,17 +39,6 @@
         org.xwiki.manager:xwiki-manager-web,
         com.xpn.xwiki.products:xwiki-enterprise-manager-web
     </xwiki.extension.features>
-
-    <!-- The default UI associated to this WAR -->
-    <xwiki.extension.distribution.ui>org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki</xwiki.extension.distribution.ui>
-    <xwiki.extension.distribution.wikiui>org.xwiki.enterprise:xwiki-enterprise-ui-wiki</xwiki.extension.distribution.wikiui>
- 
-    <!-- Flavors known to be valid with the current distribution -->
-    <xwiki.extension.knownFlavors>
-        org.xwiki.platform:xwiki-platform-distribution-flavor/${project.version},
-        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/${project.version},
-        org.xwiki.enterprise:xwiki-enterprise-ui-wiki/${project.version}
-    </xwiki.extension.knownFlavors>
   </properties>
   <dependencies>
     <!-- Databases -->
@@ -164,32 +153,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-filter-stream-confluencexml</artifactId>
-      <version>${platform.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>
-      <version>${platform.version}</version>
-    </dependency>
-    <dependency>
-      <artifactId>xwiki-platform-container-servlet</artifactId>
-      <groupId>org.xwiki.platform</groupId>
-      <version>${platform.version}</version>
-    </dependency>
-    <dependency>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <groupId>org.xwiki.platform</groupId>
-      <version>${platform.version}</version>
-    </dependency>
-    <dependency>
-      <artifactId>xwiki-platform-instance</artifactId>
-      <groupId>org.xwiki.platform</groupId>
-      <version>${platform.version}</version>
-    </dependency>
-    <dependency>
-      <artifactId>xwiki-platform-edit-default</artifactId>
-      <groupId>org.xwiki.platform</groupId>
       <version>${platform.version}</version>
     </dependency>
   </dependencies>
