@@ -240,17 +240,17 @@ function do_all() {
         cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/src/main/resources/org/xwiki/tools/jetty/listener/  || exit -1
         do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.Jettylistener&app=Platform'
     fi
-    
+
     ## Office UI (translations introduced in 7.2RC1)
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-office/xwiki-platform-office-ui/src/main/resources/  || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiOfficeImporterTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-office/xwiki-platform-office-ui/ && format_xar
-    
+
     ## App Within Minutes
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-appwithinminutes/xwiki-platform-appwithinminutes-ui/src/main/resources/ || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.AppWithinMinutesTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-appwithinminutes/xwiki-platform-appwithinminutes-ui/ && format_xar
-    
+
     ## Distribution
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/src/main/resources/ || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.MainWebHome&app=Platform'
@@ -265,17 +265,21 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-blog/xwiki-platform-blog-ui/src/main/resources/ || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.BlogTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-blog/xwiki-platform-blog-ui/ && format_xar
+    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-blog/xwiki-platform-blog-api/" ]]; then
+      cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-blog/xwiki-platform-blog-api/  || exit -1
+      do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.Blog API Resources&app=Platform'
+    fi
 
     ## Dashboard
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-dashboard/xwiki-platform-dashboard-ui/src/main/resources/ || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.DashboardTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-dashboard/xwiki-platform-dashboard-ui/ && format_xar
-    
+
     ## Administration (new in 8.3M1)
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui/src/main/resources/ || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiAdminTranslationsxml&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui && format_xar
-    
+
 
     ##
     ## Rendering
