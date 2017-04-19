@@ -265,8 +265,8 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-blog/xwiki-platform-blog-ui/src/main/resources/ || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.BlogTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-blog/xwiki-platform-blog-ui/ && format_xar
-    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-blog/xwiki-platform-blog-api/" ]]; then
-      cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-blog/xwiki-platform-blog-api/  || exit -1
+    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-blog/xwiki-platform-blog-api/" ]]; then
+      cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-blog/xwiki-platform-blog-api/  || exit -1
       do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.Blog API Resources&app=Platform'
     fi
 
@@ -280,6 +280,12 @@ function do_all() {
     do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiAdminTranslationsxml&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui && format_xar
 
+    ## Notifications (new in 9.2RC1)
+    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui/" ]]; then
+      cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui/src/main/resources/ || exit -1
+      do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiNotificationsCodeTranslations&app=Platform'
+      cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui && format_xar
+    fi
 
     ##
     ## Rendering
