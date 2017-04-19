@@ -261,15 +261,6 @@ function do_all() {
     do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.ApplicationsTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-application/xwiki-platform-application-ui/ && format_xar
 
-    ## Blog
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-blog/xwiki-platform-blog-ui/src/main/resources/ || exit -1
-    do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.BlogTranslations&app=Platform'
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-blog/xwiki-platform-blog-ui/ && format_xar
-    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-blog/xwiki-platform-blog-api/" ]]; then
-      cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-blog/xwiki-platform-blog-api/  || exit -1
-      do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.Blog API Resources&app=Platform'
-    fi
-
     ## Dashboard
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-dashboard/xwiki-platform-dashboard-ui/src/main/resources/ || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.DashboardTranslations&app=Platform'
