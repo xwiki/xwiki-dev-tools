@@ -194,7 +194,7 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-invitation/xwiki-platform-invitation-ui/ && format_xar
 
     ## Flamingo Theme (location changed in 7.2)
-    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-themes/xwiki-platform-flamingo-theme-ui" ]]; then
+    if [[ -f "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-themes/xwiki-platform-flamingo-theme-ui/pom.xml" ]]; then
       cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-themes/xwiki-platform-flamingo-theme-ui/src/main/resources/ || exit -1
       do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Platform.FlamingoThemesCodeTranslations&app=Platform'
       cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-themes/xwiki-platform-flamingo-theme-ui && format_xar
@@ -223,20 +223,20 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-ui/ && format_xar
 
     ## Template (introduce in 7.0M1)
-    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-template" ]]; then
+    if [[ -f "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-template/pom.xml" ]]; then
         cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-template/xwiki-platform-template-api/src/main/resources/  || exit -1
         do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Platform.TemplateMacro&app=Platform'
     fi
 
     ## Skin UI (introduced in 7.0RC1)
-    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ui/" ]]; then
+    if [[ -f "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ui/pom.xml" ]]; then
         cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ui/src/main/resources/  || exit -1
         do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Platform.SkinsCodeTranslations&app=Platform'
         cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ui/ && format_xar
     fi
 
     ## Jetty listener
-    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/" ]]; then
+    if [[ -f "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/pom.xml" ]]; then
         cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/src/main/resources/org/xwiki/tools/jetty/listener/  || exit -1
         do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Platform.Jettylistener&app=Platform'
     fi
@@ -272,7 +272,7 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui && format_xar
 
     ## Notifications (new in 9.2RC1)
-    if [[ -d "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui/" ]]; then
+    if [[ -f "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui/pom.xml" ]]; then
       cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui/src/main/resources/ || exit -1
       do_one 'https://l10n.xwiki.org/xwiki/bin/view/L10NCode/GetTranslationFile?name=Platform.XWikiNotificationsCodeTranslations&app=Platform'
       cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui && format_xar
