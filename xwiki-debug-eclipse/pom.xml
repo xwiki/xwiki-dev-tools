@@ -23,9 +23,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.enterprise</groupId>
-    <artifactId>xwiki-enterprise</artifactId>
-    <version>9.3-SNAPSHOT</version>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-distribution</artifactId>
+    <version>9.5-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki-debug-eclipse</artifactId>
@@ -37,18 +37,17 @@
     <xwiki.extension.features>
         com.xpn.xwiki.products:xwiki-enterprise-web,
         org.xwiki.manager:xwiki-manager-web,
-        com.xpn.xwiki.products:xwiki-enterprise-manager-web
+        com.xpn.xwiki.products:xwiki-enterprise-manager-web,
     </xwiki.extension.features>
 
     <!-- The default UI associated to this WAR -->
-    <xwiki.extension.distribution.ui>org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki</xwiki.extension.distribution.ui>
-    <xwiki.extension.distribution.wikiui>org.xwiki.enterprise:xwiki-enterprise-ui-wiki</xwiki.extension.distribution.wikiui>
+    <xwiki.extension.distribution.ui>org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki</xwiki.extension.distribution.ui>
+    <xwiki.extension.distribution.wikiui>org.xwiki.platform:xwiki-platform-distribution-flavor-wiki</xwiki.extension.distribution.wikiui>
 
     <!-- Flavors known to be valid with the current distribution -->
     <xwiki.extension.knownFlavors>
-        org.xwiki.platform:xwiki-platform-distribution-flavor/${project.version},
-        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/${project.version},
-        org.xwiki.enterprise:xwiki-enterprise-ui-wiki/${project.version}
+        org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/${platform.version},
+        org.xwiki.platform:xwiki-platform-distribution-flavor-wiki/${platform.version}
     </xwiki.extension.knownFlavors>
   </properties>
   <dependencies>
@@ -75,12 +74,18 @@
     </dependency>
 
     <!--  -->
-    <!-- XWiki Enterprise -->
+    <!-- WAR -->
     <!--  -->
 
     <dependency>
-      <groupId>org.xwiki.enterprise</groupId>
-      <artifactId>xwiki-enterprise-web-dependencies</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
