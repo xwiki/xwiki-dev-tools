@@ -40,12 +40,12 @@ function do_all() {
     read_user_and_password
 
     ##
-    ## XWiki Enterprise
+    ## XWiki Flavor
     ##
 
-    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/xwiki-enterprise-ui-tour/src/main/resources/ || exit -1
-    do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=XE.TourHomepageTourTranslations&app=XE'
-    cd ${XWIKI_TRUNKS}/xwiki-enterprise/xwiki-enterprise-ui/xwiki-enterprise-ui-tour/ && format_xar
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-tour/src/main/resources/ || exit -1
+    do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Platform.TourHomepageTourTranslations&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-tour/ && format_xar
 
     ##
     ## Wysiwyg 2.0

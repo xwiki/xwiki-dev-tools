@@ -154,7 +154,7 @@ function stabilize_branch() {
       NEXT_TRUNK_VERSION=${tmp}
     fi
     # Let maven update the version for all the submodules
-    mvn release:branch -DbranchName=stable-${VERSION_STUB}.x -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,office-tests,legacy,standalone
+    mvn release:branch -DbranchName=stable-${VERSION_STUB}.x -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,office-tests,legacy,standalone,flavor-integration-tests
     git up
     # We must update the root parent and commons.version manually
     mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -N -q
@@ -226,10 +226,10 @@ function release_maven() {
   DB_PROFILE=hsqldb
 
   echo -e "\033[0;32m* release:prepare\033[0m"
-  mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,office-tests,standalone -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
+  mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,office-tests,standalone,flavor-integration-tests -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
   echo -e "\033[0;32m* release:perform\033[0m"
-  mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,standalone ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests,office-tests ${TEST_SKIP} -Dgpg.passphrase='${GPG_PASSPHRASE}' -Dxwiki.checkstyle.skip=true" -Dgpg.passphrase="${GPG_PASSPHRASE}" || exit -2
+  mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,standalone,flavor-integration-tests ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,flavor-integration-tests ${TEST_SKIP} -Dgpg.passphrase='${GPG_PASSPHRASE}' -Dxwiki.checkstyle.skip=true" -Dgpg.passphrase="${GPG_PASSPHRASE}" || exit -2
 
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git co ${TAG_NAME} -q
@@ -277,7 +277,7 @@ function clirr_report() {
     xsltproc -o xwiki-platform-core/pom.xml $PRGDIR/clirr-excludes.xslt xwiki-platform-core/pom.xml
   fi
   # Run clirr
-  mvn clirr:check -DfailOnError=false -DtextOutputFile=clirr-result.txt -Plegacy,integration-tests,office-tests -DskipTests -q 1>/dev/null
+  mvn clirr:check -DfailOnError=false -DtextOutputFile=clirr-result.txt -Plegacy,integration-tests,office-tests,flavor-integration-tests -DskipTests -q 1>/dev/null
   # Aggregate results in one file
   find . -name clirr-result.txt | xargs cat | grep ERROR > clirr.txt ; sed -r -e 's/ERROR: [0-9]+: //g' -e 's/\s+$//g' -i clirr.txt
 }
@@ -342,10 +342,6 @@ function release_all() {
   echo -e "\033[1;32m    Releasing xwiki-platform\033[0m"
   echo              "*****************************"
   release_project xwiki-platform
-  echo              "*****************************"
-  echo -e "\033[1;32m    Releasing xwiki-enterprise\033[0m"
-  echo              "*****************************"
-  release_project xwiki-enterprise
   echo -e "\033[1;32mAll done!\033[0m"
   clean_env
 }

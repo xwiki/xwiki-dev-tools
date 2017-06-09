@@ -229,8 +229,9 @@ urlencode() {
 # Push a file to the user's incoming folder on the OW2 forge using the SCP protocol.
 # @param $1 the OW2 username to use; should be taken from O_U
 # @param $2 the file to send
+# @param $3 the file name on OW2 side
 function push_ow2_file() {
-  scp $2 $1@forge.objectweb.org:incoming/
+  scp $2 $1@forge.objectweb.org:incoming/$3
 }
 
 #####################################################
@@ -276,11 +277,9 @@ function push_ow2() {
   echo -e "\033[0;32m* Publishing files on OW2\033[0m"
   authenticate_ow2
 
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/enterprise/xwiki-enterprise-installer-generic/${VERSION}/xwiki-enterprise-installer-generic-${VERSION}-standard.jar
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/enterprise/xwiki-enterprise-installer-windows/${VERSION}/xwiki-enterprise-installer-windows-${VERSION}.exe
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/enterprise/xwiki-enterprise-jetty-hsqldb/${VERSION}/xwiki-enterprise-jetty-hsqldb-${VERSION}.zip
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/enterprise/xwiki-enterprise-web/${VERSION}/xwiki-enterprise-web-${VERSION}.war
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/enterprise/xwiki-enterprise-ui-mainwiki-all/${VERSION}/xwiki-enterprise-ui-mainwiki-all-${VERSION}.xar
+  push_ow2_file ${O_U} ${BASE}/org/xwiki/platform/xwiki-platform-distribution-jetty-hsqldb/${VERSION}/xwiki-platform-distribution-jetty-hsqldb-${VERSION}.zip xwiki-${VERSION}.zip
+  push_ow2_file ${O_U} ${BASE}/org/xwiki/platform/xwiki-platform-distribution-war/${VERSION}/platform-distribution-war-${VERSION}.war xwiki-${VERSION}.war
+  push_ow2_file ${O_U} ${BASE}/org/xwiki/platform/xwiki-platform-distribution-flavor-xip/${VERSION}/xwiki-platform-distribution-flavor-xip-${VERSION}.xip xwiki-classic-${VERSION}.xip
 }
 
 # Create the releases on OW2.
@@ -296,9 +295,9 @@ function update_ow2() {
   # Create the package while uploading the first file, the generic installer
   DATE=`date '+%Y-%m-%d %k:%M'`
   EDIT_RELEASE_URL=`curl -s -X POST --form-string "package_id=208" \
-    --form-string "release_name=xwiki-enterprise-${VERSION}" \
+    --form-string "release_name=xwiki-${VERSION}" \
     --form-string "release_date=${DATE}" \
-    --form-string "userfile2=xwiki-enterprise-installer-generic-${VERSION}-standard.jar" \
+    --form-string "userfile2=xwiki-${VERSION}.zip" \
     --form-string "userfile=" \
     --form-string "type_id=3000" \
     --form-string "processor_id=8000" \
@@ -310,27 +309,15 @@ function update_ow2() {
 
   EDIT_RELEASE_URL="http://forge.ow2.org${EDIT_RELEASE_URL}"
 
-  # XE Windows installer
+  # XWiki WAR
   curl -s -o /dev/null -X POST --form-string "step2=1" \
-    --form-string "userfile2=xwiki-enterprise-installer-windows-${VERSION}.exe" \
-    --form-string "userfile=" --form-string "type_id=9999" --form-string "processor_id=1000" --form-string "submit=Add This File" \
-    -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
-
-  # XE standalone distribution
-  curl -s -o /dev/null -X POST --form-string "step2=1" \
-    --form-string "userfile2=xwiki-enterprise-jetty-hsqldb-${VERSION}.zip" \
+    --form-string "userfile2=xwiki-${VERSION}.war" \
     --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
     -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
 
-  # XE WAR
+  # XWiki Classic flavor offline package
   curl -s -o /dev/null -X POST --form-string "step2=1" \
-    --form-string "userfile2=xwiki-enterprise-web-${VERSION}.war" \
-    --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
-    -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
-
-  # XE XAR
-  curl -s -o /dev/null -X POST --form-string "step2=1" \
-    --form-string "userfile2=xwiki-enterprise-ui-mainwiki-all-${VERSION}.xar" \
+    --form-string "userfile2=xwiki-classic-${VERSION}.xip" \
     --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
     -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
 }
@@ -379,8 +366,8 @@ function announce_ow2() {
 
   curl -s -o /tmp/resp -X POST --data "group_id=170" --data "post_changes=1" \
     --data-urlencode "summary=XWiki ${PRETTY_VERSION} Released" \
-    --data-urlencode "description=The XWiki development team is proud to announce the availability of XWiki Enterprise ${PRETTY_VERSION}. ${RELSUMMARY}. " \
-    --data-urlencode "details=The XWiki development team is proud to announce the availability of XWiki Enterprise ${PRETTY_VERSION}. $RELNOTES" \
+    --data-urlencode "description=The XWiki development team is proud to announce the availability of XWiki ${PRETTY_VERSION}. ${RELSUMMARY}. " \
+    --data-urlencode "details=The XWiki development team is proud to announce the availability of XWiki ${PRETTY_VERSION}. $RELNOTES" \
     --data "submit=SUBMIT" \
     -H "Cookie: ${O_AUTH}" http://forge.ow2.org/news/submit.php
 }
@@ -489,7 +476,7 @@ BASE=~/public_html/releases/
 if [[ -z $VERSION ]]
 then
   echo -e "Which version are you releasing?\033[0;32m"
-  GUESSED_VERSION=`ls -1t ${BASE}/org/xwiki/enterprise/xwiki-enterprise-jetty-hsqldb/ | grep -v metadata | head -1`
+  GUESSED_VERSION=`ls -1t ${BASE}/org/xwiki/platform/xwiki-platform/ | grep -v metadata | head -1`
   read -e -p "${GUESSED_VERSION}> " VERSION
   echo -n -e "\033[0m"
   if [[ -z $VERSION ]]
