@@ -298,8 +298,6 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-commons/xwiki-commons-core/xwiki-commons-extension/xwiki-commons-extension-api/src/main/resources/ || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Commons.xwiki-commons-extension-api&app=Commons'
 
-    cd ${XWIKI_TRUNKS}/xwiki-enterprise/ || exit -1
-    git status
     cd ${XWIKI_TRUNKS}/xwiki-platform/ || exit -1
     git status
     cd ${XWIKI_TRUNKS}/xwiki-rendering/ || exit -1
@@ -326,8 +324,6 @@ function check_clean() {
 
 function commit() {
     MSG="[release] Updated translations."
-    cd ${XWIKI_TRUNKS}/xwiki-enterprise/
-    git add . && git commit  -m "${MSG}" && git push
     cd ${XWIKI_TRUNKS}/xwiki-platform/
     git add . && git commit  -m "${MSG}" && git push
     cd ${XWIKI_TRUNKS}/xwiki-rendering/
@@ -339,8 +335,6 @@ function commit() {
 if [[ $1 == 'commit' ]]; then
     commit
 elif [[ $1 == 'clean' ]]; then
-    cd ${XWIKI_TRUNKS}/xwiki-enterprise/
-    git reset --hard && git clean -dxf
     cd ${XWIKI_TRUNKS}/xwiki-platform/
     git reset --hard && git clean -dxf
     cd ${XWIKI_TRUNKS}/xwiki-rendering/
@@ -348,7 +342,6 @@ elif [[ $1 == 'clean' ]]; then
     cd ${XWIKI_TRUNKS}/xwiki-commons/
     git reset --hard && git clean -dxf
 else
-    check_clean xwiki-enterprise
     check_clean xwiki-platform
     check_clean xwiki-rendering
     check_clean xwiki-commons
