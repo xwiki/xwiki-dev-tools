@@ -47,6 +47,10 @@ function do_all() {
     do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Platform.TourHomepageTourTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-tour/ && format_xar
 
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-common/src/main/resources/ || exit -1
+    do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Platform.MainWebHome&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-common/ && format_xar
+
     ##
     ## Wysiwyg 2.0
     ##
@@ -250,11 +254,6 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-appwithinminutes/xwiki-platform-appwithinminutes-ui/src/main/resources/ || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Platform.AppWithinMinutesTranslations&app=Platform'
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-appwithinminutes/xwiki-platform-appwithinminutes-ui/ && format_xar
-
-    ## Distribution
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/src/main/resources/ || exit -1
-    do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Platform.MainWebHome&app=Platform'
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/ && format_xar
 
     ## Application
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-application/xwiki-platform-application-ui/src/main/resources/ || exit -1
