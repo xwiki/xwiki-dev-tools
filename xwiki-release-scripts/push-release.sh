@@ -279,7 +279,7 @@ function push_ow2() {
 
   push_ow2_file ${O_U} ${BASE}/org/xwiki/platform/xwiki-platform-distribution-jetty-hsqldb/${VERSION}/xwiki-platform-distribution-jetty-hsqldb-${VERSION}.zip xwiki-${VERSION}.zip
   push_ow2_file ${O_U} ${BASE}/org/xwiki/platform/xwiki-platform-distribution-war/${VERSION}/platform-distribution-war-${VERSION}.war xwiki-${VERSION}.war
-  push_ow2_file ${O_U} ${BASE}/org/xwiki/platform/xwiki-platform-distribution-flavor-xip/${VERSION}/xwiki-platform-distribution-flavor-xip-${VERSION}.xip xwiki-classic-${VERSION}.xip
+  push_ow2_file ${O_U} ${BASE}/org/xwiki/platform/xwiki-platform-distribution-flavor-xip/${VERSION}/xwiki-platform-distribution-flavor-xip-${VERSION}.xip xwiki-standard-${VERSION}.xip
 }
 
 # Create the releases on OW2.
