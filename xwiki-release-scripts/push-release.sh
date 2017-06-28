@@ -321,6 +321,12 @@ function update_ow2() {
     --form-string "userfile2=xwiki-classic-${VERSION}.xip" \
     --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
     -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
+
+  # XWiki Default Flavor package
+  curl -s -o /dev/null -X POST --form-string "step2=1" \
+    --form-string "userfile2=xwiki-flavor-${VERSION}.zip" \
+    --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
+    -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
 }
 
 # Update the xwiki.org download pages.
