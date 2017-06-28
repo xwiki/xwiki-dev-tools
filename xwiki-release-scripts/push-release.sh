@@ -295,7 +295,7 @@ function update_ow2() {
   # XE
   # Create the package while uploading the first file, the generic installer
   DATE=`date '+%Y-%m-%d %k:%M'`
-  EDIT_RELEASE_URL=`curl -s -X POST --form-string "package_id=208" \
+  EDIT_RELEASE_URL=`curl -s -X POST --form-string "package_id=916" \
     --form-string "release_name=xwiki-${VERSION}" \
     --form-string "release_date=${DATE}" \
     --form-string "userfile2=xwiki-${VERSION}.zip" \
