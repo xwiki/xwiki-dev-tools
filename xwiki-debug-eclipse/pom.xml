@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>9.5-SNAPSHOT</version>
+    <version>9.6-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki-debug-eclipse</artifactId>
@@ -35,20 +35,28 @@
   <properties>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>
-        com.xpn.xwiki.products:xwiki-enterprise-web,
-        org.xwiki.manager:xwiki-manager-web,
-        com.xpn.xwiki.products:xwiki-enterprise-manager-web,
+      xwiki,
+      com.xpn.xwiki.products:xwiki-enterprise-web,
+      org.xwiki.manager:xwiki-manager-web,
+      com.xpn.xwiki.products:xwiki-enterprise-manager-web
     </xwiki.extension.features>
 
     <!-- The default UI associated to this WAR -->
-    <xwiki.extension.distribution.ui>org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki</xwiki.extension.distribution.ui>
-    <xwiki.extension.distribution.wikiui>org.xwiki.platform:xwiki-platform-distribution-flavor-wiki</xwiki.extension.distribution.wikiui>
+    <!-- <xwiki.extension.distribution.ui>org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki</xwiki.extension.distribution.ui>
+    <xwiki.extension.distribution.wikiui>org.xwiki.platform:xwiki-platform-distribution-flavor-wiki</xwiki.extension.distribution.wikiui> -->
 
     <!-- Flavors known to be valid with the current distribution -->
     <xwiki.extension.knownFlavors>
-        org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/${platform.version},
-        org.xwiki.platform:xwiki-platform-distribution-flavor-wiki/${platform.version}
+        org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/${project.version},
+        org.xwiki.platform:xwiki-platform-distribution-flavor-wiki/${project.version}
     </xwiki.extension.knownFlavors>
+
+    <!-- Flavors known to be incompatible with the current distribution -->
+    <xwiki.extension.knownInvalidFlavors>
+        org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki,
+        org.xwiki.enterprise:xwiki-enterprise-ui-wiki,
+        org.xwiki.platform:xwiki-platform-distribution-flavor
+    </xwiki.extension.knownInvalidFlavors>
   </properties>
   <dependencies>
     <!-- Databases -->
@@ -83,6 +91,11 @@
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
+
+    <!--  -->
+    <!-- Flavor -->
+    <!--  -->
+
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
