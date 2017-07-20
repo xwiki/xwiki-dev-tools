@@ -69,10 +69,6 @@ function check_env() {
     eval $(gpg-agent --daemon) || true
     export GPG_TTY=$(tty)
 
-    # Ask for the GPG passphrase used in Maven
-    echo "Enter GPG key passphrase:"
-    read -e -s -p "> " GPG_PASSPHRASE
-
     # Test GPG passphrase
     echo "Test GPG passphrase" | gpg -o /dev/null -as - || exit
   fi
@@ -229,7 +225,7 @@ function release_maven() {
   mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
   echo -e "\033[0;32m* release:perform\033[0m"
-  mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,flavor-integration-tests,distribution ${TEST_SKIP} -Dgpg.passphrase='${GPG_PASSPHRASE}' -Dxwiki.checkstyle.skip=true" -Dgpg.passphrase="${GPG_PASSPHRASE}" || exit -2
+  mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,flavor-integration-tests,distribution ${TEST_SKIP} -Dxwiki.checkstyle.skip=true" || exit -2
 
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git co ${TAG_NAME} -q
@@ -263,40 +259,15 @@ function push_release() {
   git push origin ${RELEASE_FROM_BRANCH}
 }
 
-# Generate a clirr report. Requires xsltproc to work properly.
-function clirr_report() {
-  echo -e "\033[0;32m* Generating clirr report\033[0m"
-  # Process the pom, so that all the specified excludes following the "to be removed after x.y is released" comment are removed.
-  xsltproc -o pom.xml $PRGDIR/clirr-excludes.xslt pom.xml
-  # Excludes are also specified in two other poms for xwiki-commons and xwiki-platform
-  if [[ -f xwiki-commons-core/pom.xml ]]
-  then
-    xsltproc -o xwiki-commons-core/pom.xml $PRGDIR/clirr-excludes.xslt xwiki-commons-core/pom.xml
-  elif [[ -f xwiki-platform-core/pom.xml ]]
-  then
-    xsltproc -o xwiki-platform-core/pom.xml $PRGDIR/clirr-excludes.xslt xwiki-platform-core/pom.xml
-  fi
-  # Run clirr
-  mvn clirr:check -DfailOnError=false -DtextOutputFile=clirr-result.txt -Plegacy,integration-tests,office-tests,flavor-integration-tests,distribution -DskipTests -q 1>/dev/null
-  # Aggregate results in one file
-  find . -name clirr-result.txt | xargs cat | grep ERROR > clirr.txt ; sed -r -e 's/ERROR: [0-9]+: //g' -e 's/\s+$//g' -i clirr.txt
-}
-
 # Cleanup sources again, after the release.
 function post_cleanup() {
   echo -e "\033[0;32m* Cleanup\033[0m"
-  # Temporarily move the clirr report to a different place, so that we can safely clean up the whole source tree
-## TODO: put back when fixed
-#  mv clirr.txt /tmp/clirr.txt
   git reset --hard -q
   git co master -q
   # Delete the release branch
   git branch -D ${RELEASE_BRANCH}
   git reset --hard -q
   git clean -dxfq
-  # Move back the clirr report
-## TODO: put back when fixed
-#   mv /tmp/clirr.txt clirr.txt
 }
 
 # Push the signed tag to the upstream repository.
@@ -317,8 +288,6 @@ function release_project() {
   release_maven
   post_update_parent_versions
   push_release
-## TODO: put back when fixed
-#  clirr_report
   post_cleanup
   push_tag
   cd ..
@@ -354,8 +323,6 @@ function display_help() {
   echo "* Create a release branch"
   echo "* Update the root project's parent version and the commons.version variable, if needed"
   echo "* Invoke the maven release process (mvn release:prepare and mvn release:perform)"
-## TODO: put back when fixed
-#  echo "* Generate a clirr report"
   echo "* Create GPG-signed tags and push them to the upstream repository"
   echo "* [Optional] Branch the current master into a stable release and update the master to the next version"
   echo ""
