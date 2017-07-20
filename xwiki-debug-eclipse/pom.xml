@@ -57,6 +57,13 @@
         org.xwiki.enterprise:xwiki-enterprise-ui-wiki,
         org.xwiki.platform:xwiki-platform-distribution-flavor
     </xwiki.extension.knownInvalidFlavors>
+
+    <!-- The recommended version of known extensions to use -->
+    <xwiki.extension.recommendedVersions>
+      org.xwiki.commons:.*/${project.version},
+      org.xwiki.rendering:.*/${project.version},
+      org.xwiki.platform:.*/${project.version}
+    </xwiki.extension.recommendedVersions>
   </properties>
   <dependencies>
     <!-- Databases -->
