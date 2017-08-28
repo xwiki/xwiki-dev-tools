@@ -52,17 +52,19 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-common/ && format_xar
 
     ##
-    ## Wysiwyg 2.0
+    ## Google WebToolkit based WYSIWYG content editor, retired in XWiki 9.7RC1.
     ##
 
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wysiwyg/xwiki-platform-wysiwyg-client/src/main/resources/org/xwiki/gwt/wysiwyg/client/  || exit -1
-    do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Wysiwyg.Stringsproperties&app=Wysiwyg'
+    if [[ -f "${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wysiwyg/xwiki-platform-wysiwyg-client/pom.xml" ]]; then
+      cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wysiwyg/xwiki-platform-wysiwyg-client/src/main/resources/org/xwiki/gwt/wysiwyg/client/  || exit -1
+      do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Wysiwyg.Stringsproperties&app=Wysiwyg'
 
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-gwt/xwiki-platform-gwt-user/src/main/resources/org/xwiki/gwt/user/client/  || exit -1
-    do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Wysiwyg.WidgetResources&app=Wysiwyg'
+      cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-gwt/xwiki-platform-gwt-user/src/main/resources/org/xwiki/gwt/user/client/  || exit -1
+      do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Wysiwyg.WidgetResources&app=Wysiwyg'
 
-    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wysiwyg/xwiki-platform-wysiwyg-client/src/main/resources/org/xwiki/gwt/wysiwyg/client/  || exit -1
-    do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Wysiwyg.WYSIWYGEditorCoreParametrizedResources&app=Wysiwyg'
+      cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wysiwyg/xwiki-platform-wysiwyg-client/src/main/resources/org/xwiki/gwt/wysiwyg/client/  || exit -1
+      do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Wysiwyg.WYSIWYGEditorCoreParametrizedResources&app=Wysiwyg'
+    fi
 
     ##
     ## Platform
