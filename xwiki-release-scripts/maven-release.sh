@@ -125,7 +125,7 @@ function check_versions() {
 function pre_cleanup() {
   echo -e "\033[0;32m* Cleaning up\033[0m"
   git reset --hard -q
-  git co master -q
+  git checkout master -q
   git reset --hard -q
   git clean -dxfq
 }
@@ -154,13 +154,14 @@ function stabilize_branch() {
       NEXT_TRUNK_VERSION=${tmp}
     fi
     # Let maven update the version for all the submodules
-    mvn release:branch -DbranchName=stable-${VERSION_STUB}.x -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,office-tests,legacy,standalone,flavor-integration-tests,distribution
-    git up
+    mvn release:branch -DbranchName=stable-${VERSION_STUB}.x -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -DpushChanges=false -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,office-tests,legacy,standalone,flavor-integration-tests,distribution
+    git pull --rebase
     # We must update the root parent and commons.version manually
-    mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -N -q
+    mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -DallowSnapshots=true -N -q
     sed -e "s/<commons.version>.*<\/commons.version>/<commons.version>${NEXT_TRUNK_VERSION}<\/commons.version>/" -i pom.xml
     git add pom.xml
-    git ci -m "[branch] Updating inter-project dependencies on master" -q
+    git commit -m "[branch] Updating inter-project dependencies on master" -q
+    git push origin master
     CURRENT_VERSION=`echo $NEXT_TRUNK_VERSION | cut -d- -f1`
     RELEASE_FROM_BRANCH=stable-${VERSION_STUB}.x
   fi
@@ -200,7 +201,7 @@ function check_branch() {
 function create_release_branch() {
   echo -e "\033[0;32m* Creating release branch\033[0m"
   git branch ${RELEASE_BRANCH} origin/${RELEASE_FROM_BRANCH} || exit -2
-  git co ${RELEASE_BRANCH} -q
+  git checkout ${RELEASE_BRANCH} -q
   CURRENT_VERSION=`mvn help:evaluate -Dexpression='project.version' -N | grep -v '\[' | grep -v 'Download' | cut -d- -f1`
 }
 
@@ -216,7 +217,7 @@ function pre_update_parent_versions() {
   TAG_NAME=${PROJECT_NAME}-${VERSION}
 
   git add pom.xml
-  git ci -m "[release] Preparing release ${TAG_NAME}" -q
+  git commit -m "[release] Preparing release ${TAG_NAME}" -q
 }
 
 # Perform the actual maven release.
@@ -232,7 +233,7 @@ function release_maven() {
   mvn release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,flavor-integration-tests,distribution ${TEST_SKIP} -Dgpg.passphrase='${GPG_PASSPHRASE}' -Dxwiki.checkstyle.skip=true" -Dgpg.passphrase="${GPG_PASSPHRASE}" || exit -2
 
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
-  git co ${TAG_NAME} -q
+  git checkout ${TAG_NAME} -q
   git tag -s -f -m "Tagging ${TAG_NAME}" ${TAG_NAME}
 }
 
@@ -242,7 +243,7 @@ function release_maven() {
 # The changes will be committed as a new git version.
 function post_update_parent_versions() {
   echo -e "\033[0;32m* Go back to branch ${RELEASE_BRANCH}\033[0m"
-  git co ${RELEASE_BRANCH}
+  git checkout ${RELEASE_BRANCH}
 
   echo -e "\033[0;32m* Update parent to ${NEXT_SNAPSHOT_VERSION} after release\033[0m"
   xsltproc -o pom.xml --stringparam parentversion "${NEXT_SNAPSHOT_VERSION}" $PRGDIR/set-parent-version.xslt pom.xml
@@ -250,13 +251,13 @@ function post_update_parent_versions() {
   sed -e "s/<commons.version>${VERSION}<\/commons.version>/<commons.version>${NEXT_SNAPSHOT_VERSION}<\/commons.version>/" -i pom.xml
 
   git add pom.xml
-  git ci -m "[release] Update parent after release ${TAG_NAME}" -q
+  git commit -m "[release] Update parent after release ${TAG_NAME}" -q
 }
 
 # Push changes made to the release branch (new SNAPSHOT version, etc)
 function push_release() {
   echo -e "\033[0;32m* Switch to release base branch\033[0m"
-  git co ${RELEASE_FROM_BRANCH}
+  git checkout ${RELEASE_FROM_BRANCH}
   echo -e "\033[0;32m* Merge release branch\033[0m"
   git merge ${RELEASE_BRANCH}
   echo -e "\033[0;32m* Push release base branch\033[0m"
@@ -289,7 +290,7 @@ function post_cleanup() {
 ## TODO: put back when fixed
 #  mv clirr.txt /tmp/clirr.txt
   git reset --hard -q
-  git co master -q
+  git checkout master -q
   # Delete the release branch
   git branch -D ${RELEASE_BRANCH}
   git reset --hard -q
