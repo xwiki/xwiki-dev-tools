@@ -317,10 +317,10 @@ function check_clean() {
         exit -1;
     fi
     git reset --hard &&
+    git fetch origin ${BRANCH} &&
     git checkout ${BRANCH} &&
     git reset --hard &&
-    git clean -dxf &&
-    git pull origin ${BRANCH} || exit -1
+    git clean -dxf || exit -1
 }
 
 function commit() {
