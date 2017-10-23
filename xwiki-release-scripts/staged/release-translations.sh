@@ -318,6 +318,10 @@ function check_clean() {
     fi
     git reset --hard &&
     git clean -dxf &&
+    ## Always go to 'master' before executing 'pull', otherwise it fails.
+    git checkout master &&
+    ## Do a 'git pull' to fetch new remote branches. A 'git fetch' would have been better,
+    ## but it simply does not fetch anything on the agent's git version 1.7.40
     git pull &&
     git checkout ${BRANCH} &&
     git reset --hard &&
