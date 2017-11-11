@@ -28,7 +28,7 @@
     <version>9.10-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
-  <artifactId>xwiki-debug-eclipse</artifactId>
+  <artifactId>xwiki</artifactId>
   <name>XWiki Debug Eclipse</name>
   <packaging>war</packaging>
   <description>Custom Eclipse WAR project to debug XWiki</description>
