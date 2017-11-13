@@ -162,6 +162,7 @@ function stabilize_branch() {
     git add pom.xml
     git commit -m "[branch] Updating inter-project dependencies on master" -q
     git push origin master
+    git push origin stable-${VERSION_STUB}.x
     CURRENT_VERSION=`echo $NEXT_TRUNK_VERSION | cut -d- -f1`
     RELEASE_FROM_BRANCH=stable-${VERSION_STUB}.x
   fi
