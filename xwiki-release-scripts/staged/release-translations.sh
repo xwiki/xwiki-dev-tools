@@ -331,11 +331,11 @@ function check_clean() {
 function commit() {
     MSG="[release] Updated translations."
     cd ${XWIKI_TRUNKS}/xwiki-platform/
-    git add . && git commit  -m "${MSG}" && git pull --rebase && git push origin ${BRANCH}
+    git add . && git commit  -m "${MSG}" && git pull --rebase origin ${BRANCH} && git push origin ${BRANCH}
     cd ${XWIKI_TRUNKS}/xwiki-rendering/
-    git add . && git commit  -m "${MSG}" && git pull --rebase && git push origin ${BRANCH}
+    git add . && git commit  -m "${MSG}" && git pull --rebase origin ${BRANCH} && git push origin ${BRANCH}
     cd ${XWIKI_TRUNKS}/xwiki-commons/
-    git add . && git commit  -m "${MSG}" && git pull --rebase && git push origin ${BRANCH}
+    git add . && git commit  -m "${MSG}" && git pull --rebase origin ${BRANCH} && git push origin ${BRANCH}
 }
 
 if [[ $1 == 'commit' ]]; then
