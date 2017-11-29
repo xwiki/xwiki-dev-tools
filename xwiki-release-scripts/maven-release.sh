@@ -108,7 +108,7 @@ function check_versions() {
   # Check next SNAPSHOT version
   if [[ -z $NEXT_SNAPSHOT_VERSION ]]
   then
-    VERSION_STUB=`echo $VERSION | cut -d- -f1`
+    VERSION_STUB=`echo $VERSION | cut -d. -f1,2 | cut -d- -f1`
     let NEXT_SNAPSHOT_VERSION=`echo ${VERSION_STUB} | cut -d. -f2`+1
     NEXT_SNAPSHOT_VERSION=`echo ${VERSION_STUB} | cut -d. -f1`.${NEXT_SNAPSHOT_VERSION}-SNAPSHOT
     echo "What is the next SNAPSHOT version?"
@@ -175,7 +175,7 @@ function stabilize_branch() {
 # In the end, a variable called RELEASE_FROM_BRANCH will hold the name of the source branch to start the release from (master or stable-X.Y).
 function check_branch() {
   CURRENT_VERSION=`mvn help:evaluate -Dexpression='project.version' -N | grep -v '\[' | grep -v 'Download' | cut -d- -f1`
-  VERSION_STUB=`echo $VERSION | cut -d- -f1`
+  VERSION_STUB=`echo $VERSION | cut -d. -f1,2 | cut -d- -f1`
 
   RELEASE_FROM_BRANCH=master
   if [[ $CURRENT_VERSION == $VERSION_STUB ]]
