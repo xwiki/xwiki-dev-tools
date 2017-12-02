@@ -82,7 +82,7 @@ dbparam() {
             XWDBURL="jdbc:postgresql:xwiki$XWDBSFX"
             XWDBDIALECT="org.hibernate.dialect.PostgreSQLDialect"
             XWJDBC="/usr/share/java/postgresql-jdbc4.jar"
-            XWDBAUSR="postgres"
+            XWDBAUSR="postgreSQL"
             export PGPASSWORD="xwiki"
             ;;
         oracle|ora)
@@ -226,31 +226,31 @@ unzippkg() {
     fi
 
     if [[ ! -r $XWFOLDER/$XWIKISTART ]]; then
-        echo "Unzipped distribution does no contain $XWIKISTART" >&2
+        echo "Unzipped distribution does not contain $XWIKISTART" >&2
     fi
 
     if [[ ! -r $XWFOLDER/$XWIKISTOP ]]; then
-        echo "Unzipped distribution does no contain $XWIKISTOP" >&2
+        echo "Unzipped distribution does not contain $XWIKISTOP" >&2
     fi
 
     if [[ ! -r $XWFOLDER/$XWHIBCFG ]]; then
-        echo "Unzipped distribution does no contain $XWHIBCFG" >&2
+        echo "Unzipped distribution does not contain $XWHIBCFG" >&2
     fi
 
     if [[ ! -r $XWFOLDER/$XWIKICFG ]]; then
-        echo "Unzipped distribution does no contain $XWIKICFG" >&2
+        echo "Unzipped distribution does not contain $XWIKICFG" >&2
     fi
 
     if [[ ! -r $XWFOLDER/$XWIKIPROPS ]]; then
-        echo "Unzipped distribution does no contain $XWIKIPROPS" >&2
+        echo "Unzipped distribution does not contain $XWIKIPROPS" >&2
     fi
 
     if [[ ! -d $XWFOLDER/$XWIKILIB ]]; then
-        echo "Unzipped distribution does no contain $XWFOLDER/$XWIKILIB" >&2
+        echo "Unzipped distribution does not contain $XWFOLDER/$XWIKILIB" >&2
     fi
 
     if [[ ! -d $XWFOLDER/$XWIKICLASSES ]]; then
-        echo "Unzipped distribution does no contain $XWFOLDER/$XWIKICLASSES" >&2
+        echo "Unzipped distribution does not contain $XWFOLDER/$XWIKICLASSES" >&2
     fi
 
 }
