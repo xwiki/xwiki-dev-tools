@@ -500,7 +500,7 @@ while getopts ":hb:B:d:e:f:i:I:kl:L:np:r:s:t:u:U:v:wz" OPT; do
         u)  # Save the data folder
             XWDATABKP=$OPTARG
             ;;
-        U)  # Save the data folder (not doing anything elsei but export)
+        U)  # Save the data folder (not doing anything else but export)
             XWDATABKP=$OPTARG
             XWSTART="no"
             XWCLEAR="no"
