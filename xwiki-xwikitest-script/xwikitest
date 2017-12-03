@@ -82,7 +82,7 @@ dbparam() {
             XWDBURL="jdbc:postgresql:xwiki$XWDBSFX"
             XWDBDIALECT="org.hibernate.dialect.PostgreSQLDialect"
             XWJDBC="/usr/share/java/postgresql-jdbc4.jar"
-            XWDBAUSR="postgreSQL"
+            XWDBAUSR="postgres"
             export PGPASSWORD="xwiki"
             ;;
         oracle|ora)
