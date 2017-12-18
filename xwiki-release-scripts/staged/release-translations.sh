@@ -140,6 +140,7 @@ function do_all() {
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-common/ && format_xar
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-default/src/main/resources/  || exit -1
     do_one 'https://l10n.xwiki.org/xwiki/bin/get/L10NCode/GetTranslationFile?name=Platform.xwiki-platform-wiki-default&app=Platform'
+    cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-default/ && format_xar
 
     ## Panels
     cd ${XWIKI_TRUNKS}/xwiki-platform/xwiki-platform-core/xwiki-platform-panels/xwiki-platform-panels-ui/src/main/resources/ || exit -1
