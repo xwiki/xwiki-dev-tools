@@ -31,8 +31,6 @@ function read_user_and_password() {
 }
 
 function format_xar() {
-    ## due to https://github.com/mycila/license-maven-plugin/issues/37 we need to perform "mvn xar:format" twice.
-    mvn xar:format
     mvn xar:format
 }
 
