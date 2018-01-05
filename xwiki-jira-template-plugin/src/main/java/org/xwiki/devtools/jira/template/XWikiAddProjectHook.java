@@ -135,24 +135,8 @@ public class XWikiAddProjectHook implements AddProjectHook
                 + "It is not set for the new project [%s]", project.getName()));
         }
 
-        // Set project committers role to xwiki-committers and contrib-committers
-        // Set special contributors role to xwiki-special-contributors
-        ProjectRoleService roleService = ComponentAccessor.getComponentOfType(ProjectRoleService.class);
-        SimpleErrorCollection errorCollection = new SimpleErrorCollection();
-
-        ProjectRole commmitterRole = roleService.getProjectRoleByName("Committers", errorCollection);
-        // Make sure to remove any of the groups we wish to add to the role as otherwise the addition fails
-        roleService.removeActorsFromProjectRole(Arrays.asList("xwiki-committers", "contrib-committers"), commmitterRole,
-            project, "atlassian-group-role-actor", errorCollection);
-        roleService.addActorsToProjectRole(Arrays.asList("xwiki-committers", "contrib-committers"), commmitterRole,
-            project, "atlassian-group-role-actor", errorCollection);
-
-        ProjectRole specialContributorRole = roleService.getProjectRoleByName("Special Contributors", errorCollection);
-        // Make sure to remove any of the groups we wish to add to the role as otherwise the addition fails
-        roleService.removeActorsFromProjectRole(Arrays.asList("xwiki-special-contributors"), specialContributorRole,
-            project, "atlassian-group-role-actor", errorCollection);
-        roleService.addActorsToProjectRole(Arrays.asList("xwiki-special-contributors"), specialContributorRole,
-            project, "atlassian-group-role-actor", errorCollection);
+        // Note: jira.xwiki.org is configured to have default members for roles so we don't need to set them at all.
+        // See https://jira.xwiki.org/secure/project/ViewProjectRoles.jspa
 
         return ConfigureResponse.create().setRedirect("/plugins/servlet/project-config/" + project.getKey()
             + "/summary");
