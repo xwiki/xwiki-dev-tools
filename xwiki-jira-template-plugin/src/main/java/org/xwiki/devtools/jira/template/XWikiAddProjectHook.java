@@ -136,13 +136,22 @@ public class XWikiAddProjectHook implements AddProjectHook
         }
 
         // Set project committers role to xwiki-committers and contrib-committers
+        // Set special contributors role to xwiki-special-contributors
         ProjectRoleService roleService = ComponentAccessor.getComponentOfType(ProjectRoleService.class);
         SimpleErrorCollection errorCollection = new SimpleErrorCollection();
+
         ProjectRole commmitterRole = roleService.getProjectRoleByName("Committers", errorCollection);
-        // Make sure to remove any of the groups we wish to add to the Committers role as otherwise the addition fails
+        // Make sure to remove any of the groups we wish to add to the role as otherwise the addition fails
         roleService.removeActorsFromProjectRole(Arrays.asList("xwiki-committers", "contrib-committers"), commmitterRole,
             project, "atlassian-group-role-actor", errorCollection);
         roleService.addActorsToProjectRole(Arrays.asList("xwiki-committers", "contrib-committers"), commmitterRole,
+            project, "atlassian-group-role-actor", errorCollection);
+
+        ProjectRole specialContributorRole = roleService.getProjectRoleByName("Special Contributors", errorCollection);
+        // Make sure to remove any of the groups we wish to add to the role as otherwise the addition fails
+        roleService.removeActorsFromProjectRole(Arrays.asList("xwiki-special-contributors"), specialContributorRole,
+            project, "atlassian-group-role-actor", errorCollection);
+        roleService.addActorsToProjectRole(Arrays.asList("xwiki-special-contributors"), specialContributorRole,
             project, "atlassian-group-role-actor", errorCollection);
 
         return ConfigureResponse.create().setRedirect("/plugins/servlet/project-config/" + project.getKey()
