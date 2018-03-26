@@ -154,7 +154,7 @@ function stabilize_branch() {
       NEXT_TRUNK_VERSION=${tmp}
     fi
     # Let maven update the version for all the submodules
-    mvn release:branch -DbranchName=stable-${VERSION_STUB}.x -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -DpushChanges=false -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,office-tests,legacy,standalone,flavor-integration-tests,distribution
+    mvn release:branch -DbranchName=$STABLE_BRANCH -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -DpushChanges=false -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,office-tests,legacy,standalone,flavor-integration-tests,distribution
     git pull --rebase
     # We must update the root parent and commons.version manually
     mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -DallowSnapshots=true -N -q
@@ -162,9 +162,9 @@ function stabilize_branch() {
     git add pom.xml
     git commit -m "[branch] Updating inter-project dependencies on master" -q
     git push origin master
-    git push origin stable-${VERSION_STUB}.x
+    git push origin $STABLE_BRANCH
     CURRENT_VERSION=`echo $NEXT_TRUNK_VERSION | cut -d- -f1`
-    RELEASE_FROM_BRANCH=stable-${VERSION_STUB}.x
+    RELEASE_FROM_BRANCH=$STABLE_BRANCH
   fi
 }
 
@@ -176,16 +176,18 @@ function stabilize_branch() {
 function check_branch() {
   CURRENT_VERSION=`mvn help:evaluate -Dexpression='project.version' -N | grep -v '\[' | grep -v 'Download' | cut -d- -f1`
   VERSION_STUB=`echo $VERSION | cut -d. -f1,2 | cut -d- -f1`
+  STABLE_BRANCH=stable-${VERSION_STUB}.x
 
   RELEASE_FROM_BRANCH=master
   if [[ $CURRENT_VERSION == $VERSION_STUB ]]
   then
-    if [[ `echo $VERSION | grep 'rc-1'` ]]
+    # Offer to create the stable branch if it doesn't exist and the released version is not a milestone.
+    if [[ -z `echo $VERSION | grep '-milestone-'` && -z `git branch -r | grep $STABLE_BRANCH` ]]
     then
       stabilize_branch
     fi
   else
-    RELEASE_FROM_BRANCH=stable-${VERSION_STUB}.x
+    RELEASE_FROM_BRANCH=$STABLE_BRANCH
     if [[ -z `git branch -r | grep ${RELEASE_FROM_BRANCH}` ]]
     then
       echo -e "\033[1;31mThe release must be performed from the ${RELEASE_FROM_BRANCH} branch, but it doesn't seem to exist yet.\033[0m"
@@ -335,7 +337,7 @@ function release_all() {
   echo              "*****************************"
   echo -e "\033[1;32m    Releasing xwiki-commons\033[0m"
   echo              "*****************************"
-  release_project xwiki-commons
+  #release_project xwiki-commons
   echo              "*****************************"
   echo -e "\033[1;32m    Releasing xwiki-rendering\033[0m"
   echo              "*****************************"
