@@ -337,7 +337,7 @@ function release_all() {
   echo              "*****************************"
   echo -e "\033[1;32m    Releasing xwiki-commons\033[0m"
   echo              "*****************************"
-  #release_project xwiki-commons
+  release_project xwiki-commons
   echo              "*****************************"
   echo -e "\033[1;32m    Releasing xwiki-rendering\033[0m"
   echo              "*****************************"
