@@ -306,24 +306,24 @@ function update_ow2() {
     --form-string "release_changes=${CHANGELOG}" \
     --form-string "submit=Release File" \
     -H "Cookie: ${O_AUTH}" \
-    http://forge.ow2.org/project/admin/qrs.php?group_id=170 | grep "editrelease"  | sed -r -e 's/.*You can now <a href="//' -e 's/">.*//' -e 's/&amp;/\&/g'`
+    https://forge.ow2.org/project/admin/qrs.php?group_id=170 | grep "editrelease"  | sed -r -e 's/.*You can now <a href="//' -e 's/">.*//' -e 's/&amp;/\&/g'`
 
-  EDIT_RELEASE_URL="http://forge.ow2.org${EDIT_RELEASE_URL}"
+  EDIT_RELEASE_URL="https://forge.ow2.org${EDIT_RELEASE_URL}"
 
   # XWiki WAR
-  curl -s -o /dev/null -X POST --form-string "step2=1" \
+  curl -L -s -o /dev/null -X POST --form-string "step2=1" \
     --form-string "userfile2=xwiki-${VERSION}.war" \
     --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
     -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
 
   # XWiki Classic flavor offline package
-  curl -s -o /dev/null -X POST --form-string "step2=1" \
+  curl -L -s -o /dev/null -X POST --form-string "step2=1" \
     --form-string "userfile2=xwiki-classic-${VERSION}.xip" \
     --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
     -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
 
   # XWiki Default Flavor package
-  curl -s -o /dev/null -X POST --form-string "step2=1" \
+  curl -L -s -o /dev/null -X POST --form-string "step2=1" \
     --form-string "userfile2=xwiki-flavor-${VERSION}.zip" \
     --form-string "userfile=" --form-string "type_id=3000" --form-string "processor_id=8000" --form-string "submit=Add This File" \
     -H "Cookie: ${O_AUTH}" ${EDIT_RELEASE_URL}
@@ -371,12 +371,12 @@ function announce_ow2() {
   echo -e "\033[0;32m* Announcing the release on OW2\033[0m"
   authenticate_ow2
 
-  curl -s -o /tmp/resp -X POST --data "group_id=170" --data "post_changes=1" \
+  curl -L -s -o /tmp/resp -X POST --data "group_id=170" --data "post_changes=1" \
     --data-urlencode "summary=XWiki ${PRETTY_VERSION} Released" \
     --data-urlencode "description=The XWiki development team is proud to announce the availability of XWiki ${PRETTY_VERSION}. ${RELSUMMARY}. " \
     --data-urlencode "details=The XWiki development team is proud to announce the availability of XWiki ${PRETTY_VERSION}. $RELNOTES" \
     --data "submit=SUBMIT" \
-    -H "Cookie: ${O_AUTH}" http://forge.ow2.org/news/submit.php
+    -H "Cookie: ${O_AUTH}" https://forge.ow2.org/news/submit.php
 }
 
 # Create a blog post on xwiki.org announcing the release.
