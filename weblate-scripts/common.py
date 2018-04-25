@@ -21,7 +21,7 @@ class XmlFile(object):
 
     def set_tag_content(self, tag, content):
         """Set content of an existing tag"""
-        content = content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        content = content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").strip()
         start = re.search(r"\<\s*{}\s*\>\s*".format(tag), self.document)
         if start is None:
             tag_start = re.search(r"\<\s*{}\s*\/\s*\>".format(tag), self.document)
