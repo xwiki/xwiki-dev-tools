@@ -78,17 +78,11 @@ if __name__ == '__main__':
     PATH_PREFIX = os.environ["WL_PATH"] if "WL_PATH" in os.environ else ""
     if PATH_PREFIX and PATH_PREFIX[-1] != "/":
         PATH_PREFIX += "/"
-    TRANSLATION_WIKI_FILE_NAME = sys.argv[1] if len(sys.argv) > 1 else "translation_wiki.txt"
-    if len(sys.argv) > 2:
-        TRANSLATION_WIKI_PROPERTIES_FILE_NAME = sys.argv[2]
-    else:
-        TRANSLATION_WIKI_PROPERTIES_FILE_NAME = "translation_wiki_properties.txt"
-    if len(sys.argv) > 3:
-        TRANSLATION_PROPERTIES_FILE_NAME = sys.argv[3]
-    else:
-        TRANSLATION_PROPERTIES_FILE_NAME = "translation_properties.txt"
+    TRANSLATION_XML_FILE_NAME = sys.argv[1] if len(sys.argv) > 1 else "translation_xml.txt"
+    TRANSLATION_XML_PROPERTIES_FILE_NAME = "translation_xml_properties.txt"
+    TRANSLATION_PROPERTIES_FILE_NAME = "translation_properties.txt"
 
-    with open(TRANSLATION_WIKI_FILE_NAME, 'r') as f:
+    with open(TRANSLATION_XML_FILE_NAME, 'r') as f:
         for line in f.read().splitlines():
             properties_to_xwiki_xml(line, PATH_PREFIX, "en")
             dir_name = os.path.dirname(line)
@@ -98,7 +92,7 @@ if __name__ == '__main__':
                     lang = file_name.split(".")[-2]
                     if lang != "en":
                         properties_to_xwiki_xml(dir_name + "/" + file_name, PATH_PREFIX, lang)
-    with open(TRANSLATION_WIKI_PROPERTIES_FILE_NAME, 'r') as f:
+    with open(TRANSLATION_XML_PROPERTIES_FILE_NAME, 'r') as f:
         for line in f.read().splitlines():
             properties_to_xwiki_xml_properties(line, PATH_PREFIX, "en")
             dir_name = os.path.dirname(line)
