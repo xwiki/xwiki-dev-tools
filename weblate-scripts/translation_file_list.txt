@@ -1,0 +1,69 @@
+Help.SupportPanel.Content              xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/Help/SupportPanel/Content.xml
+XWiki.XWikiSyntaxGeneralRemarks        xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxGeneralRemarks.xml
+TemplateMacro                          xwiki-platform-core/xwiki-platform-template/xwiki-platform-template-api/src/main/resources/ApplicationResources.properties
+Tour.HomepageTour.Translations         xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-tour/src/main/resources/Tour/HomepageTour/Translations.xml
+Localization Macro                     xwiki-platform-core/xwiki-platform-localization/xwiki-platform-localization-macro/src/main/resources/ApplicationResources.properties
+XWiki.RatingsTranslations              xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-ui/src/main/resources/XWiki/RatingsTranslations.xml
+Main.SolrTranslations                  xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-ui/src/main/resources/Main/SolrTranslations.xml
+XWiki.XWikiSyntaxVerbatim              xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxVerbatim.xml
+XWiki.XWikiSyntaxNewLineLineBreaks     xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxNewLineLineBreaks.xml
+XWiki Core Resources                   xwiki-platform-core/xwiki-platform-oldcore/src/main/resources/ApplicationResources.properties
+XWiki.XWikiSyntaxQuotations            xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxQuotations.xml
+XWiki.UserProfileTranslations          xwiki-platform-core/xwiki-platform-user/xwiki-platform-user-profile/xwiki-platform-user-profile-ui/src/main/resources/XWiki/UserProfileTranslations.xml
+Dashboard.Translations                 xwiki-platform-core/xwiki-platform-dashboard/xwiki-platform-dashboard-ui/src/main/resources/Dashboard/Translations.xml
+xwiki-platform-rendering-ui            xwiki-platform-core/xwiki-platform-rendering/xwiki-platform-rendering-ui/src/main/resources/Rendering/Translations.xml
+WYSIWYG Editor API                     xwiki-platform-core/xwiki-platform-wysiwyg/xwiki-platform-wysiwyg-api/src/main/resources/ApplicationResources.properties
+Repository                             xwiki-platform-core/xwiki-platform-repository/xwiki-platform-repository-server-ui/src/main/resources/ExtensionCode/Translations.xml
+Common WikiManager.CommonTranslations  xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-common/src/main/resources/WikiManager/CommonTranslations.xml
+xwiki-platform-extension-script        xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-script/src/main/resources/ApplicationResources.properties
+XWiki.XWikiSyntaxHeadings              xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxHeadings.xml
+XWiki.XWikiSyntaxEscapes               xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxEscapes.xml
+Skin Extensions                        xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-skinx/src/main/resources/ApplicationResources.properties
+XWiki.XWikiSyntaxParameters            xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxParameters.xml
+Rating module                          xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-api/src/main/resources/ApplicationResources.properties
+Main WikiManager.Translations          xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-mainwiki/src/main/resources/WikiManager/Translations.xml
+XWiki.WatchListTranslations            xwiki-platform-core/xwiki-platform-watchlist/xwiki-platform-watchlist-ui/src/main/resources/XWiki/WatchListTranslations.xml
+XWiki.XWikiSyntaxDefinitionLists       xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxDefinitionLists.xml
+XWiki.XWikiSyntaxParagraphs            xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxParagraphs.xml
+Mail.Translations                      xwiki-platform-core/xwiki-platform-mail/xwiki-platform-mail-ui/src/main/resources/Mail/Translations.xml
+xwiki-platform-extension-handler-xar   xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-handlers/xwiki-platform-extension-handler-xar/src/main/resources/ApplicationResources.properties
+Index.Translations                     xwiki-platform-core/xwiki-platform-index/xwiki-platform-index-ui/src/main/resources/Index/Translations.xml
+XWiki.XWikiSyntaxTranslations          xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTranslations.xml
+FlamingoThemesCode.Translations        xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-themes/xwiki-platform-flamingo-theme-ui/src/main/resources/FlamingoThemesCode/Translations.xml
+XWiki.AdminTranslations.xml            xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui/src/main/resources/XWiki/AdminTranslations.xml
+XWiki.DocumentTreeTranslations         xwiki-platform-core/xwiki-platform-index/xwiki-platform-index-tree/xwiki-platform-index-tree-macro/src/main/resources/XWiki/DocumentTreeTranslations.xml
+XWiki.UserDirectoryTranslations        xwiki-platform-core/xwiki-platform-user/xwiki-platform-user-directory/xwiki-platform-user-directory-ui/src/main/resources/XWiki/UserDirectoryTranslations.xml
+Macros.TreeTranslations                xwiki-platform-core/xwiki-platform-tree/xwiki-platform-tree-macro/src/main/resources/Macros/TreeTranslations.xml
+XWiki.XWikiSyntaxMacros                xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxMacros.xml
+Flavor API                             xwiki-platform-core/xwiki-platform-flavor/xwiki-platform-flavor-api/src/main/resources/ApplicationResources.properties
+XWiki.XWikiSyntaxIntroduction          xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxIntroduction.xml
+Sandbox.WebHome                        xwiki-platform-core/xwiki-platform-sandbox/src/main/resources/Sandbox/WebHome.xml
+IconThemesCode.Translations            xwiki-platform-core/xwiki-platform-icon/xwiki-platform-icon-ui/src/main/resources/IconThemesCode/Translations.xml
+Help.Translations                      xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/Help/Translations.xml
+AppWithinMinutes.Translations          xwiki-platform-core/xwiki-platform-appwithinminutes/xwiki-platform-appwithinminutes-ui/src/main/resources/AppWithinMinutes/Translations.xml
+XWiki.XWikiSyntaxImages                xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxImages.xml
+XWiki.XWikiSyntaxGroups                xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxGroups.xml
+Main.ActivityTranslations              xwiki-platform-core/xwiki-platform-activitystream/xwiki-platform-activitystream-ui/src/main/resources/Main/ActivityTranslations.xml
+XWiki.XWikiSyntaxTextFormatting        xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTextFormatting.xml
+XWiki.XWikiSyntaxTables                xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTables.xml
+xwiki-platform-wiki-default            xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-default/src/main/resources/ApplicationResources.properties
+Menu Application                       xwiki-platform-core/xwiki-platform-menu/xwiki-platform-menu-ui/src/main/resources/Menu/MenuTranslations.xml
+Applications.Translations              xwiki-platform-core/xwiki-platform-application/xwiki-platform-application-ui/src/main/resources/Applications/Translations.xml
+Jetty listener                         xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/src/main/resources/org/xwiki/tools/jetty/listener/messages.properties
+SkinsCode.Translations                 xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ui/src/main/resources/SkinsCode/Translations.xml
+XWiki.XWikiSyntaxHorizontalLine        xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxHorizontalLine.xml
+XWiki.XWikiSyntaxOtherSyntaxes         xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxOtherSyntaxes.xml
+XWiki.XWikiSyntaxScripts               xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxScripts.xml
+Panels.Translations                    xwiki-platform-core/xwiki-platform-panels/xwiki-platform-panels-ui/src/main/resources/Panels/Translations.xml
+AnnotationCode.Translations            xwiki-platform-core/xwiki-platform-annotations/xwiki-platform-annotation-ui/src/main/resources/AnnotationCode/Translations.xml
+Main.WebHome                           xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-common/src/main/resources/Main/WebHome.xml
+XWiki.XWikiSyntaxLinks                 xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxLinks.xml
+XWiki.OfficeImporterTranslations       xwiki-platform-core/xwiki-platform-office/xwiki-platform-office-ui/src/main/resources/XWiki/OfficeImporterTranslations.xml
+XWiki.XWikiSyntaxLists                 xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxLists.xml
+PanelsCode.Translations                xwiki-platform-core/xwiki-platform-panels/xwiki-platform-panels-ui/src/main/resources/PanelsCode/Translations.xml
+Wiki WikiManager.Translations          xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-wiki/src/main/resources/WikiManager/Translations.xml
+Platform.SandboxTestPage               xwiki-platform-core/xwiki-platform-sandbox/src/main/resources/Sandbox/TestPage1.xml
+XWiki.TemplateProviderTranslations     xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui/src/main/resources/XWiki/TemplateProviderTranslations.xml
+Invitation.Translations                xwiki-platform-core/xwiki-platform-invitation/xwiki-platform-invitation-ui/src/main/resources/Invitation/Translations.xml
+XWiki.XWikiSyntaxHTML                  xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxHTML.xml
+XWiki.Notifications.Code.Translations  xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui/src/main/resources/XWiki/Notifications/Code/Translations.xml
