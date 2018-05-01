@@ -37,3 +37,14 @@ The following tasks are performed:
 
 * Remove the `.translation/[file]` added by Weblate from the commit
 * Add the real translation file to the commit
+
+## Miscellaneous
+
+### Generate components script
+
+A `components.json` file can be generated and used to automatically create components in weblate.
+For instance, you can run:
+```
+./manage.py import_json components.json --project xwiki-platform --main-component help-supportpanel-content --update
+```
+This will import or update the components into the `xwiki-platform` project taking `help-supportpanel-content` as the main component. This means that all the components, specified in the `components.json` file, will use the git repository of `help-supportpanel-content`.
