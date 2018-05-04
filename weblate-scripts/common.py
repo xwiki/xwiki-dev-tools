@@ -100,6 +100,22 @@ class PropertiesFile(object):
         with open(file_name, "w") as f_properties:
             f_properties.write(self.document)
 
+    def unescape_import(self):
+        """Unescape special character for the import"""
+        self.document = self.replace_values("''", "'")
+
+    def escape_export(self):
+        """Escape special character for the export"""
+        self.document = self.replace_values("'", "''")
+
+    def replace_values(self, old, new):
+        res = ""
+        for line in self.document.splitlines(True):
+            if re.search(r"\{[0-9]*\}", line):
+                line = line.replace(old, new)
+            res += line
+        return res
+
     @staticmethod
     def escape(text):
         return text.replace("\n", "\\n")

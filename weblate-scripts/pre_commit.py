@@ -53,6 +53,7 @@ def properties_to_xwiki_xml_properties(path, path_prefix, lang):
     properties = PropertiesFile()
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
+        properties.escape_export()
 
     xml_file = XmlFile(path_prefix + path)
     xml_file.set_tag_content("content", properties.document)
@@ -68,9 +69,11 @@ def properties_to_xwiki_properties(path, path_prefix, lang):
 
     properties_path = "{}.translation/{}_{}.properties".format(
             path_prefix, relative_dir_path + "/" + file_name, lang)
+    properties = PropertiesFile()
     with open(properties_path, "r") as f_properties:
-        with open(path_prefix + path, "w") as f_wiki_properties:
-            f_wiki_properties.write(f_properties.read())
+        properties.load(f_properties.read())
+        properties.escape_export()
+        properties.write(path_prefix + path)
 
 if __name__ == '__main__':
     reload(sys)
