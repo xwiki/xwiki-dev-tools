@@ -1,0 +1,32 @@
+Map Macro                                      src/main/resources/XWiki/MapMacroTranslations.xml
+Mocca Calendar Application                     application-mocca-calendar-ui/src/main/resources/MoccaCalendar/MoccaCalendarTranslations.xml
+Tesseract OCR Application - Data Files         application-ocr-tesseract/application-ocr-tesseract-ui/src/main/resources/OCR/Tesseract/Code/DataFileTranslations.xml
+Piwik Application                              src/main/resources/XWiki/PiwikTranslations.xml
+Admin Tools Application                        src/main/resources/Admin/Translations.xml
+Wiki Manager Application                       xwiki-platform-wiki-manager-ui/src/main/resources/WikiResources/Translations.xml
+Invoices                                       src/main/resources/InvoicesCode/InvoicesTranslations.xml
+Blog.Translations                              application-blog-ui/src/main/resources/Blog/Translations.xml
+Forum Application                              application-forum-ui/src/main/resources/ForumCode/Translations.xml
+LDAP Application                               ldap-ui/src/main/resources/LDAP/Code/Translations.xml
+LimitsApplication                              application-limits-api/src/main/resources/ApplicationResources.properties
+Full Calendar Macro                            src/main/resources/Calendar/Translations.xml
+Workspace Application - Workspace Translations xwiki-platform-workspace-template-features/src/main/resources/XWiki/WorkspaceTranslations.xml
+Notes Application                              src/main/resources/NotesCode/Translations.xml
+Templates Application                          application-templates-ui/src/main/resources/Templates/Translations.xml
+CKEditor Integration                           ui/src/main/resources/CKEditor/Translations.xml
+Tour Application                               application-tour-ui/src/main/resources/TourCode/TourTranslations.xml
+Mocca Calendar Macro                           application-mocca-calendar-ui/src/main/resources/MoccaCalendar/MoccaCalendarMacroTranslations.xml
+Polls Application                              src/main/resources/Polls/PollL10n.xml
+Flash Messages Application                     application-flashmessages-ui/src/main/resources/Flash/Translations.xml
+Invoices                                       src/main/resources/InvoicesCode/InvoicesTranslations.xml
+OCR Application                                application-ocr-ui/src/main/resources/OCR/Code/Translations.xml
+File Manager Application                       ui/src/main/resources/FileManagerCode/Translations.xml
+JW Player Macro                                src/main/resources/Macros/JWPlayerTranslations.xml
+Meetings Application                           ui/src/main/resources/Meeting/Code/Translations.xml
+Tesseract OCR Application - UI                 application-ocr-tesseract/application-ocr-tesseract-ui/src/main/resources/OCR/Tesseract/Code/Translations.xml
+Workspace Application                          xwiki-platform-workspace-ui/src/main/resources/WorkspaceManager/Translations.xml
+PDF Viewer Macro                               wiki/src/main/resources/XWiki/PDFViewerMacroTranslations.xml
+Wiki Flavor Application                        application-wikiflavor-ui/src/main/resources/WikiFlavorsCode/WikiFlavorsTranslations.xml
+Blog API Resources                             application-blog-ui/src/main/resources/Blog/Translations.xml
+XPoll Application                              application-xpoll-ui/src/main/resources/XPoll/Translation.xml
+Ideas Application                              src/main/resources/Ideas/IdeasTranslations.xml

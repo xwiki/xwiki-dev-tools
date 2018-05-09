@@ -87,6 +87,8 @@ if __name__ == '__main__':
 
     with open(TRANSLATION_XML_FILE_NAME, 'r') as f:
         for line in f.read().splitlines():
+            if not os.path.isfile(PATH_PREFIX + line):
+                continue
             properties_to_xwiki_xml(line, PATH_PREFIX, "en")
             dir_name = os.path.dirname(line)
             name = os.path.basename(line).split(".")[0]
@@ -97,6 +99,8 @@ if __name__ == '__main__':
                         properties_to_xwiki_xml(dir_name + "/" + file_name, PATH_PREFIX, lang)
     with open(TRANSLATION_XML_PROPERTIES_FILE_NAME, 'r') as f:
         for line in f.read().splitlines():
+            if not os.path.isfile(PATH_PREFIX + line):
+                continue
             properties_to_xwiki_xml_properties(line, PATH_PREFIX, "en")
             dir_name = os.path.dirname(line)
             name = os.path.basename(line).split(".")[0]
@@ -108,6 +112,8 @@ if __name__ == '__main__':
                             dir_name + "/" + file_name, PATH_PREFIX, lang)
     with open(TRANSLATION_PROPERTIES_FILE_NAME, 'r') as f:
         for line in f.read().splitlines():
+            if not os.path.isfile(PATH_PREFIX + line):
+                continue
             properties_to_xwiki_properties(line, PATH_PREFIX, "en")
             dir_name = os.path.dirname(line)
             name = os.path.basename(line).split(".")[0]

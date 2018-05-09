@@ -9,3 +9,7 @@ xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-handlers/x
 xwiki-platform-core/xwiki-platform-flavor/xwiki-platform-flavor-api/src/main/resources/ApplicationResources.properties
 xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-default/src/main/resources/ApplicationResources.properties
 xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/src/main/resources/org/xwiki/tools/jetty/listener/messages.properties
+xwiki-rendering-macros/xwiki-rendering-macro-content/src/main/resources/ApplicationResources.properties
+xwiki-commons-core/xwiki-commons-extension/xwiki-commons-extension-api/src/main/resources/ApplicationResources.properties
+xwiki-commons-core/xwiki-commons-job/src/main/resources/ApplicationResources.properties
+application-limits-api/src/main/resources/ApplicationResources.properties

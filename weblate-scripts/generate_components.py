@@ -18,6 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+import fnmatch
 import json
 import os
 import sys
@@ -38,6 +39,7 @@ def generate_component(name, slug, path, pre_commit_script, post_commit_script):
     component = {
         "name": name,
         "slug": slug,
+        "vcs": "github",
         "filemask": filemask,
         "template": template,
         "file_format": file_format,
@@ -56,22 +58,23 @@ def generate_component(name, slug, path, pre_commit_script, post_commit_script):
     return component
 
 if __name__ == '__main__':
-    PATH_PREFIX = os.environ["WL_PATH"] if "WL_PATH" in os.environ else ""
-    if PATH_PREFIX and PATH_PREFIX[-1] != "/":
-        PATH_PREFIX += "/"
     DIRECTORY = os.getcwd()
-    TRANSLATION_FILE_NAME = sys.argv[1] if len(sys.argv) > 1 else "translation_file_list.txt"
-    PRE_COMMIT_SCRIPT = sys.argv[2] if len(sys.argv) > 2 else DIRECTORY + "/pre_commit.sh"
-    POST_COMMIT_SCRIPT = sys.argv[3] if len(sys.argv) > 3 else DIRECTORY + "/post_commit.sh"
+    PRE_COMMIT_SCRIPT = sys.argv[1] if len(sys.argv) > 2 else DIRECTORY + "/pre_commit.sh"
+    POST_COMMIT_SCRIPT = sys.argv[2] if len(sys.argv) > 3 else DIRECTORY + "/post_commit.sh"
 
-    components = []
-    with open(TRANSLATION_FILE_NAME, 'r') as f:
-        for line in f.read().splitlines():
-            name, path = line.rsplit(' ', 1)
-            name = name.strip()
-            slug = name.lower().replace(' ', '-').replace('.', '-')
-            components.append(generate_component(
-                name, slug, path, PRE_COMMIT_SCRIPT, POST_COMMIT_SCRIPT
-            ))
-    with open("components.json", "w+") as f:
-        f.write(json.dumps(components))
+    for file_name in os.listdir(DIRECTORY):
+        if not fnmatch.fnmatch(file_name, "translation_list_*.txt"):
+            continue
+        start, end = len("translation_list_"), file_name.index(".txt")
+        component_name = file_name[start:end]
+        components = []
+        with open(file_name, 'r') as f:
+            for line in f.read().splitlines():
+                name, path = line.rsplit(' ', 1)
+                name = name.strip()
+                slug = name.lower().replace(' ', '-').replace('.', '-')
+                components.append(generate_component(
+                    name, slug, path, PRE_COMMIT_SCRIPT, POST_COMMIT_SCRIPT
+                ))
+        with open("components_{}.json".format(component_name), "w+") as f:
+            f.write(json.dumps(components))
