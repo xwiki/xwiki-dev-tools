@@ -1,2 +1,0 @@
-xwiki-commons-extension-api xwiki-commons-core/xwiki-commons-extension/xwiki-commons-extension-api/src/main/resources/ApplicationResources.properties
-xwiki-commons-job           xwiki-commons-core/xwiki-commons-job/src/main/resources/ApplicationResources.properties

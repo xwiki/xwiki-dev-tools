@@ -1,1 +1,0 @@
-Content Macro xwiki-rendering-macros/xwiki-rendering-macro-content/src/main/resources/ApplicationResources.properties
