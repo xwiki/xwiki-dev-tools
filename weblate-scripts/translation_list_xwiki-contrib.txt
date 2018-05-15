@@ -7,15 +7,12 @@ Tesseract OCR Application - Data Files; application-ocr-tesseract/application-oc
 Tesseract OCR Application - UI; application-ocr-tesseract/application-ocr-tesseract-ui/src/main/resources/OCR/Tesseract/Code/Translations.xml; https://github.com/xwiki-contrib/application-ocr
 Piwik Application; src/main/resources/XWiki/PiwikTranslations.xml; https://github.com/xwiki-contrib/application-piwik
 Admin Tools Application; src/main/resources/Admin/Translations.xml; https://github.com/xwiki-contrib/application-admintools
-Wiki Manager Application; xwiki-platform-wiki-manager-ui/src/main/resources/WikiResources/Translations.xml; https://github.com/xwiki-attic/xwiki-platform-wiki-manager
 Invoices; src/main/resources/InvoicesCode/InvoicesTranslations.xml; https://github.com/xwiki-contrib/application-invoices
 Blog.Translations; application-blog-ui/src/main/resources/Blog/Translations.xml; https://github.com/xwiki-contrib/application-blog
 Forum Application; application-forum-ui/src/main/resources/ForumCode/Translations.xml; https://github.com/xwiki-contrib/application-forum
 LDAP Application; ldap-ui/src/main/resources/LDAP/Code/Translations.xml; https://github.com/xwiki-contrib/ldap
 LimitsApplication; application-limits-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki-contrib/application-limits
 Full Calendar Macro; src/main/resources/Calendar/Translations.xml; https://github.com/xwiki-contrib/macro-fullcalendar
-Workspace Application; xwiki-platform-workspace-ui/src/main/resources/WorkspaceManager/Translations.xml; https://github.com/xwiki-attic/xwiki-platform-workspace
-Workspace Application - Workspace Translations; xwiki-platform-workspace-template-features/src/main/resources/XWiki/WorkspaceTranslations.xml; https://github.com/xwiki-attic/xwiki-platform-workspace
 Notes Application; src/main/resources/NotesCode/Translations.xml; https://github.com/xwiki-contrib/application-notes
 Templates Application; application-templates-ui/src/main/resources/Templates/Translations.xml; https://github.com/xwiki-contrib/application-templates
 CKEditor Integration; ui/src/main/resources/CKEditor/Translations.xml; https://github.com/xwiki-contrib/application-ckeditor

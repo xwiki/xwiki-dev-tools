@@ -36,13 +36,11 @@ application-mocca-calendar-ui/src/main/resources/MoccaCalendar/MoccaCalendarTran
 application-ocr-tesseract/application-ocr-tesseract-ui/src/main/resources/OCR/Tesseract/Code/DataFileTranslations.xml
 src/main/resources/XWiki/PiwikTranslations.xml
 src/main/resources/Admin/Translations.xml
-xwiki-platform-wiki-manager-ui/src/main/resources/WikiResources/Translations.xml
 src/main/resources/InvoicesCode/InvoicesTranslations.xml
 application-blog-ui/src/main/resources/Blog/Translations.xml
 application-forum-ui/src/main/resources/ForumCode/Translations.xml
 ldap-ui/src/main/resources/LDAP/Code/Translations.xml
 src/main/resources/Calendar/Translations.xml
-xwiki-platform-workspace-template-features/src/main/resources/XWiki/WorkspaceTranslations.xml
 src/main/resources/NotesCode/Translations.xml
 application-templates-ui/src/main/resources/Templates/Translations.xml
 ui/src/main/resources/CKEditor/Translations.xml
@@ -56,7 +54,6 @@ ui/src/main/resources/FileManagerCode/Translations.xml
 src/main/resources/Macros/JWPlayerTranslations.xml
 ui/src/main/resources/Meeting/Code/Translations.xml
 application-ocr-tesseract/application-ocr-tesseract-ui/src/main/resources/OCR/Tesseract/Code/Translations.xml
-xwiki-platform-workspace-ui/src/main/resources/WorkspaceManager/Translations.xml
 wiki/src/main/resources/XWiki/PDFViewerMacroTranslations.xml
 application-wikiflavor-ui/src/main/resources/WikiFlavorsCode/WikiFlavorsTranslations.xml
 application-xpoll-ui/src/main/resources/XPoll/Translation.xml
