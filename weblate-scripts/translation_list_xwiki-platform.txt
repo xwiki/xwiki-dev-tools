@@ -1,70 +1,70 @@
 #Format: Name of the component; Relative path to the translation file; Repository url
-Help.SupportPanel.Content; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/Help/SupportPanel/Content.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxGeneralRemarks; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxGeneralRemarks.xml; https://github.com/xwiki/xwiki-platform
-TemplateMacro; xwiki-platform-core/xwiki-platform-template/xwiki-platform-template-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-Tour.HomepageTour.Translations; xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-tour/src/main/resources/Tour/HomepageTour/Translations.xml; https://github.com/xwiki/xwiki-platform
-Localization Macro; xwiki-platform-core/xwiki-platform-localization/xwiki-platform-localization-macro/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-XWiki.RatingsTranslations; xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-ui/src/main/resources/XWiki/RatingsTranslations.xml; https://github.com/xwiki/xwiki-platform
-Main.SolrTranslations; xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-ui/src/main/resources/Main/SolrTranslations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxVerbatim; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxVerbatim.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxNewLineLineBreaks; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxNewLineLineBreaks.xml; https://github.com/xwiki/xwiki-platform
-XWiki Core Resources; xwiki-platform-core/xwiki-platform-oldcore/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxQuotations; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxQuotations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.UserProfileTranslations; xwiki-platform-core/xwiki-platform-user/xwiki-platform-user-profile/xwiki-platform-user-profile-ui/src/main/resources/XWiki/UserProfileTranslations.xml; https://github.com/xwiki/xwiki-platform
-Dashboard.Translations; xwiki-platform-core/xwiki-platform-dashboard/xwiki-platform-dashboard-ui/src/main/resources/Dashboard/Translations.xml; https://github.com/xwiki/xwiki-platform
-xwiki-platform-rendering-ui; xwiki-platform-core/xwiki-platform-rendering/xwiki-platform-rendering-ui/src/main/resources/Rendering/Translations.xml; https://github.com/xwiki/xwiki-platform
-WYSIWYG Editor API; xwiki-platform-core/xwiki-platform-wysiwyg/xwiki-platform-wysiwyg-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-Repository; xwiki-platform-core/xwiki-platform-repository/xwiki-platform-repository-server-ui/src/main/resources/ExtensionCode/Translations.xml; https://github.com/xwiki/xwiki-platform
-Common WikiManager.CommonTranslations; xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-common/src/main/resources/WikiManager/CommonTranslations.xml; https://github.com/xwiki/xwiki-platform
-xwiki-platform-extension-script; xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-script/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxHeadings; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxHeadings.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxEscapes; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxEscapes.xml; https://github.com/xwiki/xwiki-platform
-Skin Extensions; xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-skinx/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxParameters; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxParameters.xml; https://github.com/xwiki/xwiki-platform
-Rating module; xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-Main WikiManager.Translations; xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-mainwiki/src/main/resources/WikiManager/Translations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.WatchListTranslations; xwiki-platform-core/xwiki-platform-watchlist/xwiki-platform-watchlist-ui/src/main/resources/XWiki/WatchListTranslations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxDefinitionLists; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxDefinitionLists.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxParagraphs; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxParagraphs.xml; https://github.com/xwiki/xwiki-platform
-Mail.Translations; xwiki-platform-core/xwiki-platform-mail/xwiki-platform-mail-ui/src/main/resources/Mail/Translations.xml; https://github.com/xwiki/xwiki-platform
-xwiki-platform-extension-handler-xar; xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-handlers/xwiki-platform-extension-handler-xar/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-Index.Translations; xwiki-platform-core/xwiki-platform-index/xwiki-platform-index-ui/src/main/resources/Index/Translations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxTranslations; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTranslations.xml; https://github.com/xwiki/xwiki-platform
-FlamingoThemesCode.Translations; xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-themes/xwiki-platform-flamingo-theme-ui/src/main/resources/FlamingoThemesCode/Translations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.AdminTranslations.xml; xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui/src/main/resources/XWiki/AdminTranslations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.DocumentTreeTranslations; xwiki-platform-core/xwiki-platform-index/xwiki-platform-index-tree/xwiki-platform-index-tree-macro/src/main/resources/XWiki/DocumentTreeTranslations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.UserDirectoryTranslations; xwiki-platform-core/xwiki-platform-user/xwiki-platform-user-directory/xwiki-platform-user-directory-ui/src/main/resources/XWiki/UserDirectoryTranslations.xml; https://github.com/xwiki/xwiki-platform
-Macros.TreeTranslations; xwiki-platform-core/xwiki-platform-tree/xwiki-platform-tree-macro/src/main/resources/Macros/TreeTranslations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxMacros; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxMacros.xml; https://github.com/xwiki/xwiki-platform
-Flavor API; xwiki-platform-core/xwiki-platform-flavor/xwiki-platform-flavor-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxIntroduction; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxIntroduction.xml; https://github.com/xwiki/xwiki-platform
-Sandbox.WebHome; xwiki-platform-core/xwiki-platform-sandbox/src/main/resources/Sandbox/WebHome.xml; https://github.com/xwiki/xwiki-platform
-IconThemesCode.Translations; xwiki-platform-core/xwiki-platform-icon/xwiki-platform-icon-ui/src/main/resources/IconThemesCode/Translations.xml; https://github.com/xwiki/xwiki-platform
-Help.Translations; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/Help/Translations.xml; https://github.com/xwiki/xwiki-platform
-AppWithinMinutes.Translations; xwiki-platform-core/xwiki-platform-appwithinminutes/xwiki-platform-appwithinminutes-ui/src/main/resources/AppWithinMinutes/Translations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxImages; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxImages.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxGroups; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxGroups.xml; https://github.com/xwiki/xwiki-platform
-Main.ActivityTranslations; xwiki-platform-core/xwiki-platform-activitystream/xwiki-platform-activitystream-ui/src/main/resources/Main/ActivityTranslations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxTextFormatting; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTextFormatting.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxTables; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTables.xml; https://github.com/xwiki/xwiki-platform
-xwiki-platform-wiki-default; xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-default/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-Menu Application; xwiki-platform-core/xwiki-platform-menu/xwiki-platform-menu-ui/src/main/resources/Menu/MenuTranslations.xml; https://github.com/xwiki/xwiki-platform
-Applications.Translations; xwiki-platform-core/xwiki-platform-application/xwiki-platform-application-ui/src/main/resources/Applications/Translations.xml; https://github.com/xwiki/xwiki-platform
-Jetty listener; xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/src/main/resources/org/xwiki/tools/jetty/listener/messages.properties; https://github.com/xwiki/xwiki-platform
-SkinsCode.Translations; xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ui/src/main/resources/SkinsCode/Translations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxHorizontalLine; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxHorizontalLine.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxOtherSyntaxes; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxOtherSyntaxes.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxScripts; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxScripts.xml; https://github.com/xwiki/xwiki-platform
-Panels.Translations; xwiki-platform-core/xwiki-platform-panels/xwiki-platform-panels-ui/src/main/resources/Panels/Translations.xml; https://github.com/xwiki/xwiki-platform
-AnnotationCode.Translations; xwiki-platform-core/xwiki-platform-annotations/xwiki-platform-annotation-ui/src/main/resources/AnnotationCode/Translations.xml; https://github.com/xwiki/xwiki-platform
-Main.WebHome; xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-common/src/main/resources/Main/WebHome.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxLinks; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxLinks.xml; https://github.com/xwiki/xwiki-platform
-XWiki.OfficeImporterTranslations; xwiki-platform-core/xwiki-platform-office/xwiki-platform-office-ui/src/main/resources/XWiki/OfficeImporterTranslations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxLists; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxLists.xml; https://github.com/xwiki/xwiki-platform
-PanelsCode.Translations; xwiki-platform-core/xwiki-platform-panels/xwiki-platform-panels-ui/src/main/resources/PanelsCode/Translations.xml; https://github.com/xwiki/xwiki-platform
-Wiki WikiManager.Translations; xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-wiki/src/main/resources/WikiManager/Translations.xml; https://github.com/xwiki/xwiki-platform
-Platform.SandboxTestPage; xwiki-platform-core/xwiki-platform-sandbox/src/main/resources/Sandbox/TestPage1.xml; https://github.com/xwiki/xwiki-platform
-XWiki.TemplateProviderTranslations; xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui/src/main/resources/XWiki/TemplateProviderTranslations.xml; https://github.com/xwiki/xwiki-platform
-Invitation.Translations; xwiki-platform-core/xwiki-platform-invitation/xwiki-platform-invitation-ui/src/main/resources/Invitation/Translations.xml; https://github.com/xwiki/xwiki-platform
-XWiki.XWikiSyntaxHTML; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxHTML.xml; https://github.com/xwiki/xwiki-platform
-XWiki.Notifications.Code.Translations; xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui/src/main/resources/XWiki/Notifications/Code/Translations.xml; https://github.com/xwiki/xwiki-platform
+XWiki Core Resources; xwiki-platform-core/xwiki-platform-oldcore/src/main/resources/ApplicationResources.properties; https://github.com/atallahade/xwiki-platform
+Help.SupportPanel.Content; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/Help/SupportPanel/Content.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxGeneralRemarks; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxGeneralRemarks.xml; https://github.com/atallahade/xwiki-platform
+TemplateMacro; xwiki-platform-core/xwiki-platform-template/xwiki-platform-template-api/src/main/resources/ApplicationResources.properties; https://github.com/atallahade/xwiki-platform
+Tour.HomepageTour.Translations; xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-tour/src/main/resources/Tour/HomepageTour/Translations.xml; https://github.com/atallahade/xwiki-platform
+Localization Macro; xwiki-platform-core/xwiki-platform-localization/xwiki-platform-localization-macro/src/main/resources/ApplicationResources.properties; https://github.com/atallahade/xwiki-platform
+XWiki.RatingsTranslations; xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-ui/src/main/resources/XWiki/RatingsTranslations.xml; https://github.com/atallahade/xwiki-platform
+Main.SolrTranslations; xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-ui/src/main/resources/Main/SolrTranslations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxVerbatim; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxVerbatim.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxNewLineLineBreaks; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxNewLineLineBreaks.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxQuotations; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxQuotations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.UserProfileTranslations; xwiki-platform-core/xwiki-platform-user/xwiki-platform-user-profile/xwiki-platform-user-profile-ui/src/main/resources/XWiki/UserProfileTranslations.xml; https://github.com/atallahade/xwiki-platform
+Dashboard.Translations; xwiki-platform-core/xwiki-platform-dashboard/xwiki-platform-dashboard-ui/src/main/resources/Dashboard/Translations.xml; https://github.com/atallahade/xwiki-platform
+xwiki-platform-rendering-ui; xwiki-platform-core/xwiki-platform-rendering/xwiki-platform-rendering-ui/src/main/resources/Rendering/Translations.xml; https://github.com/atallahade/xwiki-platform
+WYSIWYG Editor API; xwiki-platform-core/xwiki-platform-wysiwyg/xwiki-platform-wysiwyg-api/src/main/resources/ApplicationResources.properties; https://github.com/atallahade/xwiki-platform
+Repository; xwiki-platform-core/xwiki-platform-repository/xwiki-platform-repository-server-ui/src/main/resources/ExtensionCode/Translations.xml; https://github.com/atallahade/xwiki-platform
+Common WikiManager.CommonTranslations; xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-common/src/main/resources/WikiManager/CommonTranslations.xml; https://github.com/atallahade/xwiki-platform
+xwiki-platform-extension-script; xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-script/src/main/resources/ApplicationResources.properties; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxHeadings; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxHeadings.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxEscapes; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxEscapes.xml; https://github.com/atallahade/xwiki-platform
+Skin Extensions; xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-skinx/src/main/resources/ApplicationResources.properties; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxParameters; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxParameters.xml; https://github.com/atallahade/xwiki-platform
+Rating module; xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-api/src/main/resources/ApplicationResources.properties; https://github.com/atallahade/xwiki-platform
+Main WikiManager.Translations; xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-mainwiki/src/main/resources/WikiManager/Translations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.WatchListTranslations; xwiki-platform-core/xwiki-platform-watchlist/xwiki-platform-watchlist-ui/src/main/resources/XWiki/WatchListTranslations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxDefinitionLists; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxDefinitionLists.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxParagraphs; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxParagraphs.xml; https://github.com/atallahade/xwiki-platform
+Mail.Translations; xwiki-platform-core/xwiki-platform-mail/xwiki-platform-mail-ui/src/main/resources/Mail/Translations.xml; https://github.com/atallahade/xwiki-platform
+xwiki-platform-extension-handler-xar; xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-handlers/xwiki-platform-extension-handler-xar/src/main/resources/ApplicationResources.properties; https://github.com/atallahade/xwiki-platform
+Index.Translations; xwiki-platform-core/xwiki-platform-index/xwiki-platform-index-ui/src/main/resources/Index/Translations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxTranslations; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTranslations.xml; https://github.com/atallahade/xwiki-platform
+FlamingoThemesCode.Translations; xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-themes/xwiki-platform-flamingo-theme-ui/src/main/resources/FlamingoThemesCode/Translations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.AdminTranslations.xml; xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui/src/main/resources/XWiki/AdminTranslations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.DocumentTreeTranslations; xwiki-platform-core/xwiki-platform-index/xwiki-platform-index-tree/xwiki-platform-index-tree-macro/src/main/resources/XWiki/DocumentTreeTranslations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.UserDirectoryTranslations; xwiki-platform-core/xwiki-platform-user/xwiki-platform-user-directory/xwiki-platform-user-directory-ui/src/main/resources/XWiki/UserDirectoryTranslations.xml; https://github.com/atallahade/xwiki-platform
+Macros.TreeTranslations; xwiki-platform-core/xwiki-platform-tree/xwiki-platform-tree-macro/src/main/resources/Macros/TreeTranslations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxMacros; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxMacros.xml; https://github.com/atallahade/xwiki-platform
+Flavor API; xwiki-platform-core/xwiki-platform-flavor/xwiki-platform-flavor-api/src/main/resources/ApplicationResources.properties; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxIntroduction; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxIntroduction.xml; https://github.com/atallahade/xwiki-platform
+Sandbox.WebHome; xwiki-platform-core/xwiki-platform-sandbox/src/main/resources/Sandbox/WebHome.xml; https://github.com/atallahade/xwiki-platform
+IconThemesCode.Translations; xwiki-platform-core/xwiki-platform-icon/xwiki-platform-icon-ui/src/main/resources/IconThemesCode/Translations.xml; https://github.com/atallahade/xwiki-platform
+Help.Translations; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/Help/Translations.xml; https://github.com/atallahade/xwiki-platform
+AppWithinMinutes.Translations; xwiki-platform-core/xwiki-platform-appwithinminutes/xwiki-platform-appwithinminutes-ui/src/main/resources/AppWithinMinutes/Translations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxImages; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxImages.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxGroups; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxGroups.xml; https://github.com/atallahade/xwiki-platform
+Main.ActivityTranslations; xwiki-platform-core/xwiki-platform-activitystream/xwiki-platform-activitystream-ui/src/main/resources/Main/ActivityTranslations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxTextFormatting; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTextFormatting.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxTables; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTables.xml; https://github.com/atallahade/xwiki-platform
+xwiki-platform-wiki-default; xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-default/src/main/resources/ApplicationResources.properties; https://github.com/atallahade/xwiki-platform
+Menu Application; xwiki-platform-core/xwiki-platform-menu/xwiki-platform-menu-ui/src/main/resources/Menu/MenuTranslations.xml; https://github.com/atallahade/xwiki-platform
+Applications.Translations; xwiki-platform-core/xwiki-platform-application/xwiki-platform-application-ui/src/main/resources/Applications/Translations.xml; https://github.com/atallahade/xwiki-platform
+Jetty listener; xwiki-platform-tools/xwiki-platform-tool-jetty/xwiki-platform-tool-jetty-listener/src/main/resources/org/xwiki/tools/jetty/listener/messages.properties; https://github.com/atallahade/xwiki-platform
+SkinsCode.Translations; xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ui/src/main/resources/SkinsCode/Translations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxHorizontalLine; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxHorizontalLine.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxOtherSyntaxes; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxOtherSyntaxes.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxScripts; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxScripts.xml; https://github.com/atallahade/xwiki-platform
+Panels.Translations; xwiki-platform-core/xwiki-platform-panels/xwiki-platform-panels-ui/src/main/resources/Panels/Translations.xml; https://github.com/atallahade/xwiki-platform
+AnnotationCode.Translations; xwiki-platform-core/xwiki-platform-annotations/xwiki-platform-annotation-ui/src/main/resources/AnnotationCode/Translations.xml; https://github.com/atallahade/xwiki-platform
+Main.WebHome; xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-common/src/main/resources/Main/WebHome.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxLinks; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxLinks.xml; https://github.com/atallahade/xwiki-platform
+XWiki.OfficeImporterTranslations; xwiki-platform-core/xwiki-platform-office/xwiki-platform-office-ui/src/main/resources/XWiki/OfficeImporterTranslations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxLists; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxLists.xml; https://github.com/atallahade/xwiki-platform
+PanelsCode.Translations; xwiki-platform-core/xwiki-platform-panels/xwiki-platform-panels-ui/src/main/resources/PanelsCode/Translations.xml; https://github.com/atallahade/xwiki-platform
+Wiki WikiManager.Translations; xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-wiki/src/main/resources/WikiManager/Translations.xml; https://github.com/atallahade/xwiki-platform
+Platform.SandboxTestPage; xwiki-platform-core/xwiki-platform-sandbox/src/main/resources/Sandbox/TestPage1.xml; https://github.com/atallahade/xwiki-platform
+XWiki.TemplateProviderTranslations; xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui/src/main/resources/XWiki/TemplateProviderTranslations.xml; https://github.com/atallahade/xwiki-platform
+Invitation.Translations; xwiki-platform-core/xwiki-platform-invitation/xwiki-platform-invitation-ui/src/main/resources/Invitation/Translations.xml; https://github.com/atallahade/xwiki-platform
+XWiki.XWikiSyntaxHTML; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxHTML.xml; https://github.com/atallahade/xwiki-platform
+XWiki.Notifications.Code.Translations; xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui/src/main/resources/XWiki/Notifications/Code/Translations.xml; https://github.com/atallahade/xwiki-platform
