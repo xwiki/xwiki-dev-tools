@@ -31,7 +31,6 @@ def generate_component(line, pre_commit_script, post_commit_script, post_update_
     if repo_url in repo_urls:
         repo_url = repo_urls[repo_url]
         push_url = ''
-        post_update_script = ''
     else:
         repo_urls[repo_url] = 'weblate://{}/{}'.format(project, slug)
         push_url = repo_url
