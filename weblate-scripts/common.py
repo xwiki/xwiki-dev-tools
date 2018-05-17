@@ -21,8 +21,6 @@
 import os
 import re
 
-from enum import Enum
-
 class XmlFile(object):
     """"Simple class working on XML files using regex"""
     # Matches <tag>
@@ -129,7 +127,7 @@ class PropertiesFile(object):
     def unescape(text):
         return text.replace("\\n", "\n")
 
-class FileType(Enum):
+class FileType(object):
     PROPERTIES = 1
     XML = 2
     XML_PROPERTIES = 3
