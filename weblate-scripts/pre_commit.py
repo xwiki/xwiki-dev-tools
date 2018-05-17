@@ -24,7 +24,7 @@ import os
 import re
 import sys
 
-from common import XmlFile, PropertiesFile
+from common import XmlFile, PropertiesFile, FileType
 
 TRANSLATION_PREFIX = ".translation/"
 
@@ -33,8 +33,8 @@ def properties_to_xwiki_xml(path, path_prefix, lang):
     relative_dir_path = os.path.dirname(path)
     file_name = os.path.basename(path).split(".")[0]
 
-    properties_path = "{}.translation/{}_{}.properties".format(
-        path_prefix, relative_dir_path + "/" + file_name, lang)
+    properties_path = "{}_{}.properties".format(
+        path_prefix + TRANSLATION_PREFIX + relative_dir_path + "/" + file_name, lang)
     properties = PropertiesFile()
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
@@ -51,8 +51,8 @@ def properties_to_xwiki_xml_properties(path, path_prefix, lang):
     relative_dir_path = os.path.dirname(path)
     file_name = os.path.basename(path).split(".")[0]
 
-    properties_path = "{}.translation/{}_{}.properties".format(
-            path_prefix, relative_dir_path + "/" + file_name, lang)
+    properties_path = "{}/{}_{}.properties".format(
+        path_prefix + TRANSLATION_PREFIX, relative_dir_path + "/" + file_name, lang)
     properties = PropertiesFile()
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
@@ -70,56 +70,79 @@ def properties_to_xwiki_properties(path, path_prefix, lang):
     if lang_delimiter_index > 0:
         file_name = file_name[:lang_delimiter_index]
 
-    properties_path = "{}.translation/{}_{}.properties".format(
-            path_prefix, relative_dir_path + "/" + file_name, lang)
+    properties_path = "{}/{}_{}.properties".format(
+        path_prefix + TRANSLATION_PREFIX, relative_dir_path + "/" + file_name, lang)
     properties = PropertiesFile()
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
         properties.escape_export()
         properties.write(path_prefix + path)
 
+def create_xml_file(file_name, base_file_name, lang):
+    """Creates the default xml translation file"""
+    xml_file = XmlFile(base_file_name)
+    xml_file.file_name = file_name
+    xml_file.document = xml_file.document.replace('locale=""', 'locale="{}"'.format(lang))
+    xml_file.set_tag_content('language', lang)
+    xml_file.set_tag_content('translation', '1')
+    xml_file.write()
+
 if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf8')
+
     PATH_PREFIX = os.environ["WL_PATH"]
     if PATH_PREFIX and PATH_PREFIX[-1] != "/":
         PATH_PREFIX += "/"
-    FILE_MASK = os.environ["WL_FILEMASK"]
-    FILE_MASK = PATH_PREFIX + FILE_MASK[len(TRANSLATION_PREFIX):]
+
+    FILE_MASK = os.environ["WL_FILEMASK"].replace(TRANSLATION_PREFIX, '')
     BASE_PROPERTIES = FILE_MASK.replace('_*.properties', '.properties')
     BASE_XML = FILE_MASK.replace('_*.properties', '.xml')
-    if os.path.isfile(BASE_PROPERTIES):
+
+    if os.path.isfile(PATH_PREFIX + BASE_PROPERTIES):
         BASE_FILE = BASE_PROPERTIES
-    elif os.path.isfile(BASE_XML):
+        FILE_TYPE = FileType.PROPERTIES
+    elif os.path.isfile(PATH_PREFIX + BASE_XML):
         BASE_FILE = BASE_XML
-        FILE_MASK = FILE_MASK.replace('_*.properties', '.*.xml')
-        with open(BASE_FILE) as f:
-            IS_XML_PROPERTIES = '<className>XWiki.TranslationDocumentClass</className>' in f.read()
-    FILE_NAMES = glob.glob(FILE_MASK) + [BASE_FILE]
+        with open(PATH_PREFIX + BASE_XML) as f:
+            if '<className>XWiki.TranslationDocumentClass</className>' in f.read():
+                FILE_TYPE = FileType.XML_PROPERTIES
+            else:
+                FILE_TYPE = FileType.XML
+
+    FILES_GLOB = PATH_PREFIX + TRANSLATION_PREFIX + FILE_MASK
+    FILE_NAMES = [file_name.replace(PATH_PREFIX + TRANSLATION_PREFIX, '')
+                  for file_name in glob.glob(FILES_GLOB)]
+    FILE_NAMES.append(BASE_FILE)
     for file_name in FILE_NAMES:
-        file_name = file_name.replace(PATH_PREFIX, '')
-        if file_name.endswith('.properties'):
-            name = os.path.basename(BASE_FILE).split(".")[0]
-            if fnmatch.fnmatch(os.path.basename(file_name), "{}_*.properties".format(name)):
-                lang = file_name.split(".")[0]
-                lang = lang[lang.rfind("_") + 1:]
+        name = os.path.basename(BASE_FILE).split(".")[0]
+        match = re.search('{}_(.*).properties'.format(name), file_name)
+        if FILE_TYPE == FileType.PROPERTIES:
+            if match:
+                lang = match.group(1)
                 if lang != "en":
                     properties_to_xwiki_properties(file_name, PATH_PREFIX, lang)
             else:
                 properties_to_xwiki_properties(file_name, PATH_PREFIX, 'en')
-        elif IS_XML_PROPERTIES:
-            name = os.path.basename(BASE_FILE).split(".")[0]
-            if fnmatch.fnmatch(os.path.basename(file_name), "{}.*.xml".format(name)):
-                lang = file_name.split(".")[-2]
+        elif FILE_TYPE == FileType.XML_PROPERTIES:
+            if match:
+                lang = match.group(1)
+                file_name = file_name.replace('_{}.properties'.format(lang),
+                                              '.{}.xml'.format(lang))
                 if lang != "en":
+                    if not os.path.isfile(PATH_PREFIX + file_name):
+                        create_xml_file(PATH_PREFIX + file_name, PATH_PREFIX + BASE_FILE, lang)
                     properties_to_xwiki_xml_properties(file_name, PATH_PREFIX, lang)
             else:
                 properties_to_xwiki_xml_properties(file_name, PATH_PREFIX, 'en')
-        else:
-            name = os.path.basename(BASE_FILE).split(".")[0]
-            if fnmatch.fnmatch(os.path.basename(file_name), "{}.*.xml".format(name)):
-                lang = file_name.split(".")[-2]
+        elif FILE_TYPE == FileType.XML:
+            if match:
+                lang = match.group(1)
+                file_name = file_name.replace('_{}.properties'.format(lang),
+                                              '.{}.xml'.format(lang))
                 if lang != "en":
+                    if not os.path.isfile(PATH_PREFIX + file_name):
+                        create_xml_file(PATH_PREFIX + file_name, PATH_PREFIX + BASE_FILE, lang)
                     properties_to_xwiki_xml(file_name, PATH_PREFIX, lang)
             else:
                 properties_to_xwiki_xml(file_name, PATH_PREFIX, 'en')

@@ -23,7 +23,7 @@ import glob
 import os
 import sys
 
-from common import XmlFile, PropertiesFile
+from common import XmlFile, PropertiesFile, FileType
 
 TRANSLATION_PREFIX = ".translation/"
 
@@ -83,15 +83,20 @@ if __name__ == '__main__':
     BASE_XML = FILE_MASK.replace('_*.properties', '.xml')
     if os.path.isfile(BASE_PROPERTIES):
         BASE_FILE = BASE_PROPERTIES
+        FILE_TYPE = FileType.PROPERTIES
     elif os.path.isfile(BASE_XML):
         BASE_FILE = BASE_XML
         FILE_MASK = FILE_MASK.replace('_*.properties', '.*.xml')
         with open(BASE_FILE) as f:
-            IS_XML_PROPERTIES = '<className>XWiki.TranslationDocumentClass</className>' in f.read()
+            if '<className>XWiki.TranslationDocumentClass</className>' in f.read():
+                FILE_TYPE = FileType.XML_PROPERTIES
+            else:
+                FILE_TYPE = FileType.XML
+
     FILE_NAMES = glob.glob(FILE_MASK) + [BASE_FILE]
     for file_name in FILE_NAMES:
         file_name = file_name.replace(PATH_PREFIX, '')
-        if file_name.endswith('.properties'):
+        if FILE_TYPE == FileType.PROPERTIES:
             name = os.path.basename(BASE_FILE).split(".")[0]
             if fnmatch.fnmatch(os.path.basename(file_name), "{}_*.properties".format(name)):
                 lang = file_name.split(".")[0]
@@ -100,7 +105,7 @@ if __name__ == '__main__':
                     xwiki_properties_to_properties(file_name, PATH_PREFIX, lang)
             else:
                 xwiki_properties_to_properties(file_name, PATH_PREFIX, 'en')
-        elif IS_XML_PROPERTIES:
+        elif FILE_TYPE == FileType.XML_PROPERTIES:
             name = os.path.basename(BASE_FILE).split(".")[0]
             if fnmatch.fnmatch(os.path.basename(file_name), "{}.*.xml".format(name)):
                 lang = file_name.split(".")[-2]
@@ -108,7 +113,7 @@ if __name__ == '__main__':
                     xwiki_xml_properties_to_properties(file_name, PATH_PREFIX, lang)
             else:
                 xwiki_xml_properties_to_properties(file_name, PATH_PREFIX, 'en')
-        else:
+        elif FILE_TYPE == FileType.XML:
             name = os.path.basename(BASE_FILE).split(".")[0]
             if fnmatch.fnmatch(os.path.basename(file_name), "{}.*.xml".format(name)):
                 lang = file_name.split(".")[-2]

@@ -21,9 +21,13 @@
 import os
 import re
 
+from enum import Enum
+
 class XmlFile(object):
     """"Simple class working on XML files using regex"""
+    # Matches <tag>
     START_REGEX = r"\<\s*{}\s*\>\s*"
+    # Matches </tag>
     END_REGEX = r"\s*\<\s*\/\s*{}\s*\>"
 
     def __init__(self, file_name):
@@ -46,6 +50,7 @@ class XmlFile(object):
         content = content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").strip()
         start = re.search(self.START_REGEX.format(tag), self.document)
         if start is None:
+            # Matches <tag/>
             tag_start = re.search(r"\<\s*{}\s*\/\s*\>".format(tag), self.document)
             if tag_start is None:
                 raise LookupError("Couldn't find the tag {}".format(tag))
@@ -123,3 +128,8 @@ class PropertiesFile(object):
     @staticmethod
     def unescape(text):
         return text.replace("\\n", "\n")
+
+class FileType(Enum):
+    PROPERTIES = 1
+    XML = 2
+    XML_PROPERTIES = 3
