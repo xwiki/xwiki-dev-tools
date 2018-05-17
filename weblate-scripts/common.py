@@ -60,15 +60,23 @@ class XmlFile(object):
             self.document = self.document[:start.end()] + content + self.document[end.start():]
 
     def remove_tag(self, tag):
+        """Remove the first found tag from the document"""
         start = re.search(r"[ \t]*" + self.START_REGEX.format(tag), self.document)
         if start is None:
-            tag_start = re.search(r"[ \t]*" + self.SELF_CLOSE_REGEX.format(tag), self.document)
+            tag_start = re.search(
+                r"[ \t]*" + self.SELF_CLOSE_REGEX.format(tag) + r"\s*", self.document)
             if tag_start is None:
-                return
+                return False
             self.document = self.document[:tag_start.start()] + self.document[tag_start.end():]
         else:
-            end = re.search(self.END_REGEX.format(tag), self.document)
+            end = re.search(self.END_REGEX.format(tag) + r"\s*", self.document)
             self.document = self.document[:start.start()] + self.document[end.end():]
+        return True
+
+    def remove_all_tags(self, tag):
+        """Remove from the document all the tags matching the one specified"""
+        while self.remove_tag(tag):
+            pass
 
     def write(self):
         """Write the XML document into the file"""
