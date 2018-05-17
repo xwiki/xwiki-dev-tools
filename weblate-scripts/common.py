@@ -25,6 +25,8 @@ class XmlFile(object):
     """"Simple class working on XML files using regex"""
     # Matches <tag>
     START_REGEX = r"\<\s*{}\s*\>\s*"
+    # Matches <tag/>
+    SELF_CLOSE_REGEX = r"\<\s*{}\s*\/\s*\>"
     # Matches </tag>
     END_REGEX = r"\s*\<\s*\/\s*{}\s*\>"
 
@@ -48,8 +50,7 @@ class XmlFile(object):
         content = content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").strip()
         start = re.search(self.START_REGEX.format(tag), self.document)
         if start is None:
-            # Matches <tag/>
-            tag_start = re.search(r"\<\s*{}\s*\/\s*\>".format(tag), self.document)
+            tag_start = re.search(self.SELF_CLOSE_REGEX.format(tag), self.document)
             if tag_start is None:
                 raise LookupError("Couldn't find the tag {}".format(tag))
             self.document = "{0}<{1}>{2}</{1}>{3}".format(
@@ -57,6 +58,17 @@ class XmlFile(object):
         else:
             end = re.search(self.END_REGEX.format(tag), self.document)
             self.document = self.document[:start.end()] + content + self.document[end.start():]
+
+    def remove_tag(self, tag):
+        start = re.search(r"[ \t]*" + self.START_REGEX.format(tag), self.document)
+        if start is None:
+            tag_start = re.search(r"[ \t]*" + self.SELF_CLOSE_REGEX.format(tag), self.document)
+            if tag_start is None:
+                return
+            self.document = self.document[:tag_start.start()] + self.document[tag_start.end():]
+        else:
+            end = re.search(self.END_REGEX.format(tag), self.document)
+            self.document = self.document[:start.start()] + self.document[end.end():]
 
     def write(self):
         """Write the XML document into the file"""

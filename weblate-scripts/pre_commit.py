@@ -85,6 +85,7 @@ def create_xml_file(file_name, base_file_name, lang):
     xml_file.document = xml_file.document.replace('locale=""', 'locale="{}"'.format(lang))
     xml_file.set_tag_content('language', lang)
     xml_file.set_tag_content('translation', '1')
+    xml_file.remove_tag("object")
     xml_file.write()
 
 if __name__ == '__main__':
