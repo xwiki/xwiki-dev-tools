@@ -51,11 +51,12 @@ def properties_to_xwiki_xml_properties(path, path_prefix, lang):
     relative_dir_path = os.path.dirname(path)
     file_name = os.path.basename(path).split(".")[0]
 
-    properties_path = "{}/{}_{}.properties".format(
-        path_prefix + TRANSLATION_PREFIX, relative_dir_path + "/" + file_name, lang)
+    properties_path = "{}_{}.properties".format(
+        path_prefix + TRANSLATION_PREFIX + relative_dir_path + "/" + file_name, lang)
     properties = PropertiesFile()
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
+        properties.unfilter()
         properties.escape_export()
 
     xml_file = XmlFile(path_prefix + path)
@@ -66,15 +67,16 @@ def properties_to_xwiki_properties(path, path_prefix, lang):
     """Convert a java properties file to an XWiki java properties file"""
     relative_dir_path = os.path.dirname(path)
     file_name = os.path.basename(path).split(".")[0]
-    lang_delimiter_index = file_name.rfind("_")
+    lang_delimiter_index = file_name.rfind("_" + lang)
     if lang_delimiter_index > 0:
         file_name = file_name[:lang_delimiter_index]
 
-    properties_path = "{}/{}_{}.properties".format(
-        path_prefix + TRANSLATION_PREFIX, relative_dir_path + "/" + file_name, lang)
+    properties_path = "{}_{}.properties".format(
+        path_prefix + TRANSLATION_PREFIX + relative_dir_path + "/" + file_name, lang)
     properties = PropertiesFile()
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
+        properties.unfilter()
         properties.escape_export()
         properties.write(path_prefix + path)
 

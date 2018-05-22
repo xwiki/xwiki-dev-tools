@@ -139,6 +139,31 @@ class PropertiesFile(object):
             res += line
         return res
 
+    def filter(self):
+        """Filter certain keys from the document"""
+        document = ''
+        has_no_translations_marker = False
+        for line in self.document.splitlines(True):
+            if line.startswith('notranslationsmarker'):
+                has_no_translations_marker = True
+            if has_no_translations_marker:
+                line = '#' + line
+            document += line
+        self.document = document
+
+    def unfilter(self):
+        """Remove filter from the document"""
+        document = ''
+        has_no_translations_marker = False
+        for line in self.document.splitlines(True):
+            if line.startswith('#notranslationsmarker'):
+                has_no_translations_marker = True
+            if has_no_translations_marker and line.startswith('#'):
+                line = line[1:]
+            document += line
+
+        self.document = document
+
     @staticmethod
     def escape(text):
         return text.replace("\n", "\\n")
