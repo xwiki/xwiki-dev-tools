@@ -85,23 +85,23 @@ class XmlFile(object):
 
 class PropertiesFile(object):
     """"Simple class working on Java properties files using regex"""
+    # Matches key =
     START_REGEX = r"^{}\s*[=:]\s*"
+    # Matches key = value
     END_REGEX = r"^{}\s*[=:].*"
 
     def __init__(self):
         self.document = ""
+        self.key_values = {}
 
     def load(self, document):
         """Load the document from a string"""
         self.document = document
+        self.map_keys()
 
     def get_value(self, key):
-        """Get value of the specified key using regex"""
-        start = re.search(self.START_REGEX.format(key), self.document, re.MULTILINE)
-        end = re.search(self.END_REGEX.format(key), self.document, re.MULTILINE)
-        if start is None or end is None:
-            return ""
-        return self.unescape(self.document[start.end():end.end() + 1].strip())
+        """Get value of the specified key"""
+        return self.key_values[key] if key in self.key_values else ''
 
     def set_value(self, key, value):
         """Set value of key"""
@@ -114,6 +114,7 @@ class PropertiesFile(object):
             self.document += "{} = {}\n".format(key, value)
         else:
             self.document = self.document[:start.end()] + value + self.document[end.end() + 1:]
+        self.key_values[key] = self.unescape(value)
 
     def write(self, file_name):
         """Write the Java properties into the file"""
@@ -123,15 +124,8 @@ class PropertiesFile(object):
         with open(file_name, "w") as f_properties:
             f_properties.write(self.document)
 
-    def unescape_import(self):
-        """Unescape special character for the import"""
-        self.document = self.replace_values("''", "'")
-
-    def escape_export(self):
-        """Escape special character for the export"""
-        self.document = self.replace_values("'", "''")
-
     def replace_values(self, old, new):
+        """Replace values with parameters"""
         res = ""
         for line in self.document.splitlines(True):
             if re.search(r"\{[0-9]*\}", line):
@@ -139,30 +133,59 @@ class PropertiesFile(object):
             res += line
         return res
 
-    def filter(self):
-        """Filter certain keys from the document"""
+    def filter_import(self):
+        """Filter the document for the import"""
         document = ''
         has_no_translations_marker = False
         for line in self.document.splitlines(True):
             if line.startswith('notranslationsmarker'):
+                # Comment lines after 'notranslationsmarker'
                 has_no_translations_marker = True
             if has_no_translations_marker:
                 line = '#' + line
             document += line
-        self.document = document
 
-    def unfilter(self):
-        """Remove filter from the document"""
+        self.document = document
+        self.document = self.replace_values("''", "'")
+
+    def filter_export(self):
+        """Filter the document for the export"""
         document = ''
         has_no_translations_marker = False
         for line in self.document.splitlines(True):
             if line.startswith('#notranslationsmarker'):
+                # Uncomment lines after 'notranslationsmarker'
                 has_no_translations_marker = True
             if has_no_translations_marker and line.startswith('#'):
                 line = line[1:]
             document += line
 
         self.document = document
+        self.document = self.replace_values("'", "''")
+
+    def replace_with(self, properties_file):
+        """Keep this document structure and take keys from the give properties file)"""
+        document = ''
+        for line in self.document.splitlines(True):
+            # Matches key = value
+            match = re.search('^([^#].*?)(\s*[=:]\s*)(.*)', line)
+            if match:
+                key, equal, value = match.group(1), match.group(2), match.group(3)
+                if value:
+                    new_value = properties_file.get_value(key)
+                    if new_value:
+                        line = key + equal + new_value + '\n'
+                    else:
+                        line = ''
+            document += line
+        self.document = document
+
+    def map_keys(self):
+        for line in self.document.splitlines():
+            # Matches key = value
+            match = re.search('^([^#].*?)[=:](.*)', line)
+            if match:
+                self.key_values[match.group(1).strip()] = match.group(2).strip()
 
     @staticmethod
     def escape(text):
