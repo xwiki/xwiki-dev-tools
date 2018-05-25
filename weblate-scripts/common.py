@@ -164,7 +164,7 @@ class PropertiesFile(object):
         self.document = self.replace_values("'", "''")
 
     def replace_with(self, properties_file):
-        """Keep this document structure and take keys from the give properties file)"""
+        """Keep this document structure and take keys from the give properties file"""
         document = ''
         for line in self.document.splitlines(True):
             # Matches key = value
@@ -172,20 +172,23 @@ class PropertiesFile(object):
             if match:
                 key, equal, value = match.group(1), match.group(2), match.group(3)
                 if value:
-                    new_value = properties_file.get_value(key)
+                    new_value = self.escape(properties_file.get_value(key))
                     if new_value:
                         line = key + equal + new_value + '\n'
                     else:
-                        line = ''
+                        line = '# Missing: ' + line.strip() + '\n'
             document += line
         self.document = document
 
     def map_keys(self):
         for line in self.document.splitlines():
             # Matches key = value
-            match = re.search('^([^#].*?)[=:](.*)', line)
+            match = re.search(r'^([^#][^\s]*?)\s*[=:](.*)', line)
             if match:
-                self.key_values[match.group(1).strip()] = match.group(2).strip()
+                key, value = match.group(1).strip(), self.unescape(match.group(2).strip())
+                if key in self.key_values:
+                    print "Warning: {} already exists.".format(key)
+                self.key_values[key] = value
 
     @staticmethod
     def escape(text):

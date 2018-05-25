@@ -122,16 +122,16 @@ def convert(file_type, file_name_properties, base_file_name, lang):
     file_name_xml = file_name_properties.replace('_{}.properties'.format(lang),
                                                  '.{}.xml'.format(lang))
 
-    if FILE_TYPE in [FileType.XML_PROPERTIES, FileType.XML]:
+    if file_type in [FileType.XML_PROPERTIES, FileType.XML]:
         if not os.path.isfile(PATH_PREFIX + file_name_xml):
             # Create the xml translation if it doesn't exists
             create_xml_file(PATH_PREFIX + file_name_xml, PATH_PREFIX + BASE_FILE, lang)
 
-    if FILE_TYPE == FileType.PROPERTIES:
+    if file_type == FileType.PROPERTIES:
         properties_to_xwiki_properties(file_name_properties, PATH_PREFIX, lang)
-    elif FILE_TYPE == FileType.XML_PROPERTIES:
+    elif file_type == FileType.XML_PROPERTIES:
         properties_to_xwiki_xml_properties(file_name_xml, PATH_PREFIX, lang)
-    elif FILE_TYPE == FileType.XML:
+    elif file_type == FileType.XML:
         properties_to_xwiki_xml(file_name_xml, PATH_PREFIX, lang)
 
 if __name__ == '__main__':
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     if PATH_PREFIX and PATH_PREFIX[-1] != "/":
         PATH_PREFIX += "/"
 
-    # File mask used by the component
+    # File mask for the Weblate translations
     FILE_MASK = os.environ["WL_FILEMASK"].replace(TRANSLATION_PREFIX, '')
     # Relative path to the base translation (could be .properties or .xml)
     BASE_PROPERTIES = FILE_MASK.replace('_*.properties', '.properties')
@@ -175,8 +175,10 @@ if __name__ == '__main__':
         name = os.path.basename(BASE_FILE).split(".")[0]
         # Regex to find the language of the current file if not the base file
         match = re.search('{}_(.*).properties'.format(name), file_name)
-        lang = match.group(1) if match else ''
-        if lang not in ['', 'en']:
-            convert(FILE_TYPE, file_name, PATH_PREFIX, lang)
-        elif lang == '':
+        # lang is None for the base file
+        lang = match.group(1) if match else None
+        # Treat the base file as the 'en' file
+        if lang is None:
             convert(FILE_TYPE, file_name, PATH_PREFIX, 'en')
+        elif lang != 'en':
+            convert(FILE_TYPE, file_name, PATH_PREFIX, lang)
