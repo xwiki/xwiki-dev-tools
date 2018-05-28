@@ -18,11 +18,9 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-import fnmatch
 import glob
 import os
 import re
-import sys
 
 from common import XmlFile, PropertiesFile, FileType
 
@@ -86,18 +84,18 @@ def xwiki_properties_to_properties(file_path, path_prefix, lang):
 
     properties.write(properties_path)
 
-def convert(file_type, file_name_properties, base_file_name, lang):
+def convert(file_type, file_name_properties, path_prefix, lang):
     """Convert the translation file depending on its type"""
     # Current file name with xml extension
     file_name_xml = file_name_properties.replace('_{}.properties'.format(lang),
                                                  '.{}.xml'.format(lang))
 
     if file_type == FileType.PROPERTIES:
-        xwiki_properties_to_properties(file_name_properties, PATH_PREFIX, lang)
+        xwiki_properties_to_properties(file_name_properties, path_prefix, lang)
     elif file_type == FileType.XML_PROPERTIES:
-        xwiki_xml_properties_to_properties(file_name_xml, PATH_PREFIX, lang)
+        xwiki_xml_properties_to_properties(file_name_xml, path_prefix, lang)
     elif file_type == FileType.XML:
-        xwiki_xml_to_properties(file_name_xml, PATH_PREFIX, lang)
+        xwiki_xml_to_properties(file_name_xml, path_prefix, lang)
 
 if __name__ == '__main__':
     # Path to the git repository
@@ -132,12 +130,12 @@ if __name__ == '__main__':
     FILE_NAMES = [file_name.replace(PATH_PREFIX, '')
                   for file_name in glob.glob(FILES_GLOB)]
     FILE_NAMES.append(BASE_FILE)
+    # Name of the base file without the extension
+    BASE_NAME = os.path.basename(BASE_FILE).split(".")[0]
     for file_name in FILE_NAMES:
-        # Name of the base file without the extension
-        name = os.path.basename(BASE_FILE).split(".")[0]
         # Regex to find the language of the current file if not the base file
-        match_properties = re.search('{}_(.*).properties'.format(name), file_name)
-        match_xml = re.search('{}.(.*).xml'.format(name), file_name)
+        match_properties = re.search('{}_(.*).properties'.format(BASE_NAME), file_name)
+        match_xml = re.search('{}.(.*).xml'.format(BASE_NAME), file_name)
         # lang is None for the base file
         lang = None
         if match_properties:

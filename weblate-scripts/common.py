@@ -136,13 +136,11 @@ class PropertiesFile(object):
     def filter_import(self):
         """Filter the document for the import"""
         document = ''
-        has_no_translations_marker = False
         for line in self.document.splitlines(True):
-            if line.startswith('notranslationsmarker'):
-                # Comment lines after 'notranslationsmarker'
-                has_no_translations_marker = True
-            if has_no_translations_marker:
-                line = '#' + line
+            if line.strip().startswith('notranslationsmarker'):
+                break
+            if line.strip() == '' or line.startswith('#'):
+                continue
             document += line
 
         self.document = document
@@ -150,42 +148,42 @@ class PropertiesFile(object):
 
     def filter_export(self):
         """Filter the document for the export"""
-        document = ''
-        has_no_translations_marker = False
-        for line in self.document.splitlines(True):
-            if line.startswith('#notranslationsmarker'):
-                # Uncomment lines after 'notranslationsmarker'
-                has_no_translations_marker = True
-            if has_no_translations_marker and line.startswith('#'):
-                line = line[1:]
-            document += line
-
-        self.document = document
+        self.document = self.replace_values("''", "'")
         self.document = self.replace_values("'", "''")
 
     def replace_with(self, properties_file):
-        """Keep this document structure and take keys from the give properties file"""
+        """Keep this document structure and take keys from the given properties file"""
+        # Lines ending with '\' are automatically removed by Weblate and hard to handle
+        self.document = re.sub(r'\\\n\s*', '', self.document)
+        self.map_keys()
+        properties_file.document = re.sub(r'\\\n\s*', '', properties_file.document)
+        properties_file.map_keys()
+
         document = ''
+        has_no_translations_marker = False
         for line in self.document.splitlines(True):
             # Matches key = value
-            match = re.search('^([^#].*?)(\s*[=:]\s*)(.*)', line)
+            match = re.search(r'^([^#].*?)(\s*[=:]\s*)(.*)', line)
             if match:
                 key, equal, value = match.group(1), match.group(2), match.group(3)
-                if value:
+                if key == 'notranslationsmarker':
+                    has_no_translations_marker = True
+                if value and not has_no_translations_marker:
                     new_value = self.escape(properties_file.get_value(key))
                     if new_value:
                         line = key + equal + new_value + '\n'
                     else:
-                        line = '# Missing: ' + line.strip() + '\n'
+                        line = '### Missing: ' + line.strip() + '\n'
             document += line
         self.document = document
 
     def map_keys(self):
+        self.key_values.clear()
         for line in self.document.splitlines():
             # Matches key = value
-            match = re.search(r'^([^#][^\s]*?)\s*[=:](.*)', line)
+            match = re.search(r'^([^#][^\s]*?)\s*[=:]\s*(.*)', line)
             if match:
-                key, value = match.group(1).strip(), self.unescape(match.group(2).strip())
+                key, value = match.group(1).strip(), self.unescape(match.group(2))
                 if key in self.key_values:
                     print "Warning: {} already exists.".format(key)
                 self.key_values[key] = value

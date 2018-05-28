@@ -18,11 +18,9 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-import fnmatch
 import glob
 import os
 import re
-import sys
 
 from common import XmlFile, PropertiesFile, FileType
 
@@ -49,7 +47,7 @@ def properties_to_xwiki_xml(file_path, path_prefix, lang):
     xml_file.set_tag_content("content", content)
     xml_file.write()
 
-def properties_to_xwiki_xml_properties(file_path, path_prefix, lang):
+def properties_to_xwiki_xml_properties(file_path, path_prefix, base_file_name, lang):
     """Convert a java properties file to an XWiki XML file with properties"""
     # Directory of the translation file
     relative_dir_path = os.path.dirname(file_path)
@@ -62,22 +60,22 @@ def properties_to_xwiki_xml_properties(file_path, path_prefix, lang):
     properties = PropertiesFile()
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
-        properties.filter_export()
 
-    # Base translation file
-    base_properties_path = "{}_{}.properties".format(
-            path_prefix + TRANSLATION_PREFIX + relative_dir_path + "/" + file_name, 'en')
+    # Use the base translation file as template
+    xml_base_file = XmlFile(path_prefix + base_file_name)
+    content = xml_base_file.get_tag_content("content")
     base_properties = PropertiesFile()
-    with open(base_properties_path, "r") as f_properties:
-        base_properties.load(f_properties.read())
+    base_properties.load(content)
 
+    # Replace keys with the current translation
     base_properties.replace_with(properties)
+    base_properties.filter_export()
 
     xml_file = XmlFile(path_prefix + file_path)
     xml_file.set_tag_content("content", base_properties.document)
     xml_file.write()
 
-def properties_to_xwiki_properties(file_path, path_prefix, lang):
+def properties_to_xwiki_properties(file_path, path_prefix, base_file_name, lang):
     """Convert a java properties file to an XWiki java properties file"""
     # Directory of the translation file
     relative_dir_path = os.path.dirname(file_path)
@@ -93,16 +91,16 @@ def properties_to_xwiki_properties(file_path, path_prefix, lang):
     properties = PropertiesFile()
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
-        properties.filter_export()
 
-    # Base translation file
-    base_properties_path = "{}_{}.properties".format(
-            path_prefix + TRANSLATION_PREFIX + relative_dir_path + "/" + file_name, 'en')
+    # Use the base translation file as template
     base_properties = PropertiesFile()
-    with open(base_properties_path, "r") as f_properties:
+    with open(path_prefix + base_file_name, "r") as f_properties:
         base_properties.load(f_properties.read())
 
+    # Replace keys with the current translation
     base_properties.replace_with(properties)
+    base_properties.filter_export()
+
     base_properties.write(path_prefix + file_path)
 
 def create_xml_file(file_name, base_file_name, lang):
@@ -116,7 +114,7 @@ def create_xml_file(file_name, base_file_name, lang):
     xml_file.remove_all_tags("attachment")
     xml_file.write()
 
-def convert(file_type, file_name_properties, base_file_name, lang):
+def convert(file_type, file_name_properties, path_prefix, base_file_name, lang):
     """Convert the translation file depending on its type"""
     # Current file name with xml extension
     file_name_xml = file_name_properties.replace('_{}.properties'.format(lang),
@@ -125,19 +123,16 @@ def convert(file_type, file_name_properties, base_file_name, lang):
     if file_type in [FileType.XML_PROPERTIES, FileType.XML]:
         if not os.path.isfile(PATH_PREFIX + file_name_xml):
             # Create the xml translation if it doesn't exists
-            create_xml_file(PATH_PREFIX + file_name_xml, PATH_PREFIX + BASE_FILE, lang)
+            create_xml_file(PATH_PREFIX + file_name_xml, path_prefix + base_file_name, lang)
 
     if file_type == FileType.PROPERTIES:
-        properties_to_xwiki_properties(file_name_properties, PATH_PREFIX, lang)
+        properties_to_xwiki_properties(file_name_properties, path_prefix, base_file_name, lang)
     elif file_type == FileType.XML_PROPERTIES:
-        properties_to_xwiki_xml_properties(file_name_xml, PATH_PREFIX, lang)
+        properties_to_xwiki_xml_properties(file_name_xml, path_prefix, base_file_name, lang)
     elif file_type == FileType.XML:
-        properties_to_xwiki_xml(file_name_xml, PATH_PREFIX, lang)
+        properties_to_xwiki_xml(file_name_xml, path_prefix, lang)
 
 if __name__ == '__main__':
-    reload(sys)
-    sys.setdefaultencoding('utf8')
-
     # Path to the git repository
     PATH_PREFIX = os.environ["WL_PATH"]
     if PATH_PREFIX and PATH_PREFIX[-1] != "/":
@@ -170,15 +165,15 @@ if __name__ == '__main__':
     FILE_NAMES = [file_name.replace(PATH_PREFIX + TRANSLATION_PREFIX, '')
                   for file_name in glob.glob(FILES_GLOB)]
     FILE_NAMES.append(BASE_FILE)
+    # Name of the base file without the extension
+    BASE_NAME = os.path.basename(BASE_FILE).split(".")[0]
     for file_name in FILE_NAMES:
-        # Name of the base file without the extension
-        name = os.path.basename(BASE_FILE).split(".")[0]
         # Regex to find the language of the current file if not the base file
-        match = re.search('{}_(.*).properties'.format(name), file_name)
+        match = re.search('{}_(.*).properties'.format(BASE_NAME), file_name)
         # lang is None for the base file
         lang = match.group(1) if match else None
         # Treat the base file as the 'en' file
         if lang is None:
-            convert(FILE_TYPE, file_name, PATH_PREFIX, 'en')
+            convert(FILE_TYPE, file_name, PATH_PREFIX, BASE_FILE, 'en')
         elif lang != 'en':
-            convert(FILE_TYPE, file_name, PATH_PREFIX, lang)
+            convert(FILE_TYPE, file_name, PATH_PREFIX, BASE_FILE, lang)
