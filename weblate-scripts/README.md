@@ -48,3 +48,9 @@ For instance, you can run:
 ./manage.py import_json components.json --project xwiki-platform --main-component help-supportpanel-content --update
 ```
 This will import or update the components into the `xwiki-platform` project taking `help-supportpanel-content` as the main component. This means that all the components, specified in the `components.json` file, will use the git repository of `help-supportpanel-content`.
+
+### Update translations for other branches
+
+The `apply_translations.sh` script can be used to automatically update translation files based on the ones on the master branch. You can run the script from a git repository (e.g. xwiki-plaftorm) within the branch to be updated (for example an LTS branch). Translation files are found reading these files `translation_list_*.txt`
+
+Once you have executed the script, you can `git diff --cached` to see the changes and then commit.
