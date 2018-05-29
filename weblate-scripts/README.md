@@ -53,4 +53,6 @@ This will import or update the components into the `xwiki-platform` project taki
 
 The `apply_translations.sh` script can be used to automatically update translation files based on the ones on the master branch. You can run the script from a git repository (e.g. xwiki-plaftorm) within the branch to be updated (for example an LTS branch). Translation files are found reading these files `translation_list_*.txt`
 
+Once you have executed the script, you can `git diff --cached` to see the changes and then commit.
+
 Note that the script will not add new translations found in the master branch.
