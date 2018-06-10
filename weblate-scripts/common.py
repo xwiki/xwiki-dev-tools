@@ -185,7 +185,7 @@ class PropertiesFile(object):
             # Matches key = value
             match = re.search(r'^([^#][^\s]*?)\s*[=:]\s*(.*)', line)
             if match:
-                key, value = match.group(1).strip(), self.unescape(match.group(2).strip())
+                key, value = match.group(1).strip(), self.unescape(match.group(2)).strip()
                 if key in self.key_values:
                     print "Warning: {} already exists.".format(key)
                 self.key_values[key] = value
@@ -196,7 +196,7 @@ class PropertiesFile(object):
 
     @staticmethod
     def unescape(text):
-        return text.replace("\\n", "\n")
+        return text.replace("\\n", "\n").replace("\\ ", "")
 
 class FileType(object):
     PROPERTIES = 1
