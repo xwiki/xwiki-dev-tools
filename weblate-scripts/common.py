@@ -128,7 +128,7 @@ class PropertiesFile(object):
         """Replace values with parameters"""
         res = ""
         for line in self.document.splitlines(True):
-            if re.search(r"\{[0-9]*\}", line):
+            if re.search(r"\{[0-9]+\}", line):
                 line = line.replace(old, new)
             res += line
         return res
@@ -139,7 +139,9 @@ class PropertiesFile(object):
         for line in self.document.splitlines(True):
             if line.strip().startswith('notranslationsmarker'):
                 break
-            if line.strip() == '' or line.startswith('#'):
+            # Matches empty value: key =
+            match = re.search(r'^[^=:]*?[=:]\s*$', line)
+            if line.strip() == '' or line.startswith('#') or match:
                 continue
             document += line
 
@@ -183,7 +185,7 @@ class PropertiesFile(object):
             # Matches key = value
             match = re.search(r'^([^#][^\s]*?)\s*[=:]\s*(.*)', line)
             if match:
-                key, value = match.group(1).strip(), self.unescape(match.group(2))
+                key, value = match.group(1).strip(), self.unescape(match.group(2).strip())
                 if key in self.key_values:
                     print "Warning: {} already exists.".format(key)
                 self.key_values[key] = value
