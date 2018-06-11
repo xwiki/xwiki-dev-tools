@@ -5,6 +5,7 @@ import sys
 
 POST_UPDATE_SCRIPT = './post_update.sh'
 PRE_COMMIT_SCRIPT = './pre_commit.sh'
+POST_COMMIT_SCRIPT = './post_commit.sh'
 
 def update_project(project, vcs_path):
     file_name = 'translation_list_{}.txt'.format(project)
@@ -32,6 +33,9 @@ def update_project(project, vcs_path):
             os.environ['WL_FILEMASK'] = filemask
             os.system(POST_UPDATE_SCRIPT)
             os.system(PRE_COMMIT_SCRIPT)
+        for repo_url in repo_urls:
+            os.environ['WL_PATH'] = repo_urls[repo_url]
+            os.system(POST_COMMIT_SCRIPT)
 
 def path_exists(path):
     if not os.path.exists(path):
