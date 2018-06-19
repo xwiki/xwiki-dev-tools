@@ -146,7 +146,8 @@ class PropertiesFile(object):
             match = re.search(self.ANY_PROPERTY_REGEX, line)
             if match:
                 key, value = match.group(1).strip(), match.group(2).strip()
-                document += key + '=' + value + '\n'
+                if value:
+                    document += key + '=' + value + '\n'
 
         self.document = document
 
