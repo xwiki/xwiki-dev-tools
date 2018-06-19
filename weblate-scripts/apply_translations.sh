@@ -3,14 +3,26 @@ CURRENT_DIRECTORY=`pwd`
 SCRIPT_DIRECTORY=`dirname "$0"`
 SCRIPT_NAME=`basename "$0"`
 FILES="$SCRIPT_DIRECTORY/translation_list_%s.txt"
+BRANCH=$2
 
 function usage {
-  echo "Usage: $SCRIPT_NAME [target] ..."
+  echo "Usage: $SCRIPT_NAME [target] branchname"
   echo "Target:"
-  echo "  update BRANCH   Update translations of the branch BRANCH"
-  echo "  push            Push the updated translations"
-  echo "  clean           Rollback the update (before pushing)"
+  echo "  update  Update translations"
+  echo "  push    Push the updated translations"
+  echo "  clean   Rollback the update (before pushing)"
+  echo "Example:"
+  echo "  $SCRIPT_NAME update stable-X"
   exit 1
+}
+
+function checkout() {
+    git checkout $BRANCH
+    if [ $? != 0 ]; then
+      echo "Branch $BRANCH not found"
+      return -1
+    fi
+    return 0
 }
 
 function update() {
@@ -20,26 +32,26 @@ function update() {
     if [ -f $FILE ]; then
       echo "Updating $f translations..."
       cd $f
-      if [ -n "$1" ]; then
-        git checkout $1 > /dev/null 2>&1 || {
-          echo "Branch $1 not found"
-          cd $CURRENT_DIRECTORY
-          continue
-        }
+      checkout
+      if [ $? != 0 ]; then
+        cd $CURRENT_DIRECTORY
+        echo ""
+        continue
       fi
       N=$((N+1))
       PATHS=`awk -F';' 'NF && $0!~/^#/{print $2}' $FILE`
       for p in $PATHS; do
         if [ -f $p ]; then
-          git checkout master -- "${p/.properties/_*.properties}" 2> /dev/null
-          git checkout master -- "${p/.xml/.*.xml}" 2> /dev/null
+          git checkout master -- "${p/.properties/_*.properties}"
+          git checkout master -- "${p/.xml/.*.xml}"
         fi
       done
       cd $CURRENT_DIRECTORY
+      echo ""
     fi
   done
-  echo $'\n'"$N project(s) updated"
-  echo "You can commit the changes and run '$SCRIPT_NAME push' when finished"
+  echo "$N project(s) updated."
+  echo "After reviewing the changes, you can run '$SCRIPT_NAME push' to commit and push the changes."
 }
 
 function push() {
@@ -48,8 +60,16 @@ function push() {
     if [ -f $FILE ]; then
       echo "Pushing $f translations..."
       cd $f
-      git push > /dev/null
+      checkout
+      if [ $? != 0 ]; then
+        cd $CURRENT_DIRECTORY
+        echo ""
+        continue
+      fi
+      git commit -m "[release] Updated translations."
+      git push origin $BRANCH
       cd $CURRENT_DIRECTORY
+      echo ""
     fi
   done
 }
@@ -60,17 +80,24 @@ function clean() {
     if [ -f $FILE ]; then
       echo "Cleaning $f..."
       cd $f
-      git reset --hard > /dev/null
+      checkout
+      if [ $? != 0 ]; then
+        cd $CURRENT_DIRECTORY
+        echo ""
+        continue
+      fi
+      git reset --hard
       cd $CURRENT_DIRECTORY
+      echo ""
     fi
   done
 }
 
-if [ "$1" == 'update' ]; then
-  update $2
-elif [ "$1" == 'push' ]; then
+if [ "$1" == 'update' ] && [ -n "$BRANCH" ]; then
+  update
+elif [ "$1" == 'push' ] && [ -n "$BRANCH" ]; then
   push
-elif [ "$1" == 'clean' ]; then
+elif [ "$1" == 'clean' ] && [ -n "$BRANCH" ]; then
   clean
 else
   usage
