@@ -19,7 +19,7 @@ function usage {
 function checkout() {
     git checkout $BRANCH
     if [ $? != 0 ]; then
-      echo "Branch $BRANCH not found"
+      echo "Branch $BRANCH not found."
       return -1
     fi
     return 0
@@ -38,6 +38,13 @@ function update() {
         echo ""
         continue
       fi
+      git pull --rebase origin $BRANCH
+      if [ $? != 0 ]; then
+        echo "Couldn't pull new changes."
+        cd $CURRENT_DIRECTORY
+        echo ""
+        continue
+      fi
       N=$((N+1))
       PATHS=`awk -F';' 'NF && $0!~/^#/{print $2}' $FILE`
       for p in $PATHS; do
@@ -51,7 +58,7 @@ function update() {
     fi
   done
   echo "$N project(s) updated."
-  echo "After reviewing the changes, you can run '$SCRIPT_NAME push' to commit and push the changes."
+  echo "After reviewing the changes, you can run '$SCRIPT_NAME push $BRANCH' to commit and push the changes."
 }
 
 function push() {
@@ -68,6 +75,9 @@ function push() {
       fi
       git commit -m "[release] Updated translations."
       git push origin $BRANCH
+      if [ $? != 0 ]; then
+        echo "Couldn't push to $BRANCH."
+      fi
       cd $CURRENT_DIRECTORY
       echo ""
     fi
