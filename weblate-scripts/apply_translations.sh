@@ -18,7 +18,7 @@ function usage {
 
 function checkout() {
     git checkout $BRANCH
-    if [ $? != 0 ]; then
+    if [[ $? != 0 ]]; then
       echo "Branch $BRANCH not found."
       return -1
     fi
@@ -29,17 +29,17 @@ function update() {
   N=0
   for f in *; do
     FILE=`printf $FILES $f`
-    if [ -f $FILE ]; then
+    if [[ -f $FILE ]]; then
       echo "Updating $f translations..."
       cd $f
       checkout
-      if [ $? != 0 ]; then
+      if [[ $? != 0 ]]; then
         cd $CURRENT_DIRECTORY
         echo ""
         continue
       fi
       git pull --rebase origin $BRANCH
-      if [ $? != 0 ]; then
+      if [[ $? != 0 ]]; then
         echo "Couldn't pull new changes."
         cd $CURRENT_DIRECTORY
         echo ""
@@ -48,7 +48,7 @@ function update() {
       N=$((N+1))
       PATHS=`awk -F';' 'NF && $0!~/^#/{print $2}' $FILE`
       for p in $PATHS; do
-        if [ -f $p ]; then
+        if [[ -f $p ]]; then
           git checkout master -- "${p/.properties/_*.properties}"
           git checkout master -- "${p/.xml/.*.xml}"
         fi
@@ -58,24 +58,25 @@ function update() {
     fi
   done
   echo "$N project(s) updated."
-  echo "After reviewing the changes, you can run '$SCRIPT_NAME push $BRANCH' to commit and push the changes."
+  echo "After reviewing the changes, you can run '$SCRIPT_NAME push $BRANCH' "
+  echo "to commit and push the changes."
 }
 
 function push() {
   for f in *; do
     FILE=`printf $FILES $f`
-    if [ -f $FILE ]; then
+    if [[ -f $FILE ]]; then
       echo "Pushing $f translations..."
       cd $f
       checkout
-      if [ $? != 0 ]; then
+      if [[ $? != 0 ]]; then
         cd $CURRENT_DIRECTORY
         echo ""
         continue
       fi
-      git commit -m "[release] Updated translations."
-      git push origin $BRANCH
-      if [ $? != 0 ]; then
+      git add . && git commit -m "[release] Updated translations." && \
+      git pull --rebase origin $BRANCH && git push origin $BRANCH
+      if [[ $? != 0 ]]; then
         echo "Couldn't push to $BRANCH."
       fi
       cd $CURRENT_DIRECTORY
@@ -87,27 +88,27 @@ function push() {
 function clean() {
   for f in *; do
     FILE=`printf $FILES $f`
-    if [ -f $FILE ]; then
+    if [[ -f $FILE ]]; then
       echo "Cleaning $f..."
       cd $f
       checkout
-      if [ $? != 0 ]; then
+      if [[ $? != 0 ]]; then
         cd $CURRENT_DIRECTORY
         echo ""
         continue
       fi
-      git reset --hard
+      git reset --hard && git clean -dxf
       cd $CURRENT_DIRECTORY
       echo ""
     fi
   done
 }
 
-if [ "$1" == 'update' ] && [ -n "$BRANCH" ]; then
+if [[ "$1" == 'update' ]] && [[ -n "$BRANCH" ]]; then
   update
-elif [ "$1" == 'push' ] && [ -n "$BRANCH" ]; then
+elif [[ "$1" == 'push' ]] && [[ -n "$BRANCH" ]]; then
   push
-elif [ "$1" == 'clean' ] && [ -n "$BRANCH" ]; then
+elif [[ "$1" == 'clean' ]] && [[ -n "$BRANCH" ]]; then
   clean
 else
   usage
