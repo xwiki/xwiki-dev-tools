@@ -1,4 +1,5 @@
 #!/bin/bash
+SCRIPT_NAME=`basename "$0"`
 
 VERSION1=$1
 VERSION2=$2
@@ -6,8 +7,8 @@ VERSION2=$2
 PROJECTS=("xwiki-commons" "xwiki-rendering" "xwiki-platform")
 
 if [[ -z "$VERSION1" ]] || [[ -z "$VERSION2" ]]; then
-  echo "Usage: `basename "$0"` "
-  echo "Example: start_version end_version 10.4 10.5"
+  echo "Usage: $SCRIPT_NAME start_version end_version"
+  echo "Example: $SCRIPT_NAME 10.4 10.5"
   exit 1
 fi
 
