@@ -7,7 +7,7 @@ VERSION2=$2
 declare -A PROJECTS=( ["xwiki-commons"]="pom.xml" ["xwiki-rendering"]="pom.xml" ["xwiki-platform"]="xwiki-platform-core/pom.xml")
 
 if [[ -z "$VERSION1" ]] || [[ -z "$VERSION2" ]]; then
-  echo "Usage: $SCRIPT_NAME start_version end_version"
+  echo "Usage: $SCRIPT_NAME previous_version new_version"
   echo "Example: $SCRIPT_NAME 10.4 10.5"
   exit 1
 fi
