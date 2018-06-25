@@ -35,14 +35,14 @@ function update() {
       checkout
       if [[ $? != 0 ]]; then
         cd $CURRENT_DIRECTORY
-        echo ""
+        echo
         continue
       fi
       git pull --rebase origin $BRANCH
       if [[ $? != 0 ]]; then
         echo "Couldn't pull new changes."
         cd $CURRENT_DIRECTORY
-        echo ""
+        echo
         continue
       fi
       N=$((N+1))
@@ -54,7 +54,7 @@ function update() {
         fi
       done
       cd $CURRENT_DIRECTORY
-      echo ""
+      echo
     fi
   done
   echo "$N project(s) updated."
@@ -71,7 +71,7 @@ function push() {
       checkout
       if [[ $? != 0 ]]; then
         cd $CURRENT_DIRECTORY
-        echo ""
+        echo
         continue
       fi
       git add . && git commit -m "[release] Updated translations." && \
@@ -80,7 +80,7 @@ function push() {
         echo "Couldn't push to $BRANCH."
       fi
       cd $CURRENT_DIRECTORY
-      echo ""
+      echo
     fi
   done
 }
@@ -94,12 +94,12 @@ function clean() {
       checkout
       if [[ $? != 0 ]]; then
         cd $CURRENT_DIRECTORY
-        echo ""
+        echo
         continue
       fi
       git reset --hard && git clean -dxf
       cd $CURRENT_DIRECTORY
-      echo ""
+      echo
     fi
   done
 }
