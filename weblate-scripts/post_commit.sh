@@ -7,7 +7,7 @@ git rm --cached -r .translation/ && git commit --amend --no-edit --allow-empty
 if [ $? = 0 ]; then
   nCommits=$((nCommits+1))
 fi
-git add . && git reset .translation/ && git commit -m "[Translation] Update translations"
+git add *.properties *.xml && git reset .translation/ && git commit -m "[Translation] Update translations"
 if [ $? = 0 ]; then
   nCommits=$((nCommits+1))
 fi
