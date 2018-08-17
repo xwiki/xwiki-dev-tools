@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>10.6-SNAPSHOT</version>
+    <version>10.7-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki</artifactId>
@@ -97,6 +97,12 @@
       <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-web</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!--  -->
