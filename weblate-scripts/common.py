@@ -140,14 +140,23 @@ class PropertiesFile(object):
         self.document = self.document.replace('\\ ', ' ')
 
         document = ''
+        is_deprecated = False
         for line in self.document.splitlines(True):
-            if line.strip().startswith('notranslationsmarker'):
+            if is_deprecated and line.startswith('#@deprecatedend'):
+                is_deprecated = False
+                document += '#@deprecatedend\n\n'
+            elif line.startswith('#@deprecatedstart'):
+                is_deprecated = True
+                document += '#@deprecatedstart\n'
+            elif line.strip().startswith('notranslationsmarker'):
                 break
             match = re.search(self.ANY_PROPERTY_REGEX, line)
             if match:
                 key, value = match.group(1).strip(), match.group(2).strip()
                 if value:
-                    document += key + '=' + value + '\n'
+                    if is_deprecated:
+                        document += '#@deprecated#'
+                document += key + '=' + value + '\n'
 
         self.document = document
 
@@ -166,6 +175,7 @@ class PropertiesFile(object):
 
         document = ''
         has_no_translations_marker = False
+        is_deprecated = False
         for line in self.document.splitlines(True):
             match = re.search(self.ANY_PROPERTY_REGEX, line)
             if match:
@@ -184,7 +194,7 @@ class PropertiesFile(object):
     def map_properties(self):
         """Add all properties in memory"""
         self.properties.clear()
-        for line in self.document.splitlines():
+        for line in self.document.replace('#@deprecated#', '').splitlines():
             match = re.search(self.ANY_PROPERTY_REGEX, line)
             if match:
                 key, value = match.group(1).strip(), self.unescape(match.group(2).strip())
