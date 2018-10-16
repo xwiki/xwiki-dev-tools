@@ -42,10 +42,11 @@ def properties_to_xwiki_xml(file_path, path_prefix, lang):
 
     title = properties.get_value("{}.title".format(file_name))
     content = properties.get_value("{}.content".format(file_name))
-    xml_file = XmlFile(path_prefix + file_path)
+    xml_file = XmlFile()
+    xml_file.load(path_prefix + file_path)
     xml_file.set_tag_content("title", title)
     xml_file.set_tag_content("content", content)
-    xml_file.write()
+    xml_file.write(path_prefix + file_path)
 
 def properties_to_xwiki_xml_properties(file_path, path_prefix, base_file_name, lang):
     """Convert a java properties file to an XWiki XML file with properties"""
@@ -62,7 +63,8 @@ def properties_to_xwiki_xml_properties(file_path, path_prefix, base_file_name, l
         properties.load(f_properties.read())
 
     # Use the base translation file as template
-    xml_base_file = XmlFile(path_prefix + base_file_name)
+    xml_base_file = XmlFile()
+    xml_base_file.load(path_prefix + base_file_name)
     content = xml_base_file.get_tag_content("content")
     base_properties = PropertiesFile()
     base_properties.load(content)
@@ -71,9 +73,10 @@ def properties_to_xwiki_xml_properties(file_path, path_prefix, base_file_name, l
     base_properties.replace_with(properties)
     base_properties.filter_export()
 
-    xml_file = XmlFile(path_prefix + file_path)
+    xml_file = XmlFile()
+    xml_file.load(path_prefix + file_path)
     xml_file.set_tag_content("content", base_properties.document)
-    xml_file.write()
+    xml_file.write(path_prefix + file_path)
 
 def properties_to_xwiki_properties(file_path, path_prefix, base_file_name, lang):
     """Convert a java properties file to an XWiki java properties file"""
@@ -103,17 +106,6 @@ def properties_to_xwiki_properties(file_path, path_prefix, base_file_name, lang)
 
     base_properties.write(path_prefix + file_path)
 
-def create_xml_file(file_name, base_file_name, lang):
-    """Creates the default xml translation file"""
-    xml_file = XmlFile(base_file_name)
-    xml_file.file_name = file_name
-    xml_file.document = xml_file.document.replace('locale=""', 'locale="{}"'.format(lang))
-    xml_file.set_tag_content('language', lang)
-    xml_file.set_tag_content('translation', '1')
-    xml_file.remove_all_tags("object")
-    xml_file.remove_all_tags("attachment")
-    xml_file.write()
-
 def convert(file_type, file_name_properties, path_prefix, base_file_name, lang):
     """Convert the translation file depending on its type"""
     # Current file name with xml extension
@@ -123,7 +115,7 @@ def convert(file_type, file_name_properties, path_prefix, base_file_name, lang):
     if file_type in [FileType.XML_PROPERTIES, FileType.XML]:
         if not os.path.isfile(PATH_PREFIX + file_name_xml):
             # Create the xml translation if it doesn't exists
-            create_xml_file(PATH_PREFIX + file_name_xml, path_prefix + base_file_name, lang)
+            XmlFile.create_xml_file(PATH_PREFIX + file_name_xml, path_prefix + base_file_name, lang)
 
     if file_type == FileType.PROPERTIES:
         properties_to_xwiki_properties(file_name_properties, path_prefix, base_file_name, lang)

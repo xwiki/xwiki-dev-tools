@@ -30,8 +30,10 @@ class XmlFile(object):
     # Matches </tag>
     END_REGEX = r"\s*\<\s*\/\s*{}\s*\>"
 
-    def __init__(self, file_name):
-        self.file_name = file_name
+    def __init__(self):
+        self.document = ''
+
+    def load(self, file_name):
         with open(file_name, "r") as f_xml:
             self.document = f_xml.read()
 
@@ -46,18 +48,21 @@ class XmlFile(object):
         return content
 
     def set_tag_content(self, tag, content):
-        """Set content of an existing tag"""
+        """Set content of an existing tag or create it"""
         content = content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").strip()
-        start = re.search(self.START_REGEX.format(tag), self.document)
-        if start is None:
+        tag_start = re.search(self.START_REGEX.format(tag), self.document)
+        if tag_start is None:
             tag_start = re.search(self.SELF_CLOSE_REGEX.format(tag), self.document)
             if tag_start is None:
-                raise LookupError("Couldn't find the tag {}".format(tag))
+                start = end = len(self.document)
+            else:
+                start, end = tag_start.start(), tag_start.end()
             self.document = "{0}<{1}>{2}</{1}>{3}".format(
-                self.document[:tag_start.start()], tag, content, self.document[tag_start.end():])
+                self.document[:start], tag, content, self.document[end:])
         else:
-            end = re.search(self.END_REGEX.format(tag), self.document)
-            self.document = self.document[:start.end()] + content + self.document[end.start():]
+            tag_end = re.search(self.END_REGEX.format(tag), self.document)
+            self.document = self.document[:tag_start.end()] + content + \
+                self.document[tag_end.start():]
 
     def remove_tag(self, tag):
         """Remove the first found tag from the document"""
@@ -78,16 +83,30 @@ class XmlFile(object):
         while self.remove_tag(tag):
             pass
 
-    def write(self):
+    def write(self, file_name):
         """Write the XML document into the file"""
-        with open(self.file_name, "w") as f_xml:
+        with open(file_name, "w") as f_xml:
             f_xml.write(self.document)
+
+    @staticmethod
+    def create_xml_file(file_name, base_file_name, lang):
+        """Creates the default xml translation file"""
+        xml_file = XmlFile()
+        xml_file.load(base_file_name)
+        xml_file.document = xml_file.document.replace('locale=""', 'locale="{}"'.format(lang))
+        xml_file.set_tag_content('language', lang)
+        xml_file.set_tag_content('translation', '1')
+        xml_file.set_tag_content('content', '')
+        xml_file.remove_all_tags("object")
+        xml_file.remove_all_tags("attachment")
+        xml_file.write(file_name)
+        return xml_file
 
 class PropertiesFile(object):
     """"Simple class working on Java properties files using regex"""
     # Matches key = value
-    PROPERTY_REGEX = r'^([^#]{})\s*[=:](.*)'
-    ANY_PROPERTY_REGEX = PROPERTY_REGEX.format(r'[^\s]*?')
+    PROPERTY_REGEX = r'^({})\s*[=:](.*)'
+    ANY_PROPERTY_REGEX = PROPERTY_REGEX.format(r'[^#][^\s]*?')
 
     def __init__(self):
         self.document = ""
@@ -99,11 +118,14 @@ class PropertiesFile(object):
         self.map_properties()
 
     def get_value(self, key):
-        """Get value of the specified key"""
+        """
+        Get value of the specified key.
+        The map_properties method should be called if any modification has been made since load.
+        """
         return self.properties[key] if key in self.properties else ''
 
     def set_value(self, key, new_value):
-        """Set value of key"""
+        """Set value of key or create it"""
         new_value = self.escape(new_value.strip())
         match = re.search(self.PROPERTY_REGEX.format(key), self.document, re.MULTILINE)
         if match:
@@ -116,6 +138,16 @@ class PropertiesFile(object):
                 self.document += "\n"
             self.document += key + '=' + new_value
         self.properties[key] = self.unescape(new_value)
+
+    def remove_key(self, key):
+        """Remove a key if present"""
+        match = re.search(self.PROPERTY_REGEX.format(key), self.document, re.MULTILINE)
+        if match:
+            new_document = self.document[:match.start()]
+            if match.end() < len(self.document):
+                # Remove the new line if there is one
+                new_document += self.document[match.end()].strip() + self.document[match.end() + 1:]
+            self.document = new_document
 
     def write(self, file_name):
         """Write the Java properties into the file"""
@@ -211,6 +243,22 @@ class PropertiesFile(object):
         return text.replace("\\n", "\n")
 
 class FileType(object):
+    UNDEFINED = -1
     PROPERTIES = 1
     XML = 2
     XML_PROPERTIES = 3
+
+    @staticmethod
+    def get_file_type(file_name):
+        if not '.' in file_name or not os.path.isfile(file_name):
+            return FileType.UNDEFINED
+        extension = file_name.rsplit('.', 1)[1]
+        if extension == 'properties':
+            return FileType.PROPERTIES
+        elif extension == 'xml':
+            with open(file_name) as f:
+                if '<className>XWiki.TranslationDocumentClass</className>' in f.read():
+                    return FileType.XML_PROPERTIES
+                else:
+                    return FileType.XML
+        return FileType.UNDEFINED

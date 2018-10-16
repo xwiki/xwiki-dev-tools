@@ -38,7 +38,8 @@ def xwiki_xml_to_properties(file_path, path_prefix, lang):
         path_prefix + TRANSLATION_PREFIX + relative_dir_path + "/" + file_name, lang)
     properties = PropertiesFile()
 
-    xml_file = XmlFile(path_prefix + file_path)
+    xml_file = XmlFile()
+    xml_file.load(path_prefix + file_path)
     properties.set_value("{}.title".format(file_name), xml_file.get_tag_content("title"))
     properties.set_value("{}.content".format(file_name), xml_file.get_tag_content("content"))
 
@@ -56,7 +57,8 @@ def xwiki_xml_properties_to_properties(file_path, path_prefix, lang):
         path_prefix + TRANSLATION_PREFIX + relative_dir_path + "/" + file_name, lang)
     properties = PropertiesFile()
 
-    xml_file = XmlFile(path_prefix + file_path)
+    xml_file = XmlFile()
+    xml_file.load(path_prefix + file_path)
     content = xml_file.get_tag_content("content")
     properties.load(content)
     properties.filter_import()
