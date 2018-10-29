@@ -65,7 +65,8 @@ def generate_component(line, pre_commit_script, post_commit_script, post_update_
                           "Translate-URL: %(url)s",
         "committer_name": "XWiki",
         "committer_email": "noreply@xwiki.com",
-        "merge_style": "rebase"
+        "merge_style": "rebase",
+        "push_on_commit": False
     }
 
     return component

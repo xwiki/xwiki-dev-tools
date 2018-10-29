@@ -69,4 +69,5 @@ Invitation.Translations; xwiki-platform-core/xwiki-platform-invitation/xwiki-pla
 XWiki.XWikiSyntaxHTML; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxHTML.xml; https://github.com/xwiki/xwiki-platform
 XWiki.Notifications.Code.Translations; xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-ui/src/main/resources/XWiki/Notifications/Code/Translations.xml; https://github.com/xwiki/xwiki-platform
 Message Stream; xwiki-platform-core/xwiki-platform-messagestream/xwiki-platform-messagestream-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
-XWiki.Notifications.Macro; xwiki-notifications-macro-translations/Translations.xml; https://github.com/xwiki/xwiki-platform
+XWiki.Notifications.Macro; xwiki-platform-core/xwiki-platform-notifications/xwiki-platform-notifications-macro/xwiki-platform-notifications-macro-ui/src/main/resources/XWiki/Notifications/Code/Macro/Translations.xml; https://github.com/xwiki/xwiki-platform
+XWiki.Refactoring.Default; xwiki-platform-core/xwiki-platform-refactoring/xwiki-platform-refactoring-default/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform
