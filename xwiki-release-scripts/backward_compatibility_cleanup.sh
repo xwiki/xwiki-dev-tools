@@ -17,7 +17,7 @@ if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
 fi
 
 for PROJECT in ${!PROJECTS[@]}; do
-  echo "Checking [$PROJECT]..."
+  echo "## Checking [$PROJECT]..."
 
   cd $PROJECT 2> /dev/null || { echo "ERROR: unable to find project [$PROJECT]. Execute script from 'xwiki-trunks' parent folder."; exit 3; }
 
@@ -25,7 +25,7 @@ for PROJECT in ${!PROJECTS[@]}; do
   git pull --rebase || exit 4
 
   if [[ "$PROJECT" == "xwiki-commons" ]]; then
-    echo "Updating [xwiki.compatibility.previous.version]..."
+    echo "## Updating [xwiki.compatibility.previous.version]..."
 
     sed -i "s/<xwiki.compatibility.previous.version>.*</<xwiki.compatibility.previous.version>$VERSION</" pom.xml
 
@@ -35,12 +35,18 @@ for PROJECT in ${!PROJECTS[@]}; do
 
   IGNORES_FILE="${PROJECTS[$PROJECT]}"
 
-  echo "Removing any existing revapi ignores from [$IGNORES_FILE]..."
+  echo "## Removing any existing revapi ignores from [$IGNORES_FILE]..."
 
   perl -0pi -e 's/\/\/ Add more ignores below\.\.\.\s*({.*?}(,\s*|\s*$))+/\/\/ Add more ignores below\.\.\./gms' "$IGNORES_FILE"
 
-  git --no-pager diff || exit 4
-  git commit -a -m "[release] Removed revapi ignores from the previous version" || exit 4
+  DIFF=`git --no-pager diff`
+  [[ $? == 0 ]] || exit 4
+
+  if ! [[ -z $DIFF ]]; then
+    git commit -a -m "[release] Removed revapi ignores from the previous version" || exit 4
+  else
+    echo "## No ignores to remove."
+  fi
 
   git push origin master || exit 4
 
