@@ -108,6 +108,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-web</artifactId>
       <version>${platform.version}</version>
+      <type>pom</type>
     </dependency>
 
     <!--  -->
