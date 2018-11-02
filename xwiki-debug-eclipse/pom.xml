@@ -95,7 +95,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.version}</version>
       <type>pom</type>
       <exclusions>
         <exclusion>
@@ -103,6 +103,11 @@
           <artifactId>xwiki-platform-web</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-web</artifactId>
+      <version>${platform.version}</version>
     </dependency>
 
     <!--  -->
@@ -112,7 +117,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-flavor-mainwiki</artifactId>
-      <version>${project.version}</version>
+      <version>${platform.version}</version>
       <type>pom</type>
     </dependency>
 
