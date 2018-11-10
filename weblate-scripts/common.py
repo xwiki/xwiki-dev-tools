@@ -188,7 +188,7 @@ class PropertiesFile(object):
                 if value:
                     if is_deprecated:
                         document += '#@deprecated#'
-                document += key + '=' + value + '\n'
+                    document += key + '=' + value + '\n'
 
         self.document = document
 
