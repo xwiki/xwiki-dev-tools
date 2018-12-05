@@ -23,7 +23,7 @@ import json
 import os
 import sys
 
-def generate_component(line, pre_commit_script, post_commit_script, post_update_script):
+def generate_component(line):
     """Creates a component based on the given parameters"""
     name, path, repo_url = line.rsplit(';', 2)
     name, path, repo_url = name.strip(), path.strip(), repo_url.strip()
@@ -39,10 +39,8 @@ def generate_component(line, pre_commit_script, post_commit_script, post_update_
     template = '.translation/' + basename + '_en.properties'
     if extension == 'properties':
         file_format = 'properties'
-        extra_commit_file = path + "\n" + basename + "_%(language)s.properties"
     elif extension == 'xml':
         file_format = 'properties-utf8'
-        extra_commit_file = path + "\n" + basename + ".%(language)s.xml"
     else:
         print "Wrong extension: {}".format(extension)
     component = {
@@ -54,15 +52,13 @@ def generate_component(line, pre_commit_script, post_commit_script, post_update_
         "filemask": filemask,
         "template": template,
         "file_format": file_format,
-        "extra_commit_file": extra_commit_file,
-        "pre_commit_script": pre_commit_script,
-        "post_commit_script": post_commit_script,
-        "post_update_script": post_update_script,
-        "commit_message": "Translated using Weblate (%(language_name)s)\n"
-                          "Currently translated at %(translated_percent)s%% "
-                          "(%(translated)s of %(total)s strings)\n"
-                          "Translation: %(project)s/%(component)s\n"
-                          "Translate-URL: %(url)s",
+        "commit_message": "Translated using Weblate ({{ language_name }})\n\n"
+                          "Currently translated at {{ stats.translated_percent }}% "
+                          "({{ stats.translated }} of {{ stats.all }} strings)\n\n"
+                          "Translation: {{ project_name }}/{{ component_name }}\n"
+                          "Translate-URL: {{ url }}",
+        "add_message": "Added translation using Weblate ({{ language_name }})",
+        "delete_message": "Deleted translation using Weblate ({{ language_name }})",
         "committer_name": "XWiki",
         "committer_email": "noreply@xwiki.com",
         "merge_style": "rebase",
@@ -73,10 +69,6 @@ def generate_component(line, pre_commit_script, post_commit_script, post_update_
 
 if __name__ == '__main__':
     DIRECTORY = os.getcwd()
-    PRE_COMMIT_SCRIPT = sys.argv[1] if len(sys.argv) > 1 else DIRECTORY + "/pre_commit.sh"
-    POST_COMMIT_SCRIPT = sys.argv[2] if len(sys.argv) > 2 else DIRECTORY + "/post_commit.sh"
-    POST_UPDATE_SCRIPT = sys.argv[3] if len(sys.argv) > 3 else DIRECTORY + "/post_update.sh"
-
     for file_name in os.listdir(DIRECTORY):
         if not fnmatch.fnmatch(file_name, "translation_list_*.txt"):
             continue
@@ -88,7 +80,6 @@ if __name__ == '__main__':
             for line in f.read().splitlines():
                 if not line or line[0] == '#':
                     continue
-                components.append(generate_component(line, PRE_COMMIT_SCRIPT,
-                                                     POST_COMMIT_SCRIPT, POST_UPDATE_SCRIPT))
+                components.append(generate_component(line))
         with open("components_{}.json".format(project), "w+") as f:
             f.write(json.dumps(components))
