@@ -1,5 +1,5 @@
 #Format: Name of the component; Relative path to the translation file; Repository url
-Map Macro; src/main/resources/XWiki/MapMacroTranslations.xml; https://github.com/xwiki-contrib/macro-map
+Map Macro; src/main/resources/Macros/MapMacro/MapMacroTranslations.xml; https://github.com/xwiki-contrib/macro-map
 Mocca Calendar Application; application-mocca-calendar-ui/src/main/resources/MoccaCalendar/MoccaCalendarTranslations.xml; https://github.com/xwiki-contrib/application-mocca-calendar
 Mocca Calendar Macro; application-mocca-calendar-ui/src/main/resources/MoccaCalendar/MoccaCalendarMacroTranslations.xml; https://github.com/xwiki-contrib/application-mocca-calendar
 OCR Application; application-ocr-ui/src/main/resources/OCR/Code/Translations.xml; https://github.com/xwiki-contrib/application-ocr
@@ -12,7 +12,7 @@ Blog.Translations; application-blog-ui/src/main/resources/Blog/Translations.xml;
 Forum Application; application-forum-ui/src/main/resources/ForumCode/Translations.xml; https://github.com/xwiki-contrib/application-forum
 LDAP Application; ldap-ui/src/main/resources/LDAP/Code/Translations.xml; https://github.com/xwiki-contrib/ldap
 LimitsApplication; application-limits-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki-contrib/application-limits
-Full Calendar Macro; src/main/resources/Calendar/Translations.xml; https://github.com/xwiki-contrib/macro-fullcalendar
+Full Calendar Macro; macro-fullcalendar-ui/src/main/resources/Calendar/Translations.xml; https://github.com/xwiki-contrib/macro-fullcalendar
 Notes Application; src/main/resources/NotesCode/Translations.xml; https://github.com/xwiki-contrib/application-notes
 Templates Application; application-templates-ui/src/main/resources/Templates/Translations.xml; https://github.com/xwiki-contrib/application-templates
 CKEditor Integration; ui/src/main/resources/CKEditor/Translations.xml; https://github.com/xwiki-contrib/application-ckeditor
