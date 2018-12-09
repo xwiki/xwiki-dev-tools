@@ -27,7 +27,7 @@ POST_UPDATE_SCRIPT = './post_update.sh'
 PRE_COMMIT_SCRIPT = './pre_commit.sh'
 POST_COMMIT_SCRIPT = './post_commit.sh'
 
-def update_project(project, vcs_path):
+def update_project(project, vcs_path, component_url):
     file_name = 'translation_list_{}.txt'.format(project)
     project_path = vcs_path + project
     if not path_exists(project_path) or not path_exists(file_name):
@@ -39,6 +39,8 @@ def update_project(project, vcs_path):
                 continue
             name, path, repo_url = line.rsplit(';', 2)
             name, path, repo_url = name.strip(), path.strip(), repo_url.strip()
+            if component_url and component_url != repo_url:
+                continue
             slug = name.lower().replace(' ', '-').replace('.', '-')
             if repo_url not in repo_urls:
                 repo_urls[repo_url] = project_path + '/' + slug
@@ -67,6 +69,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Call post update and pre commit scripts.')
     parser.add_argument('vcs_path', metavar='vcs_path', help='Path to Weblate VCS folder')
     parser.add_argument('--project', metavar='project', help='Project name')
+    parser.add_argument('--component', metavar='component_url', help='Component url')
     args = parser.parse_args()
     if args.vcs_path and args.vcs_path[-1] != '/':
         args.vcs_path += '/'
@@ -75,11 +78,11 @@ if __name__ == '__main__':
         sys.exit(1)
 
     if args.project:
-        update_project(args.project, args.vcs_path)
+        update_project(args.project, args.vcs_path, args.component)
     else:
         for file_name in os.listdir(os.getcwd()):
             match = re.search(r'translation_list_(.*).txt', file_name)
             if not match:
                 continue
             project = match.group(1)
-            update_project(project, args.vcs_path)
+            update_project(project, args.vcs_path, args.component)

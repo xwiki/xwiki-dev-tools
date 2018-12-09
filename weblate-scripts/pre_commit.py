@@ -21,6 +21,7 @@
 import glob
 import os
 import re
+import sys
 
 from common import XmlFile, PropertiesFile, FileType
 
@@ -135,6 +136,7 @@ if __name__ == '__main__':
     # Relative path to the base translation (could be .properties or .xml)
     BASE_PROPERTIES = FILE_MASK.replace('_*.properties', '.properties')
     BASE_XML = FILE_MASK.replace('_*.properties', '.xml')
+    BASE_FILE = None
 
     if os.path.isfile(PATH_PREFIX + BASE_PROPERTIES):
         # Base file is a .properties
@@ -150,6 +152,9 @@ if __name__ == '__main__':
             else:
                 # XML without properties
                 FILE_TYPE = FileType.XML
+
+    if not BASE_FILE:
+        sys.exit("Couldn't find the base translation file for this file mask: [" + FILE_MASK + "]")
 
     # Glob string to find Weblate translation files (.translation folder)
     FILES_GLOB = PATH_PREFIX + TRANSLATION_PREFIX + FILE_MASK
