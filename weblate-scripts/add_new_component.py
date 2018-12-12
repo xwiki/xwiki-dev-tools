@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 # ---------------------------------------------------------------------------
 # See the NOTICE file distributed with this work for additional
 # information regarding copyright ownership.
@@ -56,15 +58,22 @@ def import_component(project, component):
     if not os.path.exists(component_vcs_path):
         os.makedirs(component_vcs_path)
     if not os.path.exists(component_vcs_path + '/.git'):
+        print
+        print 'git clone ' + component.url + ' ' + component_vcs_path
         call(['git', 'clone', component.url, component_vcs_path])
 
-    call(['python', 'call_updates.py', vcs_path, '--project', project.name,
-          '--component', component.url])
-
-    call(['python', 'generate_components.py'])
+    print
+    print ('./call_updates.py ' + vcs_path + ' --project ' + project.name
+         + ' --component ' + component.url)
+    os.system('./call_updates.py ' + vcs_path + ' --project ' + project.name
+            + ' --component ' + component.url)
 
     print
+    print './generate_components.py'
+    os.system('./generate_components.py')
 
+
+    print
     print 'You can now import the new component using these commands:'
     print ('$ weblate import_json --project ' + project.name + ' components_'
           + project.name + '.json --ignore')
@@ -96,10 +105,12 @@ def get_component(components):
     component_name = raw_input('Name of the new component: ').strip()
     if component_name in component_names:
         sys.exit('Component with this name already exists')
-    component_path = raw_input('Path to the translation file: ').strip()
-    print 'Existing component urls:'
-    for url in set(map(lambda c: c.url, components)):
-        print '  ' + url
+    component_path = (raw_input('Relative path to the translation file: ')
+                      .strip())
+    if components:
+        print ' Existing component urls:'
+        for url in set(map(lambda c: c.url, components)):
+            print '  ' + url
     component_url = raw_input('Repository URL: ').strip()
     component = Component(component_name, component_path, component_url)
     if (component.path, component.url) in component_paths_urls:
