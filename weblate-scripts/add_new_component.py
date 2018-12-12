@@ -114,6 +114,7 @@ def get_components(project):
     components = []
     with open(project.file) as project_file:
         for line in project_file:
+            line = line.strip()
             if not line or line[0] == '#':
                 continue
             component = Component(*map(str.strip, line.rsplit(';', 2)))
