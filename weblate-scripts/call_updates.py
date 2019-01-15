@@ -55,13 +55,13 @@ def update_project(project, vcs_path, component_url):
 
             os.environ['WL_PATH'] = repo_path
             os.environ['WL_FILEMASK'] = filemask
-            print 'Launching the post update script [{}]...'.format(POST_UPDATE_SCRIPT)
+            print 'Launching the post update script for {}/{}...'.format(project, slug)
             os.system(POST_UPDATE_SCRIPT)
-            print 'Launching the pre commit script [{}]...'.format(POST_UPDATE_SCRIPT)
+            print 'Launching the pre commit script for {}/{}...'.format(project, slug)
             os.system(PRE_COMMIT_SCRIPT)
         for repo_url in repo_urls:
             os.environ['WL_PATH'] = repo_urls[repo_url]
-            print 'Launching the post commit script [{}]...'.format(POST_UPDATE_SCRIPT)
+            print 'Launching the post commit script for {}/{}...'.format(project, slug)
             os.system(POST_COMMIT_SCRIPT)
 
 def path_exists(path):
