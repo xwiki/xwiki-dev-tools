@@ -72,17 +72,18 @@ def import_component(project, component):
     print './generate_components.py'
     os.system('./generate_components.py')
 
-
     print
     print 'You can now import the new component using these commands:'
     print ('$ weblate import_json --project ' + project.name + ' components_'
           + project.name + '.json --ignore')
+
+    slug = component.name.lower().replace(' ', '-').replace('.', '-')
     print ('$ weblate install_addon --addon xwiki.post_update '
-          + project.name + '/' + component.name)
+          + project.name + '/' + slug)
     print ('$ weblate install_addon --addon xwiki.pre_commit '
-            + project.name + '/' + component.name)
+            + project.name + '/' + slug)
     print ('$ weblate install_addon --addon xwiki.post_commit '
-            + project.name + '/' + component.name)
+            + project.name + '/' + slug)
 
 def write_component(project, component):
     with open(project.file, 'a') as project_file:
