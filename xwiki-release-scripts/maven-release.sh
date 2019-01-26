@@ -154,6 +154,7 @@ function stabilize_branch() {
       NEXT_TRUNK_VERSION=${tmp}
     fi
     # Let maven update the version for all the submodules
+    # TODO: Remove the office-tests profile when all branches we release have versions >= 11.0
     mvn release:branch -DbranchName=$STABLE_BRANCH -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -DpushChanges=false -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,office-tests,legacy,standalone,flavor-integration-tests,distribution,docker
     git pull --rebase
     # We must update the root parent and commons.version manually
