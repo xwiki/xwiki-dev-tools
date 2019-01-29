@@ -234,6 +234,13 @@ class PropertiesFile(object):
                     print "Warning: {} already exists.".format(key)
                 self.properties[key] = value
 
+    def is_empty(self):
+        """Returns true if the all properties are empty"""
+        if not self.properties or len("".join(self.properties.values())) == 0:
+            return True
+        else:
+            return False
+
     @staticmethod
     def escape(text):
         return text.replace("\n", "\\n")
