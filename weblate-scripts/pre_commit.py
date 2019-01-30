@@ -43,13 +43,16 @@ def properties_to_xwiki_xml(file_path, path_prefix, lang):
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
 
-    title = properties.get_value("{}.title".format(file_name))
-    content = properties.get_value("{}.content".format(file_name))
-    xml_file = XmlFile()
-    xml_file.load(path_prefix + file_path)
-    xml_file.set_tag_content("title", title)
-    xml_file.set_tag_content("content", content)
-    xml_file.write(path_prefix + file_path)
+    if not properties.is_empty():
+        title = properties.get_value("{}.title".format(file_name))
+        content = properties.get_value("{}.content".format(file_name))
+        xml_file = XmlFile()
+        xml_file.load(path_prefix + file_path)
+        xml_file.set_tag_content("title", title)
+        xml_file.set_tag_content("content", content)
+        xml_file.write(path_prefix + file_path)
+    else:
+        print "Warning: {} translation is empty. Skipping it.".format(properties_path)
 
 def properties_to_xwiki_xml_properties(file_path, path_prefix, base_file_name, lang):
     """Convert a java properties file to an XWiki XML file with properties"""
@@ -65,21 +68,24 @@ def properties_to_xwiki_xml_properties(file_path, path_prefix, base_file_name, l
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
 
-    # Use the base translation file as template
-    xml_base_file = XmlFile()
-    xml_base_file.load(path_prefix + base_file_name)
-    content = xml_base_file.get_tag_content("content")
-    base_properties = PropertiesFile()
-    base_properties.load(content)
+    if not properties.is_empty():
+        # Use the base translation file as template
+        xml_base_file = XmlFile()
+        xml_base_file.load(path_prefix + base_file_name)
+        content = xml_base_file.get_tag_content("content")
+        base_properties = PropertiesFile()
+        base_properties.load(content)
 
-    # Replace keys with the current translation
-    base_properties.replace_with(properties)
-    base_properties.filter_export()
+        # Replace keys with the current translation
+        base_properties.replace_with(properties)
+        base_properties.filter_export()
 
-    xml_file = XmlFile()
-    xml_file.load(path_prefix + file_path)
-    xml_file.set_tag_content("content", base_properties.document)
-    xml_file.write(path_prefix + file_path)
+        xml_file = XmlFile()
+        xml_file.load(path_prefix + file_path)
+        xml_file.set_tag_content("content", base_properties.document)
+        xml_file.write(path_prefix + file_path)
+    else:
+        print "Warning: {} translation is empty. Skipping it.".format(properties_path)
 
 def properties_to_xwiki_properties(file_path, path_prefix, base_file_name, lang):
     """Convert a java properties file to an XWiki java properties file"""
@@ -98,16 +104,19 @@ def properties_to_xwiki_properties(file_path, path_prefix, base_file_name, lang)
     with open(properties_path, "r") as f_properties:
         properties.load(f_properties.read())
 
-    # Use the base translation file as template
-    base_properties = PropertiesFile()
-    with open(path_prefix + base_file_name, "r") as f_properties:
-        base_properties.load(f_properties.read())
+    if not properties.is_empty():
+        # Use the base translation file as template
+        base_properties = PropertiesFile()
+        with open(path_prefix + base_file_name, "r") as f_properties:
+            base_properties.load(f_properties.read())
 
-    # Replace keys with the current translation
-    base_properties.replace_with(properties)
-    base_properties.filter_export()
+        # Replace keys with the current translation
+        base_properties.replace_with(properties)
+        base_properties.filter_export()
 
-    base_properties.write(path_prefix + file_path)
+        base_properties.write(path_prefix + file_path)
+    else:
+        print "Warning: {} translation is empty. Skipping it.".format(properties_path)
 
 def convert(file_type, file_name_properties, path_prefix, base_file_name, lang):
     """Convert the translation file depending on its type"""
