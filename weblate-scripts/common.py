@@ -236,10 +236,7 @@ class PropertiesFile(object):
 
     def is_empty(self):
         """Returns true if the all properties are empty"""
-        if not self.properties or len("".join(self.properties.values())) == 0:
-            return True
-        else:
-            return False
+        return not self.properties or len("".join(self.properties.values())) == 0
 
     @staticmethod
     def escape(text):
