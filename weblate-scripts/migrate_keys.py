@@ -111,7 +111,8 @@ def process_destination(destination_file, destination_type, languages_keys):
             xml.set_tag_content('content', properties.document)
             xml.write(file_name)
 
-if __name__ == '__main__':
+def main():
+    """Main function"""
     source_file, destination_file, key_list_file = parse_arguments()
     source_basename, source_extension = source_file.rsplit('.', 1)
     destination_basename, destination_extension = destination_file.rsplit('.', 1)
@@ -130,3 +131,6 @@ if __name__ == '__main__':
 
     languages_keys = process_source(source_file, source_basename, source_type, key_list)
     process_destination(destination_file, destination_type, languages_keys)
+
+if __name__ == '__main__':
+    main()

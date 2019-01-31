@@ -25,7 +25,7 @@ import json
 import os
 import sys
 
-def generate_component(line):
+def generate_component(line, repo_urls, project):
     """Creates a component based on the given parameters"""
     name, path, repo_url = line.rsplit(';', 2)
     name, path, repo_url = name.strip(), path.strip(), repo_url.strip()
@@ -69,9 +69,9 @@ def generate_component(line):
 
     return component
 
-if __name__ == '__main__':
-    DIRECTORY = os.getcwd()
-    for file_name in os.listdir(DIRECTORY):
+def main():
+    directory = os.getcwd()
+    for file_name in os.listdir(directory):
         if not fnmatch.fnmatch(file_name, "translation_list_*.txt"):
             continue
         start, end = len("translation_list_"), file_name.index(".txt")
@@ -82,6 +82,10 @@ if __name__ == '__main__':
             for line in f.read().splitlines():
                 if not line or line[0] == '#':
                     continue
-                components.append(generate_component(line))
+                components.append(generate_component(line, repo_urls, project))
         with open("components_{}.json".format(project), "w+") as f:
             f.write(json.dumps(components))
+
+if __name__ == '__main__':
+    """Main function"""
+    main()

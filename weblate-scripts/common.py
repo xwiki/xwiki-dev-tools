@@ -158,7 +158,7 @@ class PropertiesFile(object):
             f_properties.write(self.document)
 
     def replace_values(self, old, new):
-        """Replace values with parameters"""
+        """Replace 'old' with 'new' in values with parameters"""
         res = ""
         for line in self.document.splitlines(True):
             if re.search(r"\{[0-9]+\}", line):

@@ -70,7 +70,8 @@ def path_exists(path):
         return False
     return True
 
-if __name__ == '__main__':
+def main():
+    """Main function"""
     parser = argparse.ArgumentParser(description='Call post update and pre commit scripts.')
     parser.add_argument('vcs_path', metavar='vcs_path', help='Path to Weblate VCS folder')
     parser.add_argument('--project', metavar='project', help='Project name')
@@ -91,3 +92,6 @@ if __name__ == '__main__':
                 continue
             project = match.group(1)
             update_project(project, args.vcs_path, args.component)
+
+if __name__ == '__main__':
+    main()

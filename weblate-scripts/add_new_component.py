@@ -30,7 +30,7 @@ from subprocess import call
 
 Project = namedtuple('Project', ['name', 'file'])
 Component = namedtuple('Component', ['name', 'path', 'url'])
-urls_vcs_names = {}
+URLS_VCS_NAMES = {}
 
 def import_component(project, component):
     ans = None
@@ -50,11 +50,11 @@ def import_component(project, component):
     while vcs_path is None:
         vcs_path = raw_input('Please specify the Weblate vcs path: ').strip()
         if not vcs_path or not os.path.exists(vcs_path):
-            print("This directory doesn't exists")
+            print "This directory doesn't exists"
             vcs_path = None
 
     component_vcs_path = (vcs_path + ('' if vcs_path[-1] == '/' else '/')
-                          + urls_vcs_names[component.url])
+                          + URLS_VCS_NAMES[component.url])
     if not os.path.exists(component_vcs_path):
         os.makedirs(component_vcs_path)
     if not os.path.exists(component_vcs_path + '/.git'):
@@ -93,12 +93,12 @@ def write_component(project, component):
     print '"' + project.file + '"' + ' when you are done'
     print
 
-def add_url(component):
+def add_url(component, project):
     slug = component.name.lower().replace(' ', '-').replace('.', '-')
-    if component.url not in urls_vcs_names:
-        urls_vcs_names[component.url] = project.name + '/' + slug
+    if component.url not in URLS_VCS_NAMES:
+        URLS_VCS_NAMES[component.url] = project.name + '/' + slug
 
-def get_component(components):
+def get_component(components, project):
     component_names = set(map(lambda x: x.name, components))
     component_paths_urls = dict(
             ((component.path, component.url), component.name)
@@ -117,7 +117,7 @@ def get_component(components):
     if (component.path, component.url) in component_paths_urls:
         sys.exit('This component already exists and is named: '
                  + component_paths_urls[(component.path, component.url)])
-    add_url(component)
+    add_url(component, project)
 
     print
     return component
@@ -131,15 +131,15 @@ def get_components(project):
                 continue
             component = Component(*map(str.strip, line.rsplit(';', 2)))
             components.append(component)
-            add_url(component)
+            add_url(component, project)
     return components
 
 def get_project(projects):
-    print('Projects found:')
+    print 'Projects found:'
     for i, project in enumerate(projects):
-        print(('  %d. ' + project.name) % (i + 1))
+        print ('  %d. ' + project.name) % (i + 1)
     project_id = -1
-    while not (0 <= project_id < len(projects)):
+    while not 0 <= project_id < len(projects):
         try:
             project_id = int(input('Please select a project (1 - '
                          + str(len(projects)) + '): ') - 1)
@@ -150,9 +150,9 @@ def get_project(projects):
     return projects[project_id]
 
 def get_project_list():
-    DIRECTORY = os.getcwd()
+    directory = os.getcwd()
     projects = []
-    for file_name in os.listdir(DIRECTORY):
+    for file_name in os.listdir(directory):
         match = re.match('translation_list_(.*).txt', file_name)
         if match:
             projects.append(Project(match.group(1), file_name))
@@ -178,7 +178,8 @@ def display_intro():
     print '    /home/weblate/weblate/lib/python2.7/site-packages/data/vcs'
     print
 
-if __name__ == '__main__':
+def main():
+    """Main function"""
     projects = get_project_list()
     if not projects:
         sys.exit('Could not find any project.\nThe script needs to be executed'
@@ -186,6 +187,9 @@ if __name__ == '__main__':
     display_intro()
     project = get_project(projects)
     components = get_components(project)
-    component = get_component(components)
+    component = get_component(components, project)
     write_component(project, component)
     import_component(project, component)
+
+if __name__ == '__main__':
+    main()
