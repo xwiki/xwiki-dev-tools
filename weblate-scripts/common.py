@@ -21,61 +21,121 @@
 import os
 import re
 
-class XmlFile(object):
-    """"Simple class working on XML files using regex"""
-    # Matches <tag>
-    START_REGEX = r"\<\s*{}\s*\>\s*"
-    # Matches <tag/>
-    SELF_CLOSE_REGEX = r"\<\s*{}\s*\/\s*\>"
-    # Matches </tag>
-    END_REGEX = r"\s*\<\s*\/\s*{}\s*\>"
+from collections import namedtuple
+from string import whitespace
 
+TagDelimiter = namedtuple('TagDelimiter', ['start', 'end'])
+
+class XmlFile(object):
+    """"Simple class working on XML files"""
     def __init__(self):
         self.document = ''
 
     def load(self, file_name):
+        """Read and load the document"""
         with open(file_name, "r") as f_xml:
             self.document = f_xml.read()
 
-    def get_tag_content(self, tag):
-        """Get content of the specified tag using regex"""
-        start = re.search(self.START_REGEX.format(tag), self.document)
-        end = re.search(self.END_REGEX.format(tag), self.document)
-        if start is None or end is None:
+    def get_tag_delimiters(self, tag, parents=None):
+        """Get the indices of the beginning and end of the tag (first found)"""
+        # If parents = [], then the search is done at the root
+        # If parents = None, then the search is done everywhere
+        tags = []
+        pos = 0
+        while 0 <= pos < len(self.document):
+            pos = self.document.find('<', pos)
+            open_tag = TagDelimiter(pos, self.document.find('>', pos) + 1)
+            pos += 1
+            if not 0 < pos < len(self.document):
+                break
+            if self.document[pos] in '!?':
+                continue
+            while pos < len(self.document) and self.document[pos] in whitespace:
+                pos += 1
+            closing = False
+            if pos < len(self.document) and self.document[pos] == '/':
+                closing = True
+                pos += 1
+            while pos < len(self.document) and self.document[pos] in whitespace:
+                pos += 1
+            current_tag = ''
+            while pos < len(self.document) and self.document[pos] not in whitespace + '/>':
+                current_tag += self.document[pos]
+                pos += 1
+            if closing:
+                if not tags:
+                    print ('Warning: Found [{}] as close tag before the start tag'
+                           .format(current_tag))
+                elif current_tag != tags[-1][0]:
+                    print ('Warning: Expected [{}] but found [{}] as close tag'
+                           .format(tags[-1], current_tag))
+                else:
+                    (_, open_tag), close_tag = tags.pop(), open_tag
+                    if (current_tag == tag and
+                            (parents is None or (tags and list(zip(*tags)[0]) == parents))):
+                        return open_tag, close_tag
+            else:
+                if self.document.find('/', pos, open_tag.end) >= 0:
+                    if (current_tag == tag and
+                            (parents is None or (tags and list(zip(*tags)[0]) == parents))):
+                        return open_tag, None
+                else:
+                    tags.append((current_tag, open_tag))
+                pos = open_tag.end
+                while pos < len(self.document) and self.document[pos] in whitespace:
+                    pos += 1
+            pos = self.document.find('<', pos)
+        return None, None
+
+    def get_tag_content(self, tag, parents=None):
+        """Get content of the specified tag"""
+        open_tag, close_tag = self.get_tag_delimiters(tag, parents)
+        if open_tag is None or close_tag is None:
             return ""
-        content = self.document[start.end():end.start()]
+        content = self.document[open_tag.end:close_tag.start]
         content = content.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
         return content
 
-    def set_tag_content(self, tag, content):
+    def create_tags(self, tag, parents=None):
+        """Create the tag and its parents if it doesn't exists"""
+        # Note that the method is not very optimized but should be fast enough in practice
+        open_tag, _ = self.get_tag_delimiters(tag, parents)
+        if parents:
+            if not open_tag:
+                open_parent_tag, close_parent_tag = self.create_tags(parents[-1], parents[:-1])
+                if close_parent_tag:
+                    self.document = "{}<{} />\n{}".format(
+                        self.document[:close_parent_tag.start], tag,
+                        self.document[close_parent_tag.start:])
+                else:
+                    self.document = "{0}<{1}>\n<{2} />\n</{1}>\n{3}".format(
+                        self.document[:open_parent_tag.start],
+                        parents[-1],
+                        tag,
+                        self.document[open_parent_tag.end:])
+        else:
+            if not open_tag:
+                self.document += "<{} />\n".format(tag)
+        return self.get_tag_delimiters(tag, parents)
+
+    def set_tag_content(self, tag, content, parents=None):
         """Set content of an existing tag or create it"""
         content = content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").strip()
-        tag_start = re.search(self.START_REGEX.format(tag), self.document)
-        if tag_start is None:
-            tag_start = re.search(self.SELF_CLOSE_REGEX.format(tag), self.document)
-            if tag_start is None:
-                start = end = len(self.document)
-            else:
-                start, end = tag_start.start(), tag_start.end()
-            self.document = "{0}<{1}>{2}</{1}>{3}".format(
-                self.document[:start], tag, content, self.document[end:])
+        open_tag, close_tag = self.create_tags(tag, parents)
+        if close_tag:
+            self.document = self.document[:open_tag.end] + content + self.document[close_tag.start:]
         else:
-            tag_end = re.search(self.END_REGEX.format(tag), self.document)
-            self.document = self.document[:tag_start.end()] + content + \
-                self.document[tag_end.start():]
+            self.document = "{0}<{1}>{2}</{1}>{3}".format(
+                self.document[:open_tag.start], tag, content, self.document[open_tag.end:])
 
     def remove_tag(self, tag):
         """Remove the first found tag from the document"""
-        start = re.search(r"[ \t]*" + self.START_REGEX.format(tag), self.document)
-        if start is None:
-            tag_start = re.search(
-                r"[ \t]*" + self.SELF_CLOSE_REGEX.format(tag) + r"\s*", self.document)
-            if tag_start is None:
-                return False
-            self.document = self.document[:tag_start.start()] + self.document[tag_start.end():]
-        else:
-            end = re.search(self.END_REGEX.format(tag) + r"\s*", self.document)
-            self.document = self.document[:start.start()] + self.document[end.end():]
+        open_tag, close_tag = self.get_tag_delimiters(tag)
+        if not open_tag:
+            return False
+        if not close_tag:
+            close_tag = open_tag
+        self.document = self.document[:open_tag.start] + self.document[close_tag.end:]
         return True
 
     def remove_all_tags(self, tag):
@@ -207,7 +267,6 @@ class PropertiesFile(object):
 
         document = ''
         has_no_translations_marker = False
-        is_deprecated = False
         for line in self.document.splitlines(True):
             match = re.search(self.ANY_PROPERTY_REGEX, line)
             if match:

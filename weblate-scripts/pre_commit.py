@@ -49,7 +49,7 @@ def properties_to_xwiki_xml(file_path, path_prefix, lang):
         xml_file = XmlFile()
         xml_file.load(path_prefix + file_path)
         xml_file.set_tag_content("title", title)
-        xml_file.set_tag_content("content", content)
+        xml_file.set_tag_content("content", content, ['xwikidoc'])
         xml_file.write(path_prefix + file_path)
     else:
         print "Warning: {} translation is empty. Skipping it.".format(properties_path)

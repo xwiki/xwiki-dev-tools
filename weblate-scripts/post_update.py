@@ -44,7 +44,8 @@ def xwiki_xml_to_properties(file_path, path_prefix, lang):
     xml_file = XmlFile()
     xml_file.load(path_prefix + file_path)
     properties.set_value("{}.title".format(file_name), xml_file.get_tag_content("title"))
-    properties.set_value("{}.content".format(file_name), xml_file.get_tag_content("content"))
+    properties.set_value("{}.content".format(file_name),
+                         xml_file.get_tag_content("content", ['xwikidoc']))
 
     properties.write(properties_path)
 
