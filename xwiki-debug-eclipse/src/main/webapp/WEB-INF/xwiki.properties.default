@@ -22,6 +22,10 @@
 # xwiki.cfg file. However right now it's only used by some XWiki components.
 # As time progresses more and more component will get their configurations from
 # this file.
+# 
+# This file come from one of those locations (in this order):
+# * [since 9.3] /etc/xwiki/xwiki.properties
+# * /WEB-INF/xwiki.properties in the web application resources
 
 #-------------------------------------------------------------------------------------
 # Core
@@ -151,6 +155,11 @@
 # rendering.interWikiDefinitions = wikipedia = http://en.wikipedia.org/wiki/
 # rendering.interWikiDefinitions = definition = http://www.yourdictionary.com/
 
+#-# [Since 2.4M1]
+#-# Change the Pygments style used in the code macro (see http://pygments.org/docs/styles/)
+#-# If not set "default" style is used.
+# rendering.macro.code.pygments.style=vs
+
 #-------------------------------------------------------------------------------------
 # Rendering Transformations
 #-------------------------------------------------------------------------------------
@@ -169,6 +178,9 @@
 #-# Defines mappings between suite of characters and the icon to display when those characters are found.
 #-# The format is: rendering.transformation.icon.mappings = <suite of characters> = <icon name>
 #-# The following mappings are already predefined and you don't need to redefine them unless you wish to override them
+#-# [Since 9.3RC1/8.4.5] To disable a default mapping, define it with an empty value. For example:
+#-#   rendering.transformation.icon.mappings = (n) =
+#-#
 #-# rendering.transformation.icon.mappings = :) = emoticon_smile
 #-# rendering.transformation.icon.mappings = :( = emoticon_unhappy
 #-# rendering.transformation.icon.mappings = :P = emoticon_tongue
@@ -397,6 +409,9 @@
 #-# Here are the standard properties:
 #-# * user: the user to use to authenticate to the repository
 #-# * password: the password to use to authenticate to the repository
+#-# 
+#-# And here those for "maven" repositories:
+#-# * [Since 10.7RC1] checksumPolicy: what to do when checksum validation fail. Possible values are "fail", "warn" (the default) and "ignore"
 #-#
 #-# Here is an example:
 # extension.repositories=privatemavenid:maven:http://host.com/private/maven/
@@ -435,16 +450,57 @@
 #-#
 extension.oldflavors=org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki
 extension.oldflavors=org.xwiki.enterprise:xwiki-enterprise-ui-wiki
-extension.oldflavors=org.xwiki.manager:xwiki-enterprise-ui
+extension.oldflavors=org.xwiki.manager:xwiki-manager-ui
 extension.oldflavors=org.xwiki.manager:xwiki-manager-wiki-administrator
 extension.oldflavors=org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator
 extension.oldflavors=com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator
+extension.oldflavors=com.xpn.xwiki.products:xwiki-enterprise-wiki
 
 #-# [Since 8.3]
-#-# Indicate of the XWiki you try to find more informations about the core extension in the repositories.
+#-# Indicate if XWiki should try to find more informations about the core extension in the repositories.
 #-#
 #-# The default is:
 # extension.core.resolve=true
+
+#-# [Since 9.6]
+#-# Indicate a list of pattern extension ids and the corresponding recommended version.
+#-# This version will be used for dependencies matching the pattern and fallback on the version declared by the extension in case of failure.
+#-#
+#-# Here is an example:
+# extension.recommendedVersions=org.xwiki.commons:.*/[9.6]
+# extension.recommendedVersions=org.xwiki.rendering:.*/[9.6]
+# extension.recommendedVersions=org.xwiki.platform:.*/[9.6]
+# extension.recommendedVersions=com.mygroupid:.*/[1.9]
+
+#-# [Since 9.9]
+#-# Indicate whether the server should automatically check for new available environment versions.
+#-#
+#-# The default is:
+# extension.versioncheck.environment.enabled=false
+#-#
+#-# If the version check is enabled (through extension.versioncheck.environment.enabled), the following properties
+#-# can be used to customize how the version check is performed.
+#-#
+#-# Indicate the number of seconds between each check for a new version of the server.
+#-# The default is:
+# extension.versioncheck.environment.interval=3600
+#-#
+#-# Indicate a pattern that will be used to filter which version should be considered as a new version.
+#-# By default, no pattern is given an the pattern is not applied.
+#-# Example:
+# extension.versioncheck.environment.allowedVersions=9.*
+
+#-# [Since 10.5RC1]
+#-# Indicate how extension documents are protected.
+#-#
+#-# The possible choices are:
+#-# * none: no protection at all
+#-# * warning (the default): everyone get a warning when trying to edit a protected document
+#-# * deny = EDIT/DELETE right is denied for everyone except for admins who just get a warning
+#-# * forcedDeny = EDIT/DELETE right is denied for everyone, admins can't force edit/delete
+#-# * denySimple = EDIT/DELETE right is denied for simple users except for simple admins who just get a warning
+#-# * forcedDenySimple = EDIT/DELETE right is denied for all simple users, simple admins can't force edit/delete
+# extension.xar.protection=warning
 
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
@@ -455,6 +511,22 @@ extension.oldflavors=com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-admini
 #-# The default is:
 # distribution.automaticStartOnMainWiki=true
 # distribution.automaticStartOnWiki=true
+
+#-# [Since 10.2RC1] Control if the Distribution Wizard should be automatic or interactive (the default)
+#-# 
+#-# On the main wiki
+# distribution.job.interactive=true
+#-# On the subwikis
+# distribution.job.interactive.wiki=true
+
+#-# [Since 10.2RC1] Override the default UI indicated in the "environment extension" (usually means the WAR).
+#-# It usually make more sense to set that at the WAR level (since it's usually synchronized with it).
+#-# If this is set it also means the Distribution Wizard will switch to default UI mode in which you cannot choose the flavor.
+#-#
+#-# The id[/version] of the default UI for the main wiki. If the version is not indicated it will be the version of the environment extension.
+# distribution.defaultUI=org.my.groupid:artifactid-mainwiki/1.5
+#-# The id[/version] default UI for the subwikis.  If the version is not indicated it will be the version of the environment extension.
+# distribution.defaultWikiUI=org.my.groupid:artifactid-wiki/1.5
 
 #-------------------------------------------------------------------------------------
 # Solr Search
@@ -704,6 +776,12 @@ extension.oldflavors=com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-admini
 # WatchList
 #-------------------------------------------------------------------------------------
 
+#-# [Since 10.0]
+#-# [Since 9.11.2]
+#-# Controls if the notifications feature is enabled. Default value is false.
+#-# Thanks to this option, you can disable the application without uninstalling it.
+# watchlist.enabled = false
+
 #-# [Since 7.0RC1]
 #-# Controls if the realtime notifications feature is enabled. Default value is false.
 #-# This is currently an experimental feature which is not yet ready for producton. Enabling it right now will cause performance issues.
@@ -760,7 +838,54 @@ debug.minify=false
 # edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#text=text
 # edit.defaultEditor.org.xwiki.rendering.block.XDOM=text
 # edit.defaultEditor.org.xwiki.rendering.block.XDOM#text=text
-edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#wysiwyg=ckeditor
-edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=ckeditor
 
+#-------------------------------------------------------------------------------------
+# Notifications
+#-------------------------------------------------------------------------------------
+
+#-# [Since 9.4RC1]
+#-# Indicates if the notifications module should be enabled on the platform.
+#-#
+#-# The default is :
+# notifications.enabled = true
+
+#-# [Since 9.5C1]
+#-# Indicates if the notifications module can send emails.
+#-#
+#-# The default is :
+# notifications.emails.enabled = true
+
+#-# [Since 9.6RC1]
+#-# Indicate the grace time used when sending live email notifications.
+#-# When an event is triggered in the wiki (for example, a document update), the platform will wait X minutes
+#-# before sending live notifications emails. During this time, if events of the same kind are recieved, they will
+#-# be grouped in the same email.
+#-#
+#-# The grace time define the period (in minutes) for which the platform should wait before sending a notification
+#-# mail after an event.
+#-#
+#-# The default is :
+# notifications.emails.live.graceTime = 10
+
+#-# [Since 9.8RC1]
+#-# Indicate if the "watched entities" feature is enabled on the platform.
+#-# This feature mimics what the "Watchlist Application" does so it may not be a good idea to have both on the platform.
+#-#
+#-# The default is :
+# notifications.watchedEntities.enabled = true
+
+#-# [Since 9.11.8]
+#-# [Since 10.6RC1]
+#-# The automatic watch mode used by default. The value can be changed by an administrator in the wiki's administration
+#-# or by any user in their own settings.
+#-#
+#-# Possible values:
+#-#
+#-# - none:  no page is added to the list of watched pages automatically.
+#-# - all:   everytime a user makes a change on a page, it is automatically added to her list of watched pages.
+#-# - major: everytime a user makes a major change on a page, it is automatically added to her list of watched pages.
+#-# - new:   only pages created by a user are added to her list of watched pages.
+#-#
+#-# The default is :
+# notifications.watchedEntities.autoWatch = major
 
