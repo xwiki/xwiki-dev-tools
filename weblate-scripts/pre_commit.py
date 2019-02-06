@@ -46,11 +46,15 @@ def properties_to_xwiki_xml(file_path, path_prefix, lang):
     if not properties.is_empty():
         title = properties.get_value("{}.title".format(file_name))
         content = properties.get_value("{}.content".format(file_name))
-        xml_file = XmlFile()
-        xml_file.load(path_prefix + file_path)
-        xml_file.set_tag_content("title", title)
-        xml_file.set_tag_content("content", content, ['xwikidoc'])
-        xml_file.write(path_prefix + file_path)
+
+        if content:
+            xml_file = XmlFile()
+            xml_file.load(path_prefix + file_path)
+            xml_file.set_tag_content("title", title)
+            xml_file.set_tag_content("content", content, ['xwikidoc'])
+            xml_file.write(path_prefix + file_path)
+        else:
+            print "Warning: {} translation content is empty. Skipping it.".format(properties_path)
     else:
         print "Warning: {} translation is empty. Skipping it.".format(properties_path)
 
