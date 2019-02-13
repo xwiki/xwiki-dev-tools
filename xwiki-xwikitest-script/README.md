@@ -27,7 +27,8 @@ without getting conflicting users, databases, ports, ...
 
 This script does not provide any help preparing a test machine, and you will 
 need a working test configuration to use it fully. It require a linux machine 
-with MySQL, PostgreSQL and Oracle databases properly deployed and configured.
+with MySQL, PostgreSQL and Oracle databases properly deployed and configured 
+if you expect to use those databases for your tests.
 
 At the very beginning of this script, there is configuration section that 
 should be setup to match your existing configuration. The default value are
@@ -73,10 +74,10 @@ The steps are:
  7. Configure the requested database in `hibernate.cfg.xml`, and copy the 
     required driver (and dialect for MySQL MyISAM) to the deployment folder.
     Configure the database prefix, and main database name in `xwiki.cfg`.
-    Activate the snapshot repository for extension when a snapshot release
-    is used in `xwiki.properties`.
-    This step is skipped for HSQLDB database or if `-z`, `-B`, `-I`, `-L` or `-U`
-    is used.
+    Activate the snapshot repository for extensions in `xwiki.properties` when 
+    a snapshot release or `-a` option is used.
+    This step is skipped for HSQLDB database or if `-z`, `-B`, `-I`, `-L` 
+    or `-U` is used.
 
  8. Start the jetty server, waiting for CTRL-C or another signal to stop it.
     This step is skipped if `-n`, `-B`, `-I`, `-L` or `-U` is used.
@@ -86,7 +87,7 @@ The steps are:
     if `-u` or `-U` is used.
 
 Almost all option combination is possible. The last option overide any earlier
-conflicting options.
+conflicting options. `-e` and `-f` are only available for version earlier than 9.5.
 
 ## Examples
 
@@ -136,6 +137,11 @@ with jetty-hsqldb package or the HSQLDB database, since for other database
 the permanent directory is at least discarded.
 
 ## Command-line options
+ * `-a`
+
+   Force the configuration of the snapshot repositories for extensions in 
+   `xwiki.properties` when a release version is used, to allow installing 
+   snapshot extensions anyway.
 
  * `-b destination`
 
@@ -162,18 +168,20 @@ the permanent directory is at least discarded.
 
    The default is to use MySQL innoDB engine.
 
- * `-e distribution`
+ * `-e distribution` (Only if version is lower than 9.5)
 
    The XWiki distribution (enterprise or manager). The default is to
-   use the enterprise distribution.
+   use the enterprise distribution. For version 9.5 and higher, the distribution
+   is always `platform-distribution`.
 
- * `-f package`
+ * `-f package` (Only if version is lower than 9.5)
 
    The jetty distribution base package (hsqldb or mysql). The default is to
    use the hsqldb package for the enterprise distribution, and the mysql package
    for the manager distribution. Except for HSQLDB, which require an hsqldb
    package, any available package will do, and will be reconfigured for the
-   target database.
+   target database. For version 9.5 and higher, the package
+   is always `hsqldb`.
 
  * `-i source`
 

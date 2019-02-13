@@ -110,12 +110,14 @@ dbparam() {
 
 # Snapshot version, use release by default
 XWRELEASE=""
-# Distribution, use manager by default
-XWDISTRIB="enterprise"
+# Distribution, use platform by default
+XWDISTRIB="platform-distribution"
 # Database name to used to retrieve the distribution package
-XWDBPFX=""
+XWDBPFX="hsqldb"
 # XWiki version
-XWVERSION="6.2.1"
+XWVERSION="10.11.2"
+# Version is higher than 9.4
+XWVERSIONGT94="yes"
 # Should we download if missing
 XWDOWNLOAD="no"
 # Should we deploy and configure
@@ -148,6 +150,8 @@ XWIKIDIALECTCLASSES="$XWIKICLASSES/org/hibernate/dialect"
 XWIKIDATA="data"
 # XWiki HSQLDB database folder 
 XWIKIDATABASE="database"
+# Should we always configure the snapshot repository
+XWSNAPREPO="no"
 
 #### END OF CONFIGURATION ####
 
@@ -170,11 +174,16 @@ usage() {
     echo " All operations could be done in a multiuser environment, using common databases, without conflict."
     echo ""
     echo "Options:"
+    echo "  -a                  Force configuration of the snapshot repository for extensions on a release version."
     echo "  -b destination      Backup database to the given destination(*) after shutdown."
     echo "  -B destination      Backup current database to the given destination(*), same as -b -z -k -n"
     echo "  -d database         Choose a database (mysql-myisam,mysql-innodb,psql,oracle,hsqldb). Current is $XWDATABASE."
-    echo "  -e distribution     Choose a distribution (enterprise or manager). Current is $XWDISTRIB."
-    echo "  -f package          Choose the jetty distribution base package (hsqldb or mysql). Current is $XWDBPFX."
+    if [[ $XWVERSIONGT94 != "yes" ]]; then
+        echo "  -e distribution     Choose a distribution (enterprise or manager). Current is $XWDISTRIB."
+        if [[ $XWDISTRIB != "manager" ]]; then
+            echo "  -f package          Choose the jetty distribution base package (hsqldb or mysql). Current is $XWDBPFX."
+        fi
+    fi
     echo "  -i source           Import the given source(*) in the database before startup."
     echo "  -I source           Import the given source(*) in the database without running, same as -i -z -n"
     echo "  -h                  Display this usage message. At the end, it shows your current arguments and alone the defaults."
@@ -419,7 +428,7 @@ configdb() {
 #############################
 ### Edit XWiki configuration
 configxwiki() {
-    if [[ $XWDB != "psql" ]]; then
+    if [[ $XWDB != "psql" && $XWDB != "hsqldb" ]]; then
         # Use empty main db name, and set db.prefix
         mv $XWFOLDER/$XWIKICFG $XWFOLDER/$XWIKICFG.orig
         echo "## Configuring $XWIKICFG to prefix db names (for tester isolation)"
@@ -429,17 +438,35 @@ xwiki.db=
 xwiki.db.prefix=xwiki'$XWDBSFX'
             ' <$XWFOLDER/$XWIKICFG.orig >$XWFOLDER/$XWIKICFG
     fi
-    if [[ ! -z $XWRELEASE ]]; then
+    if [[ ! -z $XWRELEASE || $XWSNAPREPO = "yes" ]]; then
         # configure the snapshot repository 
         mv $XWFOLDER/$XWIKIPROPS $XWFOLDER/$XWIKIPROPS.orig
         echo "## Configuring $XWIKIPROPS to use snapshot repository"
-        sed -e 's/# extension\.repositories=maven-xwiki-snapshot:/extension\.repositories=maven-xwiki-snapshot:/' <$XWFOLDER/$XWIKIPROPS.orig >$XWFOLDER/$XWIKIPROPS
+        sed -e 's/# extension\.repositories=maven-xwiki-snapshot:/extension\.repositories=maven-xwiki-snapshot:/' \
+            -e 's/# extension\.repositories=maven-xwiki:/extension\.repositories=maven-xwiki:/' \
+            -e 's/# extension\.repositories=extensions\.xwiki\.org:/extension\.repositories=extension\.xwiki\.org:/' <$XWFOLDER/$XWIKIPROPS.orig >$XWFOLDER/$XWIKIPROPS
+    fi
+}
+
+#######################################
+### Update version dependent variables
+configversion() {
+    XWDISTRIB="enterprise"
+    XWDISTRIBFLD="$XWDISTRIB"
+    XWVERSIONGT94="no"
+    if [[ "`echo -e "$XWVERSION\n9.5" | sort -V | head -n1`" = "9.5" ]]; then
+        XWVERSIONGT94="yes"
+        XWDISTRIB="platform-distribution"
+        XWDISTRIBFLD="platform"
     fi
 }
 
 # Parse command line arguments
-while getopts ":hb:B:d:e:f:i:I:kl:L:np:r:s:t:u:U:v:wz" OPT; do
+while getopts ":hab:B:d:e:f:i:I:kl:L:np:r:s:t:u:U:v:wz" OPT; do
     case $OPT in
+        a)  # Force snapshot repository config
+            XWSNAPREPO="yes"
+            ;;
         b)  # Set export backup file (or folder for oracle)
             XWBACKUP=$OPTARG
             ;;
@@ -508,6 +535,7 @@ while getopts ":hb:B:d:e:f:i:I:kl:L:np:r:s:t:u:U:v:wz" OPT; do
             ;;
         v)  # Set XWiki version
             XWVERSION=$OPTARG
+            configversion
             ;;
         w)  # Allow downloading package
             XWDOWNLOAD="yes"
@@ -531,12 +559,8 @@ shift $((OPTIND-1))
 dbparam
 
 # Choose package
-if [[ -z $XWDBPFX ]]; then
-    if [[ $XWDISTRIB == "enterprise" ]]; then
-        XWDBPFX="hsqldb"
-    else
-        XWDBPFX="mysql"
-    fi
+if [[ $XWDISTRIB == "manager" ]]; then
+    XWDBPFX="mysql"
 fi
 
 # Folder the zip is supposed to create
@@ -564,11 +588,10 @@ echo "# Testing XWiki $XWVERSIONLABEL (jetty-$XWDBPFX distribution) on $XWDBLABE
 
 # Download the Zip file if missing and download is allowed
 if [[ $XWDOWNLOAD = "yes" && ! -r $XWZIPNAME ]]; then
-    echo "## Downloading $XWZIPNAME..."
     if [[ -z $XWRELEASE ]]; then
-        wget http://maven.xwiki.org/releases/org/xwiki/$XWDISTRIB/xwiki-$XWDISTRIB-jetty-$XWDBPFX/$XWVERSION/$XWZIPNAME
+        wget http://maven.xwiki.org/releases/org/xwiki/$XWDISTRIBFLD/xwiki-$XWDISTRIB-jetty-$XWDBPFX/$XWVERSION/$XWZIPNAME
     else
-        wget http://maven.xwiki.org/snapshots/org/xwiki/$XWDISTRIB/xwiki-$XWDISTRIB-jetty-$XWDBPFX/$XWVERSION-SNAPSHOT/$XWZIPNAME
+        wget http://maven.xwiki.org/snapshots/org/xwiki/$XWDISTRIBFLD/xwiki-$XWDISTRIB-jetty-$XWDBPFX/$XWVERSION-SNAPSHOT/$XWZIPNAME
     fi
 fi
 
@@ -597,6 +620,11 @@ if [[ -r $XWDATAIMP ]]; then
     fi
 fi
 
+# Config XWiki
+if [[ $XWUNZIP != "no" ]]; then
+    configxwiki
+fi
+
 # Configure database
 if [[ $XWCLEAR = "yes" ]]; then
     resetdb
@@ -604,7 +632,6 @@ fi
 if [[ $XWDB != "hsqldb" ]]; then
     if [[ $XWUNZIP != "no" ]]; then
         configdb
-        configxwiki
         if [[ $XWDB != $XWDBPFX ]]; then
             echo "## Copying required JDBC driver..."
             cp $XWJDBC $XWFOLDER/$XWIKILIB
