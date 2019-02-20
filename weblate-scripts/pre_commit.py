@@ -29,7 +29,7 @@ from common import XmlFile, PropertiesFile, FileType
 
 TRANSLATION_PREFIX = ".translation/"
 
-def properties_to_xwiki_xml(file_path, path_prefix, lang):
+def properties_to_xwiki_xml(file_path, path_prefix, base_file_name, lang):
     """Convert a java properties file to an XWiki XML file"""
     # Directory of the translation file
     relative_dir_path = os.path.dirname(file_path)
@@ -47,6 +47,10 @@ def properties_to_xwiki_xml(file_path, path_prefix, lang):
     content = properties.get_value("{}.content".format(file_name))
 
     if content:
+        if not os.path.isfile(path_prefix + file_path):
+            # Create the xml translation if it doesn't exists
+            XmlFile.create_xml_file(path_prefix + file_path, path_prefix + base_file_name, lang)
+
         xml_file = XmlFile()
         xml_file.load(path_prefix + file_path)
         xml_file.set_tag_content("title", title)
@@ -70,6 +74,10 @@ def properties_to_xwiki_xml_properties(file_path, path_prefix, base_file_name, l
         properties.load(f_properties.read())
 
     if not properties.is_empty():
+        if not os.path.isfile(path_prefix + file_path):
+            # Create the xml translation if it doesn't exists
+            XmlFile.create_xml_file(path_prefix + file_path, path_prefix + base_file_name, lang)
+
         # Use the base translation file as template
         xml_base_file = XmlFile()
         xml_base_file.load(path_prefix + base_file_name)
@@ -125,17 +133,12 @@ def convert(file_type, file_name_properties, path_prefix, base_file_name, lang):
     file_name_xml = file_name_properties.replace('_{}.properties'.format(lang),
                                                  '.{}.xml'.format(lang))
 
-    if file_type in [FileType.XML_PROPERTIES, FileType.XML]:
-        if not os.path.isfile(path_prefix + file_name_xml):
-            # Create the xml translation if it doesn't exists
-            XmlFile.create_xml_file(path_prefix + file_name_xml, path_prefix + base_file_name, lang)
-
     if file_type == FileType.PROPERTIES:
         properties_to_xwiki_properties(file_name_properties, path_prefix, base_file_name, lang)
     elif file_type == FileType.XML_PROPERTIES:
         properties_to_xwiki_xml_properties(file_name_xml, path_prefix, base_file_name, lang)
     elif file_type == FileType.XML:
-        properties_to_xwiki_xml(file_name_xml, path_prefix, lang)
+        properties_to_xwiki_xml(file_name_xml, path_prefix, base_file_name, lang)
 
 def main():
     """Main function"""
