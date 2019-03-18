@@ -36,46 +36,55 @@
 
     <!-- Generic parameters common to all Databases -->
 
-    <property name="show_sql">false</property>
-    <property name="use_outer_join">true</property>
+    <property name="hibernate.show_sql">false</property>
+    <property name="hibernate.use_outer_join">true</property>
 
     <!-- Without it, some queries fail in MS SQL. XWiki doesn't need scrollable result sets, anyway. -->
-    <property name="jdbc.use_scrollable_resultset">false</property>
+    <property name="hibernate.jdbc.use_scrollable_resultset">false</property>
 
     <!-- DBCP Connection Pooling configuration. Only some properties are shown. All available properties can be found
          at http://commons.apache.org/proper/commons-dbcp/configuration.html
     -->
-    <property name="dbcp.defaultAutoCommit">false</property>
-    <property name="dbcp.maxTotal">50</property>
-    <property name="dbcp.maxIdle">5</property>
-    <property name="dbcp.maxWaitMillis">30000</property>
-    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="hibernate.dbcp.defaultAutoCommit">false</property>
+    <property name="hibernate.dbcp.maxTotal">50</property>
+    <property name="hibernate.dbcp.maxIdle">5</property>
+    <property name="hibernate.dbcp.maxWaitMillis">30000</property>
+    <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
 
-    <!-- Setting "dbcp.poolPreparedStatements" to true and "dbcp.maxOpenPreparedStatements" will tell DBCP to cache
-         Prepared Statements (it's off by default). Note that for backward compatibility the "dbcp.ps.maxActive" is also
-         supported and when set it'll set "dbcp.poolPreparedStatements" to true and "dbcp.maxOpenPreparedStatements" to
-         value of "dbcp.ps.maxActive".
+    <!--
+      Keep the old behavior. The new version of hibernate tries to delete and recreate unique
+      constraints when updating the database schema. The problem is that an exception is thrown
+      when the constraint to be deleted does not exists, which is the case with a new XWiki
+      instance.
+      See https://hibernate.atlassian.net/browse/HHH-8162
+    -->
+    <property name="hibernate.schema_update.unique_constraint_strategy">skip</property>
+
+    <!-- Setting "hibernate.dbcp.poolPreparedStatements" to true and "hibernate.dbcp.maxOpenPreparedStatements" will tell DBCP to cache
+         Prepared Statements (it's off by default). Note that for backward compatibility the "hibernate.dbcp.ps.maxActive" is also
+         supported and when set it'll set "hibernate.dbcp.poolPreparedStatements" to true and "hibernate.dbcp.maxOpenPreparedStatements" to
+         value of "hibernate.dbcp.ps.maxActive".
 
          Note 1: When using HSQLDB for example, it's important to NOT cache prepared statements because HSQLDB
          Prepared Statements (PS) contain the schema on which they were initially created and thus when switching
          schema if the same PS is reused it'll execute on the wrong schema! Since HSQLDB does internally cache
          prepared statement there's no performance loss by not caching Prepared Statements at the DBCP level.
-         See http://jira.xwiki.org/browse/XWIKI-1740.
+         See https://jira.xwiki.org/browse/XWIKI-1740.
          Thus we recommend not turning on this configuration for HSQLDB unless you know what you're doing :)
 
          Note 2: The same applies to PostGreSQL.
     -->
 
     <!-- BoneCP Connection Pooling configuration.
-    <property name="bonecp.idleMaxAgeInMinutes">240</property>
-    <property name="bonecp.idleConnectionTestPeriodInMinutes">60</property>
-    <property name="bonecp.partitionCount">3</property>
-    <property name="bonecp.acquireIncrement">10</property>
-    <property name="bonecp.maxConnectionsPerPartition">60</property>
-    <property name="bonecp.minConnectionsPerPartition">20</property>
-    <property name="bonecp.statementsCacheSize">50</property>
-    <property name="bonecp.releaseHelperThreads">3</property>
-    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="hibernate.bonecp.idleMaxAgeInMinutes">240</property>
+    <property name="hibernate.bonecp.idleConnectionTestPeriodInMinutes">60</property>
+    <property name="hibernate.bonecp.partitionCount">3</property>
+    <property name="hibernate.bonecp.acquireIncrement">10</property>
+    <property name="hibernate.bonecp.maxConnectionsPerPartition">60</property>
+    <property name="hibernate.bonecp.minConnectionsPerPartition">20</property>
+    <property name="hibernate.bonecp.statementsCacheSize">50</property>
+    <property name="hibernate.bonecp.releaseHelperThreads">3</property>
+    <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     -->
 
 
@@ -83,7 +92,7 @@
          Comment out this section and uncomment other sections below if you want to use another database.
          Note that the database tables will be created automatically if they don't already exist.
     -->
-    <property name="connection.url">jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</property>
+    <property name="connection.url">jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_hsqldb;shutdown=true</property>
     <property name="connection.username">sa</property>
     <property name="connection.password"></property>
     <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
