@@ -29,3 +29,4 @@ Ideas Application; src/main/resources/Ideas/IdeasTranslations.xml; https://githu
 Page Relations Application; application-page-relations-ui/src/main/resources/PageRelations/Code/Translations.xml; https://github.com/xwiki-contrib/application-page-relations
 Application Gardening; application-gardening-ui/src/main/resources/Gardening/Code/GardeningTranslations.xml; https://github.com/xwiki-contrib/application-gardening
 Application Chart.js; application-chartjs-ui/src/main/resources/XWiki/ChartJS/Translations.xml; https://github.com/xwiki-contrib/application-chartjs
+Application Help Center; src/main/resources/Help/Code/Translations.xml; https://github.com/xwiki-contrib/application-help-center
