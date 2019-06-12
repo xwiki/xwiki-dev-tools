@@ -96,7 +96,6 @@
     <property name="connection.username">sa</property>
     <property name="connection.password"></property>
     <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
-    <property name="dialect">org.hibernate.dialect.HSQLDialect</property>
 
     <property name="hibernate.connection.charSet">UTF-8</property>
     <property name="hibernate.connection.useUnicode">true</property>

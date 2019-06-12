@@ -95,7 +95,6 @@
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">org.postgresql.Driver</property>
-    <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
     <property name="jdbc.use_streams_for_binary">false</property>
 
     <property name="hibernate.connection.charSet">UTF-8</property>
