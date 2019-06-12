@@ -91,11 +91,11 @@
          Comment out this section and uncomment other sections below if you want to use another database.
          Note that the database tables will be created automatically if they don't already exist.
     -->
-    <property name="connection.url">jdbc:postgresql:xwiki</property>
-    <property name="connection.username">xwiki</property>
-    <property name="connection.password">xwiki</property>
-    <property name="connection.driver_class">org.postgresql.Driver</property>
-    <property name="jdbc.use_streams_for_binary">false</property>
+    <property name="hibernate.connection.url">jdbc:postgresql:xwiki</property>
+    <property name="hibernate.connection.username">xwiki</property>
+    <property name="hibernate.connection.password">xwiki</property>
+    <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+    <property name="hibernate.jdbc.use_streams_for_binary">false</property>
 
     <property name="hibernate.connection.charSet">UTF-8</property>
     <property name="hibernate.connection.useUnicode">true</property>
