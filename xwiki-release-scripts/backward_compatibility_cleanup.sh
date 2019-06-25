@@ -37,7 +37,7 @@ for PROJECT in ${!PROJECTS[@]}; do
 
   echo "## Removing any existing revapi ignores from [$IGNORES_FILE]..."
 
-  perl -0pi -e 's/\/\/ Add more ignores below\.\.\.\s*({.*?}(,\s*|\s*$))+/\/\/ Add more ignores below\.\.\./gms' "$IGNORES_FILE"
+  perl -0pi -e 's/(\"ignore\" : \[$)\s*({.*?}(,\s*|\s*$))+/$1/gms' "$IGNORES_FILE"
 
   DIFF=`git --no-pager diff`
   [[ $? == 0 ]] || exit 4
