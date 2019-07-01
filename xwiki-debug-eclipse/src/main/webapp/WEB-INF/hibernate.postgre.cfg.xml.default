@@ -87,10 +87,6 @@
     <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     -->
 
-    <!-- Configuration for the default database.
-         Comment out this section and uncomment other sections below if you want to use another database.
-         Note that the database tables will be created automatically if they don't already exist.
-    -->
     <property name="hibernate.connection.url">jdbc:postgresql:xwiki</property>
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>

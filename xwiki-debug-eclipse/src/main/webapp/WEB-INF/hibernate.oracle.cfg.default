@@ -87,10 +87,13 @@
     <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     -->
 
-    <property name="hibernate.connection.url">jdbc:mysql://localhost/xwiki?useSSL=false</property>
+    <property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:49161/xe</property>
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
-    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+    <property name="hibernate.connection.SetBigStringTryClob">true</property>
+    <property name="hibernate.jdbc.batch_size">0</property>
+    <property name="hibernate.jdbc.use_streams_for_binary">false</property>
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
     <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 
@@ -98,10 +101,10 @@
     <property name="hibernate.connection.useUnicode">true</property>
     <property name="hibernate.connection.characterEncoding">utf8</property>
 
-    <mapping resource="xwiki.hbm.xml"/>
-    <mapping resource="feeds.hbm.xml"/>
+    <mapping resource="xwiki.oracle.hbm.xml"/>
+    <mapping resource="feeds.oracle.hbm.xml"/>
     <mapping resource="instance.hbm.xml"/>
     <mapping resource="notification-filter-preferences.hbm.xml"/>
-    <mapping resource="mailsender.hbm.xml"/>
+    <mapping resource="mailsender.oracle.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

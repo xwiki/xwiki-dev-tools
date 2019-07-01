@@ -39,3 +39,8 @@ nbproject
 *.log
 .sonar-ide.properties
 .clover
+
+# XWiki Debug Eclipse files
+/xwiki-debug-eclipse/src/main/webapp/WEB-INF/currentoracle_hibernate.cfg.xml
+/xwiki-debug-eclipse/src/main/webapp/WEB-INF/currentpgsql_hibernate.cfg.xml
+
