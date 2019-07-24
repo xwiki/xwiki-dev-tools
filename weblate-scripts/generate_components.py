@@ -27,8 +27,8 @@ import sys
 
 def generate_component(line, repo_urls, project):
     """Creates a component based on the given parameters"""
-    name, path, repo_url = line.rsplit(';', 2)
-    name, path, repo_url = name.strip(), path.strip(), repo_url.strip()
+    name, path, repo_url, license = line.rsplit(';', 3)
+    name, path, repo_url, license = name.strip(), path.strip(), repo_url.strip(), license.strip()
     slug = name.lower().replace(' ', '-').replace('.', '-')
     if repo_url in repo_urls:
         repo_url = repo_urls[repo_url]
@@ -53,6 +53,7 @@ def generate_component(line, repo_urls, project):
         "push": push_url,
         "filemask": filemask,
         "template": template,
+        "license": license,
         "file_format": file_format,
         "commit_message": "Translated using Weblate ({{ language_name }})\n\n"
                           "Currently translated at {{ stats.translated_percent }}% "

@@ -1,2 +1,2 @@
-#Format: Name of the component; Relative path to the translation file; Repository url
-Content Macro; xwiki-rendering-macros/xwiki-rendering-macro-content/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-rendering
+#Format: Name of the component; Relative path to the translation file; Repository url; License
+Content Macro; xwiki-rendering-macros/xwiki-rendering-macro-content/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-rendering; LGPL-2.1

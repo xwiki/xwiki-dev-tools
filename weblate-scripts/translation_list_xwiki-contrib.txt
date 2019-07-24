@@ -1,32 +1,32 @@
-#Format: Name of the component; Relative path to the translation file; Repository url
-Map Macro; src/main/resources/Macros/MapMacro/MapMacroTranslations.xml; https://github.com/xwiki-contrib/macro-map
-Mocca Calendar Application; application-mocca-calendar-ui/src/main/resources/MoccaCalendar/MoccaCalendarTranslations.xml; https://github.com/xwiki-contrib/application-mocca-calendar
-Mocca Calendar Macro; application-mocca-calendar-ui/src/main/resources/MoccaCalendar/MoccaCalendarMacroTranslations.xml; https://github.com/xwiki-contrib/application-mocca-calendar
-OCR Application; application-ocr-ui/src/main/resources/OCR/Code/Translations.xml; https://github.com/xwiki-contrib/application-ocr
-Tesseract OCR Application - Data Files; application-ocr-tesseract/application-ocr-tesseract-ui/src/main/resources/OCR/Tesseract/Code/DataFileTranslations.xml; https://github.com/xwiki-contrib/application-ocr
-Tesseract OCR Application - UI; application-ocr-tesseract/application-ocr-tesseract-ui/src/main/resources/OCR/Tesseract/Code/Translations.xml; https://github.com/xwiki-contrib/application-ocr
-Piwik Application; src/main/resources/XWiki/PiwikTranslations.xml; https://github.com/xwiki-contrib/application-piwik
-Admin Tools Application; src/main/resources/Admin/Translations.xml; https://github.com/xwiki-contrib/application-admintools
-Invoices; src/main/resources/InvoicesCode/InvoicesTranslations.xml; https://github.com/xwiki-contrib/application-invoices
-Blog.Translations; application-blog-ui/src/main/resources/Blog/Translations.xml; https://github.com/xwiki-contrib/application-blog
-Forum Application; application-forum-ui/src/main/resources/ForumCode/Translations.xml; https://github.com/xwiki-contrib/application-forum
-LDAP Application; ldap-ui/src/main/resources/LDAP/Code/Translations.xml; https://github.com/xwiki-contrib/ldap
-LimitsApplication; application-limits-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki-contrib/application-limits
-Full Calendar Macro; macro-fullcalendar-ui/src/main/resources/Calendar/Translations.xml; https://github.com/xwiki-contrib/macro-fullcalendar
-Notes Application; src/main/resources/NotesCode/Translations.xml; https://github.com/xwiki-contrib/application-notes
-Templates Application; application-templates-ui/src/main/resources/Templates/Translations.xml; https://github.com/xwiki-contrib/application-templates
-CKEditor Integration; ui/src/main/resources/CKEditor/Translations.xml; https://github.com/xwiki-contrib/application-ckeditor
-Tour Application; application-tour-ui/src/main/resources/TourCode/TourTranslations.xml; https://github.com/xwiki-contrib/application-tour
-Polls Application; src/main/resources/Polls/PollL10n.xml; https://github.com/xwiki-contrib/application-polls
-Flash Messages Application; application-flashmessages-ui/src/main/resources/Flash/Translations.xml; https://github.com/xwiki-contrib/application-flashmessages
-File Manager Application; ui/src/main/resources/FileManagerCode/Translations.xml; https://github.com/xwiki-contrib/application-filemanager
-JW Player Macro; src/main/resources/Macros/JWPlayerTranslations.xml; https://github.com/xwiki-contrib/macro-jwplayer
-Meetings Application; ui/src/main/resources/Meeting/Code/Translations.xml; https://github.com/xwiki-contrib/application-meeting
-PDF Viewer Macro; wiki/src/main/resources/XWiki/PDFViewerMacroTranslations.xml; https://github.com/xwiki-contrib/macro-pdfviewer
-Wiki Flavor Application; application-wikiflavor-ui/src/main/resources/WikiFlavorsCode/WikiFlavorsTranslations.xml; https://github.com/xwiki-contrib/application-wikiflavor
-XPoll Application; application-xpoll-ui/src/main/resources/XPoll/Translation.xml; https://github.com/xwiki-contrib/application-xpoll
-Ideas Application; src/main/resources/Ideas/IdeasTranslations.xml; https://github.com/xwiki-contrib/application-ideas
-Page Relations Application; application-page-relations-ui/src/main/resources/PageRelations/Code/Translations.xml; https://github.com/xwiki-contrib/application-page-relations
-Application Gardening; application-gardening-ui/src/main/resources/Gardening/Code/GardeningTranslations.xml; https://github.com/xwiki-contrib/application-gardening
-Application Chart.js; application-chartjs-ui/src/main/resources/XWiki/ChartJS/Translations.xml; https://github.com/xwiki-contrib/application-chartjs
-Application Help Center; src/main/resources/Help/Code/Translations.xml; https://github.com/xwiki-contrib/application-help-center
+#Format: Name of the component; Relative path to the translation file; Repository url; License
+Map Macro; src/main/resources/Macros/MapMacro/MapMacroTranslations.xml; https://github.com/xwiki-contrib/macro-map; LGPL-2.1
+Mocca Calendar Application; application-mocca-calendar-ui/src/main/resources/MoccaCalendar/MoccaCalendarTranslations.xml; https://github.com/xwiki-contrib/application-mocca-calendar; LGPL-2.1
+Mocca Calendar Macro; application-mocca-calendar-ui/src/main/resources/MoccaCalendar/MoccaCalendarMacroTranslations.xml; https://github.com/xwiki-contrib/application-mocca-calendar; LGPL-2.1
+OCR Application; application-ocr-ui/src/main/resources/OCR/Code/Translations.xml; https://github.com/xwiki-contrib/application-ocr; LGPL-2.1
+Tesseract OCR Application - Data Files; application-ocr-tesseract/application-ocr-tesseract-ui/src/main/resources/OCR/Tesseract/Code/DataFileTranslations.xml; https://github.com/xwiki-contrib/application-ocr; LGPL-2.1
+Tesseract OCR Application - UI; application-ocr-tesseract/application-ocr-tesseract-ui/src/main/resources/OCR/Tesseract/Code/Translations.xml; https://github.com/xwiki-contrib/application-ocr; LGPL-2.1
+Piwik Application; src/main/resources/XWiki/PiwikTranslations.xml; https://github.com/xwiki-contrib/application-piwik; LGPL-2.1
+Admin Tools Application; src/main/resources/Admin/Translations.xml; https://github.com/xwiki-contrib/application-admintools; LGPL-2.1
+Invoices; src/main/resources/InvoicesCode/InvoicesTranslations.xml; https://github.com/xwiki-contrib/application-invoices; LGPL-2.1
+Blog.Translations; application-blog-ui/src/main/resources/Blog/Translations.xml; https://github.com/xwiki-contrib/application-blog; LGPL-2.1
+Forum Application; application-forum-ui/src/main/resources/ForumCode/Translations.xml; https://github.com/xwiki-contrib/application-forum; LGPL-2.1
+LDAP Application; ldap-ui/src/main/resources/LDAP/Code/Translations.xml; https://github.com/xwiki-contrib/ldap; LGPL-2.1
+LimitsApplication; application-limits-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki-contrib/application-limits; LGPL-2.1
+Full Calendar Macro; macro-fullcalendar-ui/src/main/resources/Calendar/Translations.xml; https://github.com/xwiki-contrib/macro-fullcalendar; LGPL-2.1
+Notes Application; src/main/resources/NotesCode/Translations.xml; https://github.com/xwiki-contrib/application-notes; LGPL-2.1
+Templates Application; application-templates-ui/src/main/resources/Templates/Translations.xml; https://github.com/xwiki-contrib/application-templates; LGPL-2.1
+CKEditor Integration; ui/src/main/resources/CKEditor/Translations.xml; https://github.com/xwiki-contrib/application-ckeditor; LGPL-2.1
+Tour Application; application-tour-ui/src/main/resources/TourCode/TourTranslations.xml; https://github.com/xwiki-contrib/application-tour; LGPL-2.1
+Polls Application; src/main/resources/Polls/PollL10n.xml; https://github.com/xwiki-contrib/application-polls; LGPL-2.1
+Flash Messages Application; application-flashmessages-ui/src/main/resources/Flash/Translations.xml; https://github.com/xwiki-contrib/application-flashmessages; LGPL-2.1
+File Manager Application; ui/src/main/resources/FileManagerCode/Translations.xml; https://github.com/xwiki-contrib/application-filemanager; LGPL-2.1
+JW Player Macro; src/main/resources/Macros/JWPlayerTranslations.xml; https://github.com/xwiki-contrib/macro-jwplayer; LGPL-2.1
+Meetings Application; ui/src/main/resources/Meeting/Code/Translations.xml; https://github.com/xwiki-contrib/application-meeting; LGPL-2.1
+PDF Viewer Macro; wiki/src/main/resources/XWiki/PDFViewerMacroTranslations.xml; https://github.com/xwiki-contrib/macro-pdfviewer; LGPL-2.1
+Wiki Flavor Application; application-wikiflavor-ui/src/main/resources/WikiFlavorsCode/WikiFlavorsTranslations.xml; https://github.com/xwiki-contrib/application-wikiflavor; LGPL-2.1
+XPoll Application; application-xpoll-ui/src/main/resources/XPoll/Translation.xml; https://github.com/xwiki-contrib/application-xpoll; LGPL-2.1
+Ideas Application; src/main/resources/Ideas/IdeasTranslations.xml; https://github.com/xwiki-contrib/application-ideas; LGPL-2.1
+Page Relations Application; application-page-relations-ui/src/main/resources/PageRelations/Code/Translations.xml; https://github.com/xwiki-contrib/application-page-relations; LGPL-2.1
+Application Gardening; application-gardening-ui/src/main/resources/Gardening/Code/GardeningTranslations.xml; https://github.com/xwiki-contrib/application-gardening; LGPL-2.1
+Application Chart.js; application-chartjs-ui/src/main/resources/XWiki/ChartJS/Translations.xml; https://github.com/xwiki-contrib/application-chartjs; LGPL-2.1
+Application Help Center; src/main/resources/Help/Code/Translations.xml; https://github.com/xwiki-contrib/application-help-center; LGPL-2.1

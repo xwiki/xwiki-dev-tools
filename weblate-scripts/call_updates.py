@@ -39,7 +39,7 @@ def update_project(project, vcs_path, component_url):
         for line in f.read().splitlines():
             if not line or line[0] == '#':
                 continue
-            name, path, repo_url = line.rsplit(';', 2)
+            name, path, repo_url, license = line.rsplit(';', 3)
             name, path, repo_url = name.strip(), path.strip(), repo_url.strip()
             if component_url and component_url != repo_url:
                 continue

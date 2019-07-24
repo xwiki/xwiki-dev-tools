@@ -29,7 +29,7 @@ from collections import namedtuple
 from subprocess import call
 
 Project = namedtuple('Project', ['name', 'file'])
-Component = namedtuple('Component', ['name', 'path', 'url'])
+Component = namedtuple('Component', ['name', 'path', 'url', 'license'])
 URLS_VCS_NAMES = {}
 
 def import_component(project, component):
@@ -88,7 +88,7 @@ def import_component(project, component):
 def write_component(project, component):
     with open(project.file, 'a') as project_file:
         project_file.write(component.name + '; ' + component.path + '; '
-                           + component.url + '\n')
+                           + component.url + '; ' + component.license + '\n')
     print 'The component has been saved, please commit the file '
     print '"' + project.file + '"' + ' when you are done'
     print
@@ -113,7 +113,8 @@ def get_component(components, project):
         for url in set(map(lambda c: c.url, components)):
             print '  ' + url
     component_url = raw_input('Repository URL: ').strip()
-    component = Component(component_name, component_path, component_url)
+    component_license = raw_input('License: ').strip()
+    component = Component(component_name, component_path, component_url, component_license)
     if (component.path, component.url) in component_paths_urls:
         sys.exit('This component already exists and is named: '
                  + component_paths_urls[(component.path, component.url)])
