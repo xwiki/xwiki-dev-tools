@@ -268,7 +268,7 @@ class PropertiesFile(object):
         document = ''
         has_no_translations_marker = False
         for line in self.document.splitlines(True):
-            match = re.search(self.ANY_PROPERTY_REGEX, line)
+            match = re.search(self.ANY_PROPERTY_REGEX, line.strip())
             if match:
                 key, value = match.group(1).strip(), match.group(2).strip()
                 if key == 'notranslationsmarker':
@@ -286,7 +286,7 @@ class PropertiesFile(object):
         """Add all properties in memory"""
         self.properties.clear()
         for line in self.document.replace('#@deprecated#', '').splitlines():
-            match = re.search(self.ANY_PROPERTY_REGEX, line)
+            match = re.search(self.ANY_PROPERTY_REGEX, line.strip())
             if match:
                 key, value = match.group(1).strip(), self.unescape(match.group(2).strip())
                 if key in self.properties:
