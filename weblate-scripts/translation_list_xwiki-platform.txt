@@ -56,7 +56,7 @@ XWiki.XWikiSyntaxHorizontalLine; xwiki-platform-core/xwiki-platform-help/xwiki-p
 XWiki.XWikiSyntaxOtherSyntaxes; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxOtherSyntaxes.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.XWikiSyntaxScripts; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxScripts.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 Panels.Translations; xwiki-platform-core/xwiki-platform-panels/xwiki-platform-panels-ui/src/main/resources/Panels/Translations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
-AnnotationCode.Translations; xwiki-platform-core/xwiki-platform-annotations/xwiki-platform-annotation-ui/src/main/resources/AnnotationCode/Translations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
+AnnotationCode.Translations; xwiki-platform-core/xwiki-platform-annotation/xwiki-platform-annotation-ui/src/main/resources/AnnotationCode/Translations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 Main.WebHome; xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-common/src/main/resources/Main/WebHome.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.XWikiSyntaxLinks; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxLinks.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.OfficeImporterTranslations; xwiki-platform-core/xwiki-platform-office/xwiki-platform-office-ui/src/main/resources/XWiki/OfficeImporterTranslations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
