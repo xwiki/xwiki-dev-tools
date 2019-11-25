@@ -16,39 +16,48 @@ if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
   exit 2;
 fi
 
-for PROJECT in ${!PROJECTS[@]}; do
-  echo "## Checking [$PROJECT]..."
+function backward_compatibility_cleanup ()
+{
+  local branch=$1
 
-  cd $PROJECT 2> /dev/null || { echo "ERROR: unable to find project [$PROJECT]. Execute script from 'xwiki-trunks' parent folder."; exit 3; }
+  for PROJECT in ${!PROJECTS[@]}; do
+    echo "## Checking [$PROJECT]..."
 
-  git checkout master || exit 4
-  git pull --rebase || exit 4
+    cd $PROJECT 2> /dev/null || { echo "ERROR: unable to find project [$PROJECT]. Execute script from 'xwiki-trunks' parent folder."; exit 3; }
 
-  if [[ "$PROJECT" == "xwiki-commons" ]]; then
-    echo "## Updating [xwiki.compatibility.previous.version]..."
+    git checkout $branch || exit 4
+    git pull --rebase origin $branch || exit 4
 
-    sed -i "s/<xwiki.compatibility.previous.version>.*</<xwiki.compatibility.previous.version>$VERSION</" pom.xml
+    if [[ "$PROJECT" == "xwiki-commons" ]]; then
+      echo "## Updating [xwiki.compatibility.previous.version]..."
 
-    git --no-pager diff || exit 4
-    git commit -a -m "[release] Updated compatibility previous version to the one just released." || exit 4
-  fi
+      sed -i "s/<xwiki.compatibility.previous.version>.*</<xwiki.compatibility.previous.version>$VERSION</" pom.xml
 
-  IGNORES_FILE="${PROJECTS[$PROJECT]}"
+      git --no-pager diff || exit 4
+      git commit -a -m "[release] Updated compatibility previous version to the one just released." || exit 4
+    fi
 
-  echo "## Removing any existing revapi ignores from [$IGNORES_FILE]..."
+    IGNORES_FILE="${PROJECTS[$PROJECT]}"
 
-  perl -0pi -e 's/(\"ignore\" : \[$)\s*({.*?}(,\s*|\s*$))+/$1/gms' "$IGNORES_FILE"
+    echo "## Removing any existing revapi ignores from [$IGNORES_FILE]..."
 
-  DIFF=`git --no-pager diff`
-  [[ $? == 0 ]] || exit 4
+    perl -0pi -e 's/(\"ignore\" : \[$)\s*({.*?}(,\s*|\s*$))+/$1/gms' "$IGNORES_FILE"
 
-  if ! [[ -z $DIFF ]]; then
-    git commit -a -m "[release] Removed revapi ignores from the previous version" || exit 4
-  else
-    echo "## No ignores to remove."
-  fi
+    DIFF=`git --no-pager diff`
+    [[ $? == 0 ]] || exit 4
 
-  git push origin master || exit 4
+    if ! [[ -z $DIFF ]]; then
+      git commit -a -m "[release] Removed revapi ignores from the previous version" || exit 4
+    else
+      echo "## No ignores to remove."
+    fi
 
-  cd ..
-done
+    git push origin $branch || exit 4
+
+    cd ..
+  done
+}
+
+backward_compatibility_cleanup master
+backward_compatibility_cleanup stable-$VERSION.x
+
