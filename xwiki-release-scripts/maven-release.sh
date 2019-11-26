@@ -157,8 +157,11 @@ function stabilize_branch() {
     # TODO: Remove the office-tests profile when all branches we release have versions >= 11.0
     mvn release:branch -DbranchName=$STABLE_BRANCH -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -DpushChanges=false -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,office-tests,legacy,standalone,flavor-integration-tests,distribution,docker
     git pull --rebase
-    # We must update the root parent and commons.version manually
-    mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -DallowSnapshots=true -N -q
+    # We must update the root parent manually
+    # Using versions:update-parent here is not safe because this version of the parent pom might not exist yet
+    # mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -DallowSnapshots=true -N -q
+    xmlstarlet ed -u "/_:project/_:parent/_:version" -v "${NEXT_TRUNK_VERSION}" pom.xml
+    # We must update commons.version manually
     sed -e "s/<commons.version>.*<\/commons.version>/<commons.version>${NEXT_TRUNK_VERSION}<\/commons.version>/" -i pom.xml
     git add pom.xml
     git commit -m "[branch] Updating inter-project dependencies on master" -q
