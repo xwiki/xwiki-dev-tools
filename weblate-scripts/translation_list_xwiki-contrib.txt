@@ -26,7 +26,7 @@ PDF Viewer Macro; wiki/src/main/resources/XWiki/PDFViewerMacroTranslations.xml; 
 Wiki Flavor Application; application-wikiflavor-ui/src/main/resources/WikiFlavorsCode/WikiFlavorsTranslations.xml; https://github.com/xwiki-contrib/application-wikiflavor; LGPL-2.1
 XPoll Application; application-xpoll-ui/src/main/resources/XPoll/Translation.xml; https://github.com/xwiki-contrib/application-xpoll; LGPL-2.1
 Ideas Application; src/main/resources/Ideas/IdeasTranslations.xml; https://github.com/xwiki-contrib/application-ideas; LGPL-2.1
-Page Relations Application; pages/src/main/resources/PageRelations/Code/Translations.xml; https://github.com/xwiki-contrib/application-page-relations; LGPL-2.1
+Page Relations Application; pages/src/main/resources/Ring/Code/Translations.xml; https://github.com/xwiki-contrib/application-page-relations; LGPL-2.1
 Application Gardening; application-gardening-ui/src/main/resources/Gardening/Code/GardeningTranslations.xml; https://github.com/xwiki-contrib/application-gardening; LGPL-2.1
 Application Chart.js; application-chartjs-ui/src/main/resources/XWiki/ChartJS/Translations.xml; https://github.com/xwiki-contrib/application-chartjs; LGPL-2.1
 Application Help Center; src/main/resources/Help/Code/Translations.xml; https://github.com/xwiki-contrib/application-help-center; LGPL-2.1
