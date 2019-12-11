@@ -18,7 +18,7 @@ function usage {
 
 function checkout() {
     # Ensure that all commits from master are retrieved, since we'll update from it.
-    git fetch master
+    git fetch origin master
     git checkout $BRANCH
     if [[ $? != 0 ]]; then
       echo "Branch $BRANCH not found."
@@ -58,11 +58,15 @@ function update() {
           p_prop="${p/.properties/_*.properties}"
           p_xml="${p/.xml/.*.xml}"
 
-          # we use checkout -f to ensure it won't break if the file does not exist.
+          # we don't want the checkout to fail if the pattern does not exist in master
+          # (could be the case if the component does not have any translation yet on master)
+          # Note that some not nice error logs might still occur, such as:
+          # error: pathspec 'xwiki-platform-core/xwiki-platform-captcha/xwiki-platform-captcha-ui/src/main/resources/XWiki/Captcha/Translations.*.xml' did not match any file(s) known to git.
+          # Those are not nice to have, but not harmful.
           if [[ $p != $p_prop ]]; then
-            git checkout -f master -- $p_prop
+            git checkout master -- $p_prop || true
           elif [[ $p != $p_xml ]]; then
-            git checkout -f master -- $p_xml
+            git checkout master -- $p_xml || true
           fi
         fi
       done
