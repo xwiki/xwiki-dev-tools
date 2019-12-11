@@ -130,7 +130,7 @@ def get_components(project):
             line = line.strip()
             if not line or line[0] == '#':
                 continue
-            component = Component(*map(str.strip, line.rsplit(';', 2)))
+            component = Component(*map(str.strip, line.rsplit(';', 3)))
             components.append(component)
             add_url(component, project)
     return components
