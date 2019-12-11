@@ -55,10 +55,12 @@ function update() {
 
           p_prop="${p/.properties/_*.properties}"
           p_xml="${p/.xml/.*.xml}"
-          if [[ $p != $p_prop && -f $p_prop ]]; then
-            git checkout master -- $p_prop
-          elif [[ $p != $p_xml && -f $p_xml ]]; then
-            git checkout master -- $p_xml
+
+          # we use checkout -f to ensure it won't break if the file does not exist.
+          if [[ $p != $p_prop ]]; then
+            git checkout -f master -- $p_prop
+          elif [[ $p != $p_xml ]]; then
+            git checkout -f master -- $p_xml
           fi
         fi
       done
