@@ -46,11 +46,20 @@ function update() {
         continue
       fi
       N=$((N+1))
+      # Iterate on all paths from the list of components and checkout the changes from master on the translation
+      # and on the source file translation
       PATHS=`awk -F';' 'NF && $0!~/^#/{print $2}' $FILE`
       for p in $PATHS; do
         if [[ -f $p ]]; then
-          git checkout master -- "${p/.properties/_*.properties}"
-          git checkout master -- "${p/.xml/.*.xml}"
+          git checkout master -- $p
+
+          p_prop="${p/.properties/_*.properties}"
+          p_xml="${p/.xml/.*.xml}"
+          if [[ $p != $p_prop && -f $p_prop ]]; then
+            git checkout master -- $p_prop
+          elif [[ $p != $p_xml && -f $p_xml ]]; then
+            git checkout master -- $p_xml
+          fi
         fi
       done
       cd $CURRENT_DIRECTORY
