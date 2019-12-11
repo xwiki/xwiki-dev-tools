@@ -17,6 +17,8 @@ function usage {
 }
 
 function checkout() {
+    # Ensure that all commits from master are retrieved, since we'll update from it.
+    git fetch master
     git checkout $BRANCH
     if [[ $? != 0 ]]; then
       echo "Branch $BRANCH not found."
