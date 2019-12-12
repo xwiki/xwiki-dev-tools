@@ -229,7 +229,6 @@ class PropertiesFile(object):
     def filter_import(self):
         """Filter the document for the import"""
         self.document = self.replace_values("''", "'")
-        self.document = self.document.replace('\\ ', ' ')
 
         document = ''
         is_deprecated = False
