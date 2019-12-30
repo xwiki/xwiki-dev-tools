@@ -17,8 +17,6 @@ function usage {
 }
 
 function checkout() {
-    # Ensure that all commits from master are retrieved, since we'll update from it.
-    git fetch origin master
     git checkout $BRANCH
     if [[ $? != 0 ]]; then
       echo "Branch $BRANCH not found."
@@ -34,6 +32,9 @@ function update() {
     if [[ -f $FILE ]]; then
       echo "Updating $f translations..."
       cd $f
+      # Ensure that all commits from master are retrieved, since we'll update from it.
+      git checkout master
+      git pull --rebase origin master
       checkout
       if [[ $? != 0 ]]; then
         cd $CURRENT_DIRECTORY
