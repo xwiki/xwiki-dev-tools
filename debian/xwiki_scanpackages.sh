@@ -33,7 +33,7 @@ SNAPSHOTS_REP="snapshots"
 RELEASES_REP="releases"
 STABLE_REP="stable"
 LTS_REP="lts"
-LTS_BRANCH="10.11"
+LTS_BRANCH="11.10"
 GPG_KEY="0398E391"
 
 cd "$ROOT_REP"
