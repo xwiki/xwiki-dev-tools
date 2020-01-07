@@ -88,7 +88,7 @@
 #-# If neither the system property nor this configuration value here are set then the Servlet container's temporary
 #-# directory is used; This is absolutely not recommended since that directory could be wiped out at any time and you
 #-# should specify a value.
-# environment.permanentDirectory=/var/local/xwiki/
+# environment.permanentDirectory=/var/lib/xwiki/data/
 
 #-------------------------------------------------------------------------------------
 # Rendering
@@ -292,31 +292,36 @@
 #-# Velocity Tools that will be available from your scripts. The format is
 #-# velocity.tools = <name under which it'll be available in the context> = <class name>
 #-# Default values (no need to add them)
-#-#   velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool
-#-#   velocity.tools = numbertool = org.apache.velocity.tools.generic.NumberTool
-#-#   velocity.tools = datetool = org.apache.velocity.tools.generic.ComparisonDateTool
-#-#   velocity.tools = mathtool = org.apache.velocity.tools.generic.MathTool
-#-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool
+#-#   velocity.tools = numbertool = org.xwiki.velocity.internal.XWikiNumberTool
+#-#   velocity.tools = datetool = org.xwiki.velocity.internal.XWikiDateTool
+#-#   velocity.tools = mathtool = org.xwiki.velocity.internal.XWikiMathTool
 #-#   velocity.tools = escapetool = org.apache.velocity.tools.generic.EscapeTool
 #-#   velocity.tools = regextool = org.xwiki.velocity.tools.RegexTool
 #-#   velocity.tools = collectionstool = org.xwiki.velocity.tools.CollectionsTool
-#-#   velocity.tools = stringtool = org.apache.commons.lang3.StringUtils
+#-#   velocity.tools = stringtool = org.xwiki.text.StringUtils
 #-#   velocity.tools = jsontool = org.xwiki.velocity.tools.JSONTool
 #-#   velocity.tools = urltool = org.xwiki.velocity.tools.URLTool
-#-#   velocity.tools = cookietool = org.apache.velocity.tools.view.CookieTool
 #-#   velocity.tools = exceptiontool = org.apache.commons.lang3.exception.ExceptionUtils
+#-#   velocity.tools = niotool = org.xwiki.velocity.tools.nio.NIOTool
+#-#   velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool (deprecated)
+#-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool (deprecated)
 
 #-# [Since 2.0M1]
 #-# Velocity configuration properties. The format is
 #-# velocity.properties = <Velocity property name> = <value>
 #-# Default values (no need to add them)
-#-#   velocity.properties = resource.loader = webapp
-#-#   velocity.properties = directive.set.null.allowed = true
-#-#   velocity.properties = webapp.resource.loader.class = org.apache.velocity.tools.view.servlet.WebappLoader
-#-#   velocity.properties = velocimacro.messages.on = false
-#-#   velocity.properties = resource.manager.logwhenfound = false
-#-#   velocity.properties = velocimacro.permissions.allow.inline.local.scope = true
-#-#   velocity.properties = runtime.introspector.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.xwiki.velocity.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+#-#   velocity.properties = resource.loader = xwiki
+#-#   velocity.properties = xwiki.resource.loader.class = org.xwiki.velocity.XWikiWebappResourceLoader
+#-#   velocity.properties = velocimacro.library = "/templates/macros.vm"
+#-#   velocity.properties = velocimacro.max_depth = 100
+#-#   velocity.properties = resource.manager.log_when_found = false
+#-#   velocity.properties = velocimacro.inline.local_scope = true
+#-#   velocity.properties = velocimacro.inline.replace_global = true
+#-#   velocity.properties = directive.if.empty_check = false
+#-#   velocity.properties = parser.space_gobbling = bc
+#-#   velocity.properties = parser.allow_hyphen_in_identifiers = true
+#-#   velocity.properties = velocimacro.arguments.preserve_literals = true
+#-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
 
 #-------------------------------------------------------------------------------------
 # Groovy
@@ -645,6 +650,14 @@ extension.oldflavors=com.xpn.xwiki.products:xwiki-enterprise-wiki
 #-# The default is:
 # url.standard.hideViewAction=false
 
+#-# [Since 11.1RC1]
+#-# Whether a the last modified date of the file to be loaded should be checked and put in the URL query parameter.
+#-# Disabling this might improve a bit the performance on some old hard drives, or custom filesystem, however
+#-# it might imply the need to force-reload some resources in the browser, when migrating.
+#-#
+#-# The default is:
+# url.useResourceLastModificationDate=true
+
 #-------------------------------------------------------------------------------------
 # Attachment
 #-------------------------------------------------------------------------------------
@@ -701,6 +714,12 @@ extension.oldflavors=com.xpn.xwiki.products:xwiki-enterprise-wiki
 #-# Note that if you disable this feature, empty directories will accumulate and you are responsible
 #-# for cleaning them up.
 # store.fsattach.cleanOnStartup=true
+
+#-# [Since 11.4RC1]
+#-# The root directory used by the various "file" stores implementation (attachment, deleted document, etc.).
+#-# 
+#-# The default is ${environment.permanentDirectory}/store/file.
+# store.file.directory=/var/lib/xwiki/data/store/file/
 
 #-------------------------------------------------------------------------------------
 # Mail
@@ -772,6 +791,16 @@ extension.oldflavors=com.xpn.xwiki.products:xwiki-enterprise-wiki
 #-# The default is:
 # mail.sender.database.discardSuccessStatuses = true
 
+#-# [Since 11.6RC1]
+#-# Max queue size for the prepare mail thread. When the max size is reached, asynchronously sending a mail will block
+#-# till the first mail item in the prepare queue has been processed.
+# mail.sender.prepareQueueCapacity = 1000
+
+#-# [Since 11.6RC1]
+#-# Max queue size for the send mail thread. When the max size is reached, the prepare queue will block till the first
+# mail item in the send queue has been sent.
+# mail.sender.sendQueueCapacity = 1000
+
 #-------------------------------------------------------------------------------------
 # WatchList
 #-------------------------------------------------------------------------------------
@@ -839,6 +868,16 @@ debug.minify=false
 # edit.defaultEditor.org.xwiki.rendering.block.XDOM=text
 # edit.defaultEditor.org.xwiki.rendering.block.XDOM#text=text
 
+#-# [Since 11.3.2, 11.6RC1]
+#-# Indicate if the mechanism to detect and handle edition conflicts should be enabled or not.
+#-# If disabled, it means that in case of edition conflicts, the latest save will be always take into account, and
+#-# erase previous data (which can always be recovered in the history of the document).
+#-# This option is provided because the feature is still experimental and it could be useful is some specific usecases
+#-# to switch it off. However it is not recommended to do so.
+#-#
+#-# The default is:
+# edit.conflictChecking.enabled = true
+
 #-------------------------------------------------------------------------------------
 # Notifications
 #-------------------------------------------------------------------------------------
@@ -888,4 +927,58 @@ debug.minify=false
 #-#
 #-# The default is :
 # notifications.watchedEntities.autoWatch = major
+
+#-# [Since 10.11.4]
+#-# [Since 11.2]
+#-# The search for notifications in the REST API is done trough a thread pool to limit the impact on the rest of the
+#-# XWiki instance.
+#-# This properties controls the size of this pool. Any number lower than 1 disable the thread pool system.
+#-# 
+#-# The default is :
+# notifications.rest.poolSize=2
+
+#-# [Since 10.11.8]
+#-# [Since 11.3]
+#-# Enable or disable caching of notification search result in the REST API.
+#-# 
+#-# The default is :
+# notifications.rest.cache=true
+
+#-------------------------------------------------------------------------------------
+# Event Stream
+#-------------------------------------------------------------------------------------
+
+#-# [Since 11.1RC1]
+#-# The Event Stream, on which the notifications are based, stores data in a dedicated table in the database.
+#-# Each wiki has its own database. The feature can be configured to store its data into the database corresponding to
+#-# the wiki, into the main database (default: xwiki) or both. These options should not be both set to false (in this
+#-# case the local store will be forced).
+#-# Important note: disabling storage in the main store will prevent the notifications from retrieving events from
+#-# subwikis. Moreover, disabling the main store makes impossible for global users to watch pages from subwikis. It is
+#-# not recommended.
+#-#
+#-# This feature was originally implemented by the Activity Stream plugin so these settings might sound familiar to you.
+#-#
+#-# The default is :
+# eventstream.uselocalstore = true
+#-#
+#-# The default is :
+# eventstream.usemainstore = true
+#-#
+#-# Number of days the events should be kept (0 or any negative value: infinite duration)
+#-# Note: if this value is greater than 0 a scheduler job will be created, this job will then be fired every week to
+#-# delete events older than the configured value.
+#-# The default is :
+# eventstream.daystokeepevents = 0
+
+#-------------------------------------------------------------------------------------
+# Logging
+#-------------------------------------------------------------------------------------
+
+#-# [Since 12.0RC1]
+#-# Indicate of logging about the use of deprecated APIs/feature should be enabled.
+#-# 
+#-# The default is:
+# logging.deprecated.enabled=true
+
 

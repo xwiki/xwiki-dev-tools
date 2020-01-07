@@ -133,9 +133,6 @@ xwiki.tags=1
 #-# The path to the hibernate configuration file.
 # xwiki.store.hibernate.path=/WEB-INF/hibernate.cfg.xml
 
-#-# [Since 3.3M1] Deprecated, use xwiki.store.migration
-# xwiki.store.hibernate.updateschema=1
-
 #-# Allow or disable custom mapping for particular XClasses. Custom mapping may increase the performance of certain
 #-# queries when large number of objects from particular classes are used in the wiki.
 # xwiki.store.hibernate.custommapping=1
@@ -195,8 +192,8 @@ xwiki.store.migration=1
 #-# allows to use the default language of the wiki when the user didn't manually choose a language.
 # xwiki.language.preferDefault=0
 
-#-# Force only one of the supported languages to be accepted.
-# xwiki.language.forceSupported=0
+#-# Force only one of the supported languages to be accepted. Default to true.
+# xwiki.language.forceSupported=1
 
 
 #---------------------------------------
@@ -474,31 +471,6 @@ xwiki.plugins=\
 xwiki.plugin.image.cache.capacity=30
 
 #---------------------------------------
-# Activity Stream Plugin
-#
-
-#-# [Since 2.0RC1]
-#-# Activity Stream plugin.
-#-# The Activity Stream plugin stores data in a dedicated table in the database. Each wiki has its own database.
-#-# The plugin can be configured to store its data into the database corresponding to the wiki, into the main database
-#-# (default: xwiki) or both. These options should not be both set to 0 (in this case the local store will be forced).
-#-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
-#-# Moreover, disabling the main store makes impossible for global users to watch pages from subwikis. It is not
-#-# recommended.
-#-#
-#-# Default: 1
-# xwiki.plugin.activitystream.uselocalstore=1
-#-#
-#-# Default: 1
-# xwiki.plugin.activitystream.usemainstore=1
-#-#
-#-# Number of days the events should be kept (0 or any negative value: infinite duration)
-#-# Note: if this value is greater than 0 a scheduler job will be created, this job will then be fired every week to
-#-# delete events older than the configured value.
-#-# Default: 0
-# xwiki.plugin.activitystream.daystokeepevents=0
-
-#---------------------------------------
 # Watchlist Plugin
 #
 
@@ -517,7 +489,7 @@ xwiki.plugin.image.cache.capacity=30
 
 #-# Note that this plugin is in charge of storing stats in the database, and offering some API to query them.
 #-# It doesn't provide any UI. If you wish to install a UI, please check the Statistics Application at
-#-# http://extensions.xwiki.org/xwiki/bin/view/Extension/Statistics+Application
+#-# https://extensions.xwiki.org/xwiki/bin/view/Extension/Statistics+Application
 #-# (this application is no longer bundled in XWiki starting with 8.0)
 
 #-# Stats configuration allows to globally activate/deactivate stats module (launch storage thread, register events...).
@@ -563,4 +535,5 @@ xwiki.stats.default=0
 #-# Indicate if Filter module should be used when importing a XAR in the import action.
 #-# By default Filter module is used, uncomment to use the old system.
 # xwiki.action.import.xar.usefilter=0
+
 
