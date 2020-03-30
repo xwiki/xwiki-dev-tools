@@ -11,14 +11,18 @@ if [[ -z "$VERSION" ]]; then
   exit 1
 fi
 
-if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
-  echo "ERROR: Only run this operation on final versions, not release candidates or bugfixes."
+if ! [[ $VERSION =~ ^([0-9]+.){1,2}[0-9]+$ ]]; then
+  echo "ERROR: Only run this operation on final or bugfix versions, not release candidates or milestones."
   exit 2;
 fi
+
+VERSION_COMPONENTS=(${VERSION//./ })
 
 function backward_compatibility_cleanup ()
 {
   local branch=$1
+
+  echo "## Running on branch [$branch] for version [$VERSION]..."
 
   for PROJECT in ${!PROJECTS[@]}; do
     echo "## Checking [$PROJECT]..."
@@ -43,21 +47,30 @@ function backward_compatibility_cleanup ()
 
     perl -0pi -e 's/(\"ignore\" : \[$)\s*({.*?}(,\s*|\s*$))+/$1/gms' "$IGNORES_FILE"
 
-    DIFF=`git --no-pager diff`
+    DIFF=`git --no-pager -c color.ui=always diff`
     [[ $? == 0 ]] || exit 4
 
     if ! [[ -z $DIFF ]]; then
+      echo $DIFF
       git commit -a -m "[release] Removed revapi ignores from the previous version" || exit 4
     else
       echo "## No ignores to remove."
     fi
 
+    echo "## Pushing changes..."
     git push origin $branch || exit 4
 
     cd ..
   done
 }
 
-backward_compatibility_cleanup master
-backward_compatibility_cleanup stable-$VERSION.x
+## Update the stable branch (either final release or bugfix release, they both use a stable branch, unlike a RC/milestone that releases from master).
+backward_compatibility_cleanup "stable-${VERSION_COMPONENTS[0]}.${VERSION_COMPONENTS[1]}.x"
 
+echo "Also update the [master] branch? (Only if new release version is 'bigger' than the existing one. Y for final, N for most bugfixes except bugfix of a very recent final) :"
+read -p "[y/N] " UPDATE_MASTER
+
+if [[ "$UPDATE_MASTER" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+  ## Also update master. Useful when releasing a final version (right after a RC) or a bugfix of a previously released final (before the new final has a chance to be released).
+  backward_compatibility_cleanup master
+fi
