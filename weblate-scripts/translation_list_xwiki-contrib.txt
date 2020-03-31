@@ -31,3 +31,5 @@ Application Gardening; application-gardening-ui/src/main/resources/Gardening/Cod
 Application Chart.js; application-chartjs-ui/src/main/resources/XWiki/ChartJS/Translations.xml; https://github.com/xwiki-contrib/application-chartjs; LGPL-2.1
 Application Help Center; src/main/resources/Help/Code/Translations.xml; https://github.com/xwiki-contrib/application-help-center; LGPL-2.1
 Developer Tools - Syntax Highlighting; editor-tool-highlighting/editor-tool-highlighting-ui/src/main/resources/SyntaxHighlighting/Translations.xml; https://github.com/xwiki-contrib/wiki-editor-devtools.git; LGPL-2.1
+ActivityPub Notifications; activitypub-notifications/src/main/resources/ApplicationResources.properties; https://github.com/xwiki-contrib/application-activitypub; LGPL-2.1
+ActivityPub UI; activitypub-ui/src/main/resources/ActivityPub/ActivityPubTranslations.xml; https://github.com/xwiki-contrib/application-activitypub; LGPL-2.1
