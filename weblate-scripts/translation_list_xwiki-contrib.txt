@@ -20,6 +20,7 @@ Tour Application; application-tour-ui/src/main/resources/TourCode/TourTranslatio
 Polls Application; src/main/resources/Polls/PollL10n.xml; https://github.com/xwiki-contrib/application-polls; LGPL-2.1
 Flash Messages Application; application-flashmessages-ui/src/main/resources/Flash/Translations.xml; https://github.com/xwiki-contrib/application-flashmessages; LGPL-2.1
 File Manager Application; ui/src/main/resources/FileManagerCode/Translations.xml; https://github.com/xwiki-contrib/application-filemanager; LGPL-2.1
+File Manager Application Macros; ui/src/main/resources/FileManager/FileManagerTranslations.xml; https://github.com/xwiki-contrib/application-filemanager; LGPL-2.1
 JW Player Macro; src/main/resources/Macros/JWPlayerTranslations.xml; https://github.com/xwiki-contrib/macro-jwplayer; LGPL-2.1
 Meetings Application; ui/src/main/resources/Meeting/Code/Translations.xml; https://github.com/xwiki-contrib/application-meeting; LGPL-2.1
 PDF Viewer Macro; wiki/src/main/resources/XWiki/PDFViewerMacroTranslations.xml; https://github.com/xwiki-contrib/macro-pdfviewer; LGPL-2.1
