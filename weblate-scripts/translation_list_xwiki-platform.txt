@@ -80,3 +80,7 @@ XWiki WikiMacro Store; xwiki-platform-core/xwiki-platform-rendering/xwiki-platfo
 Model Validation UI; xwiki-platform-core/xwiki-platform-model/xwiki-platform-model-validation/xwiki-platform-model-validation-ui/src/main/resources/XWiki/EntityNameValidation/Translations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 Model Validation API; xwiki-platform-core/xwiki-platform-model/xwiki-platform-model-validation/xwiki-platform-model-validation-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 JCaptcha UI; xwiki-platform-core/xwiki-platform-captcha/xwiki-platform-captcha-jcaptcha/xwiki-platform-captcha-jcaptcha-ui/src/main/resources/XWiki/Captcha/JCaptcha/Translations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
+Model API; xwiki-platform-core/xwiki-platform-model/xwiki-platform-model-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
+Include Macro; xwiki-platform-core/xwiki-platform-rendering/xwiki-platform-rendering-macros/xwiki-platform-rendering-macro-include/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
+Display Macro; xwiki-platform-core/xwiki-platform-display/xwiki-platform-display-macro/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
+XWiki.EditTranslations; xwiki-platform-core/xwiki-platform-edit/xwiki-platform-edit-ui/src/main/resources/XWiki/EditTranslations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
