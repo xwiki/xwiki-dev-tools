@@ -1,11 +1,1110 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="xwiki">
+                                                                                                                                                
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <wb-module deploy-name="xwiki-12.5-SNAPSHOT">
+                                                                                                                                                                                                                                                                                        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         <wb-resource deploy-path="/" source-path="/target-eclipse/m2e-wtp/web-resources"/>
+                                                                                                                                                                                                                                                                                        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+                                                                                                                                                                                                                                                                                        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+                
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <dependent-module archiveName="xwiki-platform-uiextension-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-uiextension-api/xwiki-platform-uiextension-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-async-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-async-api/xwiki-platform-rendering-async-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-script/xwiki-platform-localization-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-source-legacy-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-source-legacy/xwiki-platform-localization-source-legacy">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-source-wiki-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-source-wiki/xwiki-platform-localization-source-wiki">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-syntax-messagetool-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-syntax-messagetool/xwiki-platform-localization-syntax-messagetool">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-source-jar-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-source-jar/xwiki-platform-localization-source-jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-security-bridge-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-security-bridge/xwiki-platform-security-bridge">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-text-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-text/xwiki-commons-text">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-url-scheme-standard-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-url-scheme-standard/xwiki-platform-url-scheme-standard">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-url-container-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-url-container/xwiki-platform-url-container">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-default/xwiki-platform-wiki-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-script/xwiki-platform-wiki-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-lesscss-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-lesscss-default/xwiki-platform-lesscss-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-lesscss-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-lesscss-api/xwiki-platform-lesscss-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-lesscss-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-lesscss-script/xwiki-platform-lesscss-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-xar-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-xar-script/xwiki-platform-xar-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-user-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-user-default/xwiki-platform-user-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-user-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-user-script/xwiki-platform-user-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-refactoring-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-refactoring-default/xwiki-platform-refactoring-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-oldcore-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-oldcore/xwiki-platform-oldcore">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-tika-detect-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-tika-detect/xwiki-platform-tika-detect">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-store-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-store-api/xwiki-platform-store-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-url-scheme-filesystem-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-url-scheme-filesystem/xwiki-platform-url-scheme-filesystem">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-observation-local-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-observation-local/xwiki-commons-observation-local">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-velocity-xwiki-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-velocity-xwiki/xwiki-platform-velocity-xwiki">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-xwiki-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-xwiki/xwiki-platform-rendering-xwiki">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-sheet-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-sheet-api/xwiki-platform-sheet-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-captcha-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-captcha-api/xwiki-platform-captcha-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-cache-infinispan-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-cache-infinispan/xwiki-commons-cache-infinispan">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-component-multi-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-component-multi/xwiki-platform-component-multi">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-query-xwql-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-query-xwql/xwiki-platform-query-xwql">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-query-jpql-parser-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-query-jpql-parser/xwiki-platform-query-jpql-parser">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-edit-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-edit-api/xwiki-platform-edit-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-filter-event-user-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-filter-event-user/xwiki-platform-filter-event-user">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-filter-instance-document-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-filter-instance-document/xwiki-platform-filter-instance-document">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-security-authentication-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-security-authentication-api/xwiki-platform-security-authentication-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-store-merge-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-store-merge-api/xwiki-platform-store-merge-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-model-validation-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-model-validation-api/xwiki-platform-model-validation-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-velocity-webapp-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-velocity-webapp/xwiki-platform-velocity-webapp">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-environment-servlet-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-environment-servlet/xwiki-commons-environment-servlet">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-environment-common-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-environment-common/xwiki-commons-environment-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-captcha-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-captcha-default/xwiki-platform-captcha-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wysiwyg-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wysiwyg-api/xwiki-platform-wysiwyg-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rest-server-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rest-server/xwiki-platform-rest-server">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-repository-model-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-repository-model/xwiki-commons-repository-model">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rest-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rest-api/xwiki-platform-rest-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rest-model-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rest-model/xwiki-platform-rest-model">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-configuration-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-configuration-api/xwiki-platform-rendering-configuration-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-icon-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-icon-api/xwiki-platform-icon-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-security-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-security-script/xwiki-platform-security-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-webjars-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-webjars-api/xwiki-platform-webjars-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-configuration-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-configuration-default/xwiki-platform-configuration-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-icon-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-icon-default/xwiki-platform-icon-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-resource-servlet-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-resource-servlet/xwiki-platform-resource-servlet">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-edit-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-edit-default/xwiki-platform-edit-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-configuration-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-configuration-default/xwiki-platform-rendering-configuration-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-transformation-icon-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-transformation-icon/xwiki-platform-rendering-transformation-icon">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-logging-logback-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-logging-logback/xwiki-commons-logging-logback">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-logging-common-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-logging-common/xwiki-commons-logging-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-store-filesystem-oldcore-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-store-filesystem-oldcore/xwiki-platform-store-filesystem-oldcore">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-store-serialization-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-store-serialization/xwiki-platform-store-serialization">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-store-transaction-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-store-transaction/xwiki-platform-store-transaction">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-store-filesystem-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-store-filesystem/xwiki-platform-store-filesystem">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-store-locks-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-store-locks/xwiki-platform-store-locks">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-store-merge-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-store-merge-default/xwiki-platform-store-merge-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-security-authentication-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-security-authentication-default/xwiki-platform-security-authentication-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-security-authentication-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-security-authentication-script/xwiki-platform-security-authentication-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-model-validation-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-model-validation-default/xwiki-platform-model-validation-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-skin-skinx-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-skin-skinx/xwiki-platform-skin-skinx">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-annotation-core-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-annotation-core/xwiki-platform-annotation-core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-filter-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-filter-api/xwiki-commons-filter-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-observation-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-observation-api/xwiki-commons-observation-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-model-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-model-api/xwiki-platform-model-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-bridge-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-bridge/xwiki-platform-bridge">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-annotation-reference-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-annotation-reference/xwiki-platform-annotation-reference">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-annotation-io-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-annotation-io/xwiki-platform-annotation-io">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-context-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-context/xwiki-commons-context">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-component-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-component-api/xwiki-commons-component-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-annotation-maintainer-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-annotation-maintainer/xwiki-platform-annotation-maintainer">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-annotation-rest-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-annotation-rest/xwiki-platform-annotation-rest">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-annotation-scripting-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-annotation-scripting/xwiki-platform-annotation-scripting">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-script/xwiki-commons-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-component-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-component-script/xwiki-platform-component-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-logging-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-logging-script/xwiki-platform-logging-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-logging-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-logging-api/xwiki-commons-logging-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-api/xwiki-platform-localization-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-security-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-security-api/xwiki-platform-security-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-csrf-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-csrf/xwiki-platform-csrf">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-container-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-container-api/xwiki-platform-container-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-container-servlet-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-container-servlet/xwiki-platform-container-servlet">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-diff-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-diff-script/xwiki-commons-diff-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-diff-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-diff-api/xwiki-commons-diff-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-diff-display-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-diff-display/xwiki-commons-diff-display">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-diff-xml-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-diff-xml/xwiki-commons-diff-xml">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-diff-xml-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-diff-xml/xwiki-platform-diff-xml">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-blame-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-blame-script/xwiki-commons-blame-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-blame-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-blame-api/xwiki-commons-blame-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-jodatime-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-jodatime/xwiki-platform-jodatime">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-xml-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-xml-script/xwiki-platform-xml-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-xml-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-xml/xwiki-commons-xml">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-component-wiki-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-component-wiki/xwiki-platform-component-wiki">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-async-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-async-default/xwiki-platform-rendering-async-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-classloader-xwiki-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-classloader-xwiki/xwiki-platform-classloader-xwiki">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-classloader-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-classloader-api/xwiki-commons-classloader-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-api/xwiki-platform-wiki-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-classloader-protocol-attachmentjar-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-classloader-protocol-attachmentjar/xwiki-platform-classloader-protocol-attachmentjar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-job-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-job-script/xwiki-platform-job-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-job-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-job/xwiki-commons-job">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-xstream-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-xstream/xwiki-commons-xstream">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-job-handler-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-job-handler/xwiki-platform-job-handler">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-resource-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-resource-default/xwiki-platform-resource-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-url-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-url-api/xwiki-platform-url-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-template-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-template-api/xwiki-platform-template-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-extension-handler-jar-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-extension-handler-jar/xwiki-commons-extension-handler-jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-component-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-component-default/xwiki-commons-component-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-extension-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-extension-script/xwiki-platform-extension-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-extension-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-extension-api/xwiki-platform-extension-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-extension-repository-maven-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-extension-repository-maven/xwiki-commons-extension-repository-maven">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-properties-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-properties/xwiki-commons-properties">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-collection-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-collection/xwiki-commons-collection">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-environment-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-environment-api/xwiki-commons-environment-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-extension-maven-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-extension-maven/xwiki-commons-extension-maven">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-extension-repository-xwiki-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-extension-repository-xwiki/xwiki-commons-extension-repository-xwiki">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-extension-repository-http-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-extension-repository-http/xwiki-commons-extension-repository-http">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-repository-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-repository-api/xwiki-commons-repository-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-extension-cluster-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-extension-cluster/xwiki-platform-extension-cluster">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-observation-remote-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-observation-remote/xwiki-platform-observation-remote">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-extension-distribution-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-extension-distribution/xwiki-platform-extension-distribution">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-flavor-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-flavor-api/xwiki-platform-flavor-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-wikimacro-store-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-wikimacro-store/xwiki-platform-rendering-wikimacro-store">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-wikimacro-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-wikimacro-api/xwiki-platform-rendering-wikimacro-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-parser-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-parser/xwiki-platform-rendering-parser">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-toc-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-toc/xwiki-platform-rendering-macro-toc">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-chart-macro-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-chart-macro/xwiki-platform-chart-macro">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-chart-renderer-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-chart-renderer/xwiki-platform-chart-renderer">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-display-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-display-api/xwiki-platform-display-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-transformation-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-transformation-api/xwiki-platform-rendering-transformation-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-dashboard-macro-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-dashboard-macro/xwiki-platform-dashboard-macro">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-skin-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-skin-api/xwiki-platform-skin-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-display-macro-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-display-macro/xwiki-platform-display-macro">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-formula-macro-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-formula-macro/xwiki-platform-formula-macro">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-formula-renderer-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-formula-renderer/xwiki-platform-formula-renderer">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-office-viewer-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-office-viewer/xwiki-platform-office-viewer">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-resource-temporary-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-resource-temporary/xwiki-platform-resource-temporary">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-office-importer-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-office-importer/xwiki-platform-office-importer">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-tika-parsers-12.5-SNAPSHOT.pom" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-tika-parsers/xwiki-platform-tika-parsers">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-cache-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-cache-api/xwiki-commons-cache-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-office-macro-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-office-macro/xwiki-platform-office-macro">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-include-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-include/xwiki-platform-rendering-macro-include">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-transformation-macro-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-transformation-macro/xwiki-platform-rendering-transformation-macro">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-cache-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-cache/xwiki-platform-rendering-macro-cache">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-code-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-code/xwiki-platform-rendering-macro-code">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-container-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-container/xwiki-platform-rendering-macro-container">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-context-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-context/xwiki-platform-rendering-macro-context">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-gallery-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-gallery/xwiki-platform-rendering-macro-gallery">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-groovy-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-groovy/xwiki-platform-rendering-macro-groovy">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-groovy-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-groovy/xwiki-platform-groovy">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-groovy-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-groovy/xwiki-commons-groovy">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-python-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-python/xwiki-platform-rendering-macro-python">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-rss-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-rss/xwiki-platform-rendering-macro-rss">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-script/xwiki-platform-rendering-macro-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-classloader-protocol-jar-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-classloader-protocol-jar/xwiki-commons-classloader-protocol-jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-component-observation-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-component-observation/xwiki-commons-component-observation">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-signature-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-signature/xwiki-platform-rendering-signature">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-useravatar-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-useravatar/xwiki-platform-rendering-macro-useravatar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-user-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-user-api/xwiki-platform-user-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-macro-velocity-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-macro-velocity/xwiki-platform-rendering-macro-velocity">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-velocity-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-velocity/xwiki-commons-velocity">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-management-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-management/xwiki-commons-management">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-wikimacro-macro-wikimacrocontent-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-wikimacro-macro-wikimacrocontent/xwiki-platform-rendering-wikimacro-macro-wikimacrocontent">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-wikimacro-macro-wikimacroparameter-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-wikimacro-macro-wikimacroparameter/xwiki-platform-rendering-wikimacro-macro-wikimacroparameter">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-rendering-async-macro-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-rendering-async-macro/xwiki-platform-rendering-async-macro">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-activeinstalls-client-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-activeinstalls-client-api/xwiki-platform-activeinstalls-client-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-instance-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-instance/xwiki-platform-instance">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-activeinstalls-common-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-activeinstalls-common/xwiki-platform-activeinstalls-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-localization-macro-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-localization-macro/xwiki-platform-localization-macro">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-crypto-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-crypto-script/xwiki-platform-crypto-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-crypto-common-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-crypto-common/xwiki-commons-crypto-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-crypto-cipher-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-crypto-cipher/xwiki-commons-crypto-cipher">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-crypto-password-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-crypto-password/xwiki-commons-crypto-password">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-crypto-signer-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-crypto-signer/xwiki-commons-crypto-signer">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-crypto-pkix-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-crypto-pkix/xwiki-commons-crypto-pkix">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-crypto-store-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-crypto-store-api/xwiki-commons-crypto-store-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-crypto-store-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-crypto-store-api/xwiki-platform-crypto-store-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-crypto-store-filesystem-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-crypto-store-filesystem/xwiki-commons-crypto-store-filesystem">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-crypto-store-wiki-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-crypto-store-wiki/xwiki-platform-crypto-store-wiki">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-query-manager-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-query-manager/xwiki-platform-query-manager">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-filter-stream-xml-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-filter-stream-xml/xwiki-commons-filter-stream-xml">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-filter-xml-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-filter-xml/xwiki-commons-filter-xml">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-filter-instance-extension-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-filter-instance-extension/xwiki-platform-filter-instance-extension">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-filter-instance-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-filter-instance-api/xwiki-platform-filter-instance-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-filter-event-model-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-filter-event-model/xwiki-platform-filter-event-model">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-filter-event-extension-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-filter-event-extension/xwiki-commons-filter-event-extension">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-filter-instance-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-filter-instance-script/xwiki-platform-filter-instance-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-filter-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-filter-script/xwiki-platform-filter-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-workspaces-migrator-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-workspaces-migrator/xwiki-platform-wiki-workspaces-migrator">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-user-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-user-api/xwiki-platform-wiki-user-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-mail-general-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-mail-general/xwiki-platform-mail-general">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-mail-send-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-mail-send-default/xwiki-platform-mail-send-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-mail-send-storage-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-mail-send-storage/xwiki-platform-mail-send-storage">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-display-html-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-display-html/xwiki-platform-display-html">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-displayer-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-displayer/xwiki-commons-displayer">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-extension-handler-xar-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-extension-handler-xar/xwiki-platform-extension-handler-xar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-xar-model-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-xar-model/xwiki-platform-xar-model">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-refactoring-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-refactoring-api/xwiki-platform-refactoring-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-job-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-job-api/xwiki-platform-job-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-tree-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-tree-api/xwiki-platform-tree-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-filter-stream-xar-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-filter-stream-xar/xwiki-platform-filter-stream-xar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-filter-event-xwiki-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-filter-event-xwiki/xwiki-platform-filter-event-xwiki">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-eventstream-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-eventstream-default/xwiki-platform-eventstream-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-eventstream-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-eventstream-api/xwiki-platform-eventstream-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-eventstream-store-hibernate-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-eventstream-store-hibernate/xwiki-platform-eventstream-store-hibernate">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-eventstream-store-common-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-eventstream-store-common/xwiki-platform-eventstream-store-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-eventstream-store-solr-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-eventstream-store-solr/xwiki-platform-eventstream-store-solr">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-search-solr-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-search-solr-api/xwiki-platform-search-solr-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-scheduler-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-scheduler-api/xwiki-platform-scheduler-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-notifiers-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-notifiers-default/xwiki-platform-notifications-notifiers-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-notifiers-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-notifiers-api/xwiki-platform-notifications-notifiers-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-preferences-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-preferences-api/xwiki-platform-notifications-preferences-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-sources-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-sources/xwiki-platform-notifications-sources">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-api/xwiki-platform-notifications-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-filters-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-filters-default/xwiki-platform-notifications-filters-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-filters-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-filters-api/xwiki-platform-notifications-filters-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-filters-watchlistbridge-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-filters-watchlistbridge/xwiki-platform-notifications-filters-watchlistbridge">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-filters-watch-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-filters-watch/xwiki-platform-notifications-filters-watch">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-image-plugin-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-image-plugin/xwiki-platform-image-plugin">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-image-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-image-api/xwiki-platform-image-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-captcha-jcaptcha-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-captcha-jcaptcha-api/xwiki-platform-captcha-jcaptcha-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-resource-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-resource-api/xwiki-platform-resource-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-search-solr-rest-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-search-solr-rest/xwiki-platform-search-solr-rest">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-search-solr-query-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-search-solr-query/xwiki-platform-search-solr-query">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-creationjob-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-creationjob/xwiki-platform-wiki-creationjob">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-stability-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-stability/xwiki-commons-stability">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-template-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-template-api/xwiki-platform-wiki-template-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-template-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-template-default/xwiki-platform-wiki-template-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-template-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-template-script/xwiki-platform-wiki-template-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-user-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-user-default/xwiki-platform-wiki-user-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-wiki-user-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-wiki-user-script/xwiki-platform-wiki-user-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-feed-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-feed-api/xwiki-platform-feed-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-mailsender-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-mailsender/xwiki-platform-mailsender">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-mail-send-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-mail-send-api/xwiki-platform-mail-send-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-zipexplorer-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-zipexplorer/xwiki-platform-zipexplorer">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-graphviz-oldcore-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-graphviz-oldcore/xwiki-platform-graphviz-oldcore">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-graphviz-plugin-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-graphviz-plugin/xwiki-platform-graphviz-plugin">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-diffplugin-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-diffplugin/xwiki-platform-diffplugin">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-panels-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-panels-api/xwiki-platform-panels-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-icon-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-icon-script/xwiki-platform-icon-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-index-tree-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-index-tree-api/xwiki-platform-index-tree-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-tag-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-tag-api/xwiki-platform-tag-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-script-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-script/xwiki-platform-notifications-script">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-preferences-default-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-preferences-default/xwiki-platform-notifications-preferences-default">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-notifications-rest-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-notifications-rest/xwiki-platform-notifications-rest">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-date-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-date/xwiki-platform-date">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-messagestream-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-messagestream-api/xwiki-platform-messagestream-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-extension-repository-maven-snapshots-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-extension-repository-maven-snapshots/xwiki-commons-extension-repository-maven-snapshots">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-extension-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-extension-api/xwiki-commons-extension-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-commons-configuration-api-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-commons-configuration-api/xwiki-commons-configuration-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xwiki-platform-search-solr-server-plugin-12.5-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/xwiki-platform-search-solr-server-plugin/xwiki-platform-search-solr-server-plugin">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/" handle="module:/overlay/var/M2_REPO/org/xwiki/platform/xwiki-platform-index-tree-war/12.5-SNAPSHOT/xwiki-platform-index-tree-war-12.5-SNAPSHOT.war?unpackFolder=target-eclipse/m2e-wtp/overlays&amp;includes=**/**&amp;excludes=META-INF/MANIFEST.MF">
+            <dependency-type>consumes</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/" handle="module:/overlay/var/M2_REPO/org/xwiki/platform/xwiki-platform-tree-war/12.5-SNAPSHOT/xwiki-platform-tree-war-12.5-SNAPSHOT.war?unpackFolder=target-eclipse/m2e-wtp/overlays&amp;includes=**/**&amp;excludes=META-INF/MANIFEST.MF">
+            <dependency-type>consumes</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/" handle="module:/overlay/slf/?includes=**/**&amp;excludes=META-INF/MANIFEST.MF">
+            <dependency-type>consumes</dependency-type>
+        </dependent-module>
+                                                                                                                                                                                                                                                                                                
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         <property name="java-output-path"/>
+                                                                                                                                                                                                                                                                                                
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         <property name="component.exclusion.patterns"/>
+                                                                                                                                                                                                                                                                                                
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         <property name="context-root" value="xwiki"/>
+                                                                                                                                                                                                                                                                                            
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     </wb-module>
+                                                                                                                                            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </project-modules>
