@@ -45,7 +45,7 @@ function backward_compatibility_cleanup ()
 
     echo "## Removing any existing revapi ignores from [$IGNORES_FILE]..."
 
-    perl -0pi -e 's/(\"ignore\" : \[$)\s*({.*?}(,\s*|\s*$))+/$1/gms' "$IGNORES_FILE"
+    xmlstarlet ed -P --inplace -N m="http://maven.apache.org/POM/4.0.0" -d "/m:project/m:build/m:plugins/m:plugin/m:configuration/m:analysisConfiguration/m:revapi.ignore" "$IGNORES_FILE"
 
     DIFF=`git --no-pager -c color.ui=always diff`
     [[ $? == 0 ]] || exit 4
