@@ -160,7 +160,7 @@ function stabilize_branch() {
     # We must update the root parent manually
     # Using versions:update-parent here is not safe because this version of the parent pom might not exist yet
     # mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -DallowSnapshots=true -N -q
-    xmlstarlet ed -u "/_:project/_:parent/_:version" -v "${NEXT_TRUNK_VERSION}" pom.xml
+    xmlstarlet ed -P --inplace -N m="http://maven.apache.org/POM/4.0.0" -u "/m:project/m:parent/m:version" -v "${NEXT_TRUNK_VERSION}" pom.xml
     # We must update commons.version manually
     sed -e "s/<commons.version>.*<\/commons.version>/<commons.version>${NEXT_TRUNK_VERSION}<\/commons.version>/" -i pom.xml
     git add pom.xml
@@ -271,40 +271,15 @@ function push_release() {
   git push origin ${RELEASE_FROM_BRANCH}
 }
 
-# Generate a clirr report. Requires xsltproc to work properly.
-function clirr_report() {
-  echo -e "\033[0;32m* Generating clirr report\033[0m"
-  # Process the pom, so that all the specified excludes following the "to be removed after x.y is released" comment are removed.
-  xsltproc -o pom.xml $PRGDIR/clirr-excludes.xslt pom.xml
-  # Excludes are also specified in two other poms for xwiki-commons and xwiki-platform
-  if [[ -f xwiki-commons-core/pom.xml ]]
-  then
-    xsltproc -o xwiki-commons-core/pom.xml $PRGDIR/clirr-excludes.xslt xwiki-commons-core/pom.xml
-  elif [[ -f xwiki-platform-core/pom.xml ]]
-  then
-    xsltproc -o xwiki-platform-core/pom.xml $PRGDIR/clirr-excludes.xslt xwiki-platform-core/pom.xml
-  fi
-  # Run clirr
-  mvn clirr:check -DfailOnError=false -DtextOutputFile=clirr-result.txt -Plegacy,integration-tests,office-tests,flavor-integration-tests,distribution -DskipTests -q 1>/dev/null
-  # Aggregate results in one file
-  find . -name clirr-result.txt | xargs cat | grep ERROR > clirr.txt ; sed -r -e 's/ERROR: [0-9]+: //g' -e 's/\s+$//g' -i clirr.txt
-}
-
 # Cleanup sources again, after the release.
 function post_cleanup() {
   echo -e "\033[0;32m* Cleanup\033[0m"
-  # Temporarily move the clirr report to a different place, so that we can safely clean up the whole source tree
-## TODO: put back when fixed
-#  mv clirr.txt /tmp/clirr.txt
   git reset --hard -q
   git checkout master -q
   # Delete the release branch
   git branch -D ${RELEASE_BRANCH}
   git reset --hard -q
   git clean -dxfq
-  # Move back the clirr report
-## TODO: put back when fixed
-#   mv /tmp/clirr.txt clirr.txt
 }
 
 # Push the signed tag to the upstream repository.
@@ -325,8 +300,6 @@ function release_project() {
   release_maven
   post_update_parent_versions
   push_release
-## TODO: put back when fixed
-#  clirr_report
   post_cleanup
   push_tag
   cd ..
