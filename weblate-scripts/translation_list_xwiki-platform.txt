@@ -23,7 +23,6 @@ Skin Extensions; xwiki-platform-core/xwiki-platform-skin/xwiki-platform-skin-ski
 XWiki.XWikiSyntaxParameters; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxParameters.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 Rating module; xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 Main WikiManager.Translations; xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-ui/xwiki-platform-wiki-ui-mainwiki/src/main/resources/WikiManager/Translations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
-XWiki.WatchListTranslations; xwiki-platform-core/xwiki-platform-watchlist/xwiki-platform-watchlist-ui/src/main/resources/XWiki/WatchListTranslations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.XWikiSyntaxDefinitionLists; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxDefinitionLists.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.XWikiSyntaxParagraphs; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxParagraphs.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 Mail.Translations; xwiki-platform-core/xwiki-platform-mail/xwiki-platform-mail-ui/src/main/resources/Mail/Translations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
@@ -44,7 +43,6 @@ Help.Translations; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-u
 AppWithinMinutes.Translations; xwiki-platform-core/xwiki-platform-appwithinminutes/xwiki-platform-appwithinminutes-ui/src/main/resources/AppWithinMinutes/Translations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.XWikiSyntaxImages; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxImages.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.XWikiSyntaxGroups; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxGroups.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
-Main.ActivityTranslations; xwiki-platform-core/xwiki-platform-activitystream/xwiki-platform-activitystream-ui/src/main/resources/Main/ActivityTranslations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.XWikiSyntaxTextFormatting; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTextFormatting.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.XWikiSyntaxTables; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxTables.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 xwiki-platform-wiki-default; xwiki-platform-core/xwiki-platform-wiki/xwiki-platform-wiki-default/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
