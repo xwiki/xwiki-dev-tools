@@ -90,6 +90,7 @@
     <property name="hibernate.connection.url">jdbc:mysql://localhost/xwiki?allowPublicKeyRetrieval=true&amp;useSSL=false&amp;serverTimezone=${timezone}</property>
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
+    <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
     <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 
