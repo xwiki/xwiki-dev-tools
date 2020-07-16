@@ -24,7 +24,6 @@ File Manager Application Macros; ui/src/main/resources/FileManager/FileManagerTr
 JW Player Macro; src/main/resources/Macros/JWPlayerTranslations.xml; https://github.com/xwiki-contrib/macro-jwplayer; LGPL-2.1
 Meetings Application; ui/src/main/resources/Meeting/Code/Translations.xml; https://github.com/xwiki-contrib/application-meeting; LGPL-2.1
 PDF Viewer Macro; wiki/src/main/resources/XWiki/PDFViewerMacroTranslations.xml; https://github.com/xwiki-contrib/macro-pdfviewer; LGPL-2.1
-Wiki Flavor Application; application-wikiflavor-ui/src/main/resources/WikiFlavorsCode/WikiFlavorsTranslations.xml; https://github.com/xwiki-contrib/application-wikiflavor; LGPL-2.1
 XPoll Application; application-xpoll-ui/src/main/resources/XPoll/Translation.xml; https://github.com/xwiki-contrib/application-xpoll; LGPL-2.1
 Ideas Application; src/main/resources/Ideas/IdeasTranslations.xml; https://github.com/xwiki-contrib/application-ideas; LGPL-2.1
 Page Relations Application; pages/src/main/resources/Ring/Code/Translations.xml; https://github.com/xwiki-contrib/application-page-relations; LGPL-2.1
