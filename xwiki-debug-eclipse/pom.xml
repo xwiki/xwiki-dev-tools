@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>12.5-SNAPSHOT</version>
+    <version>12.6-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki</artifactId>
@@ -68,9 +68,14 @@
   <dependencies>
     <!-- Databases -->
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
+      <groupId>${mysql.groupId}</groupId>
+      <artifactId>${mysql.artifactId}</artifactId>
       <version>${mysql.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${mariadb.groupId}</groupId>
+      <artifactId>${mariadb.artifactId}</artifactId>
+      <version>${mariadb.version}</version>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -88,9 +93,9 @@
       <version>${pgsql.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.oracle.jdbc</groupId>
+      <groupId>com.oracle.ojdbc</groupId>
       <artifactId>ojdbc8</artifactId>
-      <version>12.2.0.1</version>
+      <version>${oracle.version}</version>
     </dependency>
 
     <!--  -->
