@@ -82,3 +82,5 @@ Model API; xwiki-platform-core/xwiki-platform-model/xwiki-platform-model-api/src
 Include Macro; xwiki-platform-core/xwiki-platform-rendering/xwiki-platform-rendering-macros/xwiki-platform-rendering-macro-include/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 Display Macro; xwiki-platform-core/xwiki-platform-display/xwiki-platform-display-macro/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.EditTranslations; xwiki-platform-core/xwiki-platform-edit/xwiki-platform-edit-ui/src/main/resources/XWiki/EditTranslations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
+Mentions UI; xwiki-platform-core/xwiki-platform-mentions/xwiki-platform-mentions-ui/src/main/resources/XWiki/Mentions/MentionsTranslations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
+Mentions Notifications; xwiki-platform-core/xwiki-platform-mentions/xwiki-platform-mentions-notifications/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
