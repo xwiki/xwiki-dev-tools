@@ -36,6 +36,8 @@ function update_compatibility_version ()
 
   git --no-pager diff || exit 4
   git commit -a -m "[release] Updated compatibility previous version to the one just released." || exit 4
+
+  cd ..
 }
 
 function backward_compatibility_cleanup ()
