@@ -5,7 +5,7 @@ XWiki.XWikiSyntaxGeneralRemarks; xwiki-platform-core/xwiki-platform-help/xwiki-p
 TemplateMacro; xwiki-platform-core/xwiki-platform-template/xwiki-platform-template-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 Tour.HomepageTour.Translations; xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-tour/src/main/resources/Tour/HomepageTour/Translations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 Localization Macro; xwiki-platform-core/xwiki-platform-localization/xwiki-platform-localization-macro/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-platform; LGPL-2.1
-XWiki.RatingsTranslations; xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-ui/src/main/resources/XWiki/RatingsTranslations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
+XWiki.RatingsTranslations; xwiki-platform-core/xwiki-platform-ratings/xwiki-platform-ratings-ui/src/main/resources/XWiki/Ratings/RatingsTranslations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 Main.SolrTranslations; xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-ui/src/main/resources/Main/SolrTranslations.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.XWikiSyntaxVerbatim; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxVerbatim.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
 XWiki.XWikiSyntaxNewLineLineBreaks; xwiki-platform-core/xwiki-platform-help/xwiki-platform-help-ui/src/main/resources/XWiki/XWikiSyntaxNewLineLineBreaks.xml; https://github.com/xwiki/xwiki-platform; LGPL-2.1
