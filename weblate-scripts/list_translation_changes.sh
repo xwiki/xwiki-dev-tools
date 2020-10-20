@@ -34,7 +34,7 @@ function usage() {
 
 function showDiff {
   ## Use --no-pager to not block the execution.
-  git --no-pager diff $START_COMMIT..$END_COMMIT -- $1
+  git --no-pager diff --color=always $START_COMMIT..$END_COMMIT -- $1
 }
 
 if [[ -z "$START_COMMIT" ]] || [[ -z "$END_COMMIT" ]]; then
