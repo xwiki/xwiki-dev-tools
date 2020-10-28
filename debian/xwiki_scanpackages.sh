@@ -34,6 +34,8 @@ RELEASES_REP="releases"
 STABLE_REP="stable"
 LTS_REP="lts"
 LTS_BRANCH="11.10"
+RECOMMENDED_REP="recommended"
+RECOMMENDED_BRANCH="12.6"
 GPG_KEY="0398E391"
 
 cd "$ROOT_REP"
@@ -92,6 +94,9 @@ update_repository $LTS_REP ".*-${LTS_BRANCH}\(\.[0-9]+\)*\(-[0-9]+\)*.deb"
 
 ## stable
 update_repository $STABLE_REP ".*\.[0-9]+\(-[0-9]+\)*.deb"
+
+## recommended
+update_repository $RECOMMENDED_REP ".*-${RECOMMENDED_BRANCH}\(\.[0-9]+\)*\(-[0-9]+\)*.deb"
 
 ## releases
 if [ -d $RELEASES_REP ]; then
