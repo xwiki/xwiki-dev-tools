@@ -23,13 +23,16 @@
 import fnmatch
 import json
 import os
-import sys
 
 def generate_component(line, repo_urls, project):
     """Creates a component based on the given parameters"""
-    name, path, repo_url, license = line.rsplit(';', 3)
-    name, path, repo_url, license = name.strip(), path.strip(), repo_url.strip(), license.strip()
+    name, path, repo_url, license, format = line.rsplit(';', 4)
+    name, path, repo_url, license, format = name.strip(), path.strip(), repo_url.strip(), license.strip(), format.strip()
     slug = name.lower().replace(' ', '-').replace('.', '-')
+    allowed_formats = ['Java', 'XWiki', 'XWikiPage']
+    if not(format in allowed_formats):
+        print("Format not correct for project {}: {}. Accepted formats: {}".format(name, format, allowed_formats))
+        return
     if repo_url in repo_urls:
         repo_url = repo_urls[repo_url]
         push_url = ''
@@ -38,13 +41,16 @@ def generate_component(line, repo_urls, project):
         push_url = repo_url
     basename, extension = path.rsplit('.', 1)
     filemask = '.translation/' + basename + '_*.properties'
-    template = '.translation/' + basename + '_en.properties'
-    if extension == 'properties':
-        file_format = 'properties'
-    elif extension == 'xml':
-        file_format = 'properties-utf8'
-    else:
-        print "Wrong extension: {}".format(extension)
+    template = path
+    if format == 'Java':
+        file_format = 'xwiki-java-properties'
+        filemask = basename + '_*.properties'
+    elif format == 'XWiki':
+        file_format = 'xwiki-page-properties'
+        filemask = basename + '.*.xml'
+    elif extension == 'XWikiPage':
+        file_format = 'xwiki-fullpage'
+        filemask = basename + '.*.xml'
     component = {
         "name": name,
         "slug": slug,
@@ -86,6 +92,7 @@ def main():
                 components.append(generate_component(line, repo_urls, project))
         with open("components_{}.json".format(project), "w+") as f:
             f.write(json.dumps(components))
+        print("You can now call: weblate import_json --project {} components_{}.json [--ignore|--update]".format(project,project))
 
 if __name__ == '__main__':
     """Main function"""

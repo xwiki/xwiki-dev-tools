@@ -22,7 +22,6 @@
 
 import os
 import re
-import readline
 import sys
 
 from collections import namedtuple
