@@ -42,15 +42,18 @@ def generate_component(line, repo_urls, project):
     basename, extension = path.rsplit('.', 1)
     filemask = '.translation/' + basename + '_*.properties'
     template = path
+    file_format = ''
     if format == 'Java':
         file_format = 'xwiki-java-properties'
         filemask = basename + '_*.properties'
     elif format == 'XWiki':
         file_format = 'xwiki-page-properties'
         filemask = basename + '.*.xml'
-    elif extension == 'XWikiPage':
+    elif format == 'XWikiPage':
         file_format = 'xwiki-fullpage'
         filemask = basename + '.*.xml'
+    else:
+        print("Wrong format for project {}".format(name))
     component = {
         "name": name,
         "slug": slug,
