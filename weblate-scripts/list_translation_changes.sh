@@ -1,12 +1,16 @@
 #!/bin/bash
+
+## Following options  are needed to avoid the subshell issue because of using a while read loop with a pipe.
+## See: https://mywiki.wooledge.org/BashFAQ/024
+set +m
+shopt -s lastpipe
+
 SCRIPT_NAME=`basename "$0"`
 SCRIPT_DIRECTORY=`dirname "$0"`
-FILES="$SCRIPT_DIRECTORY/translation_list_%s.txt"
+COMPONENTS_SCRIPT="retrieve_components.py"
 
 CURRENT_DIRECTORY=`pwd`
 PROJECT=`basename "$CURRENT_DIRECTORY"`
-
-PROJECT_TRANSLATIONS=`printf $FILES $PROJECT`
 
 START_COMMIT=$1
 END_COMMIT=$2
@@ -41,12 +45,6 @@ if [[ -z "$START_COMMIT" ]] || [[ -z "$END_COMMIT" ]]; then
   usage
 fi
 
-if [[ ! -f $PROJECT_TRANSLATIONS ]]; then
-  echo "ERROR: Project [$PROJECT] is not supported. File [$PROJECT_TRANSLATIONS] not found."
-  echo "       Are you in the right folder? Execute from the repository root."
-  exit 2
-fi
-
 git cat-file -e $START_COMMIT
 if [[ $? != 0 ]]; then
   echo "ERROR: Invalid start commit. Check for typos or update the local git repository with upstream changes."
@@ -64,8 +62,7 @@ UPDATED_LANGUAGES=()
 
 echo "Listing [$PROJECT] translation changes between [$START_COMMIT] and [$END_COMMIT]..."
 
-PATHS=`awk -F';' 'NF && $0!~/^#/{print $2}' $PROJECT_TRANSLATIONS`
-for TRANSLATION_BASE_FILE in $PATHS; do
+$SCRIPT_DIRECTORY/$COMPONENTS_SCRIPT $PROJECT | while read -r TRANSLATION_BASE_FILE; do
   if [ "$VERBOSE_ENABLED" == true ]; then
     echo "Checking file [$TRANSLATION_BASE_FILE]..."
   fi
