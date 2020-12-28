@@ -48,9 +48,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src/main/resources/logback.xml</name>
-			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/resources/logback.xml</locationURI>
+			<name>src/main/resources</name>
+			<type>2</type>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/resources</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/redirect</name>
@@ -86,11 +86,6 @@
 			<name>src/main/webapp/WEB-INF/portlet.xml</name>
 			<type>1</type>
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/portlet.xml</locationURI>
-		</link>
-		<link>
-			<name>src/main/webapp/WEB-INF/struts-config.xml</name>
-			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/struts-config.xml</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/WEB-INF/sun-web.xml</name>
