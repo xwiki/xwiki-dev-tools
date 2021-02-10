@@ -20,8 +20,19 @@ for PROJECT in ${PROJECTS[@]}; do
 
   cd $PROJECT 2> /dev/null || { echo "ERROR: unable to find project [$PROJECT]. Execute script from 'xwiki-trunks' parent folder."; exit 2; }
 
-  FROM=${PROJECT}-${VERSION1}
-  TO=${PROJECT}-${VERSION2}
+  if [[ $VERSION1 =~ ^[0-9] ]]
+  then
+    FROM=${PROJECT}-${VERSION1}
+  else
+    FROM=${VERSION1}
+  fi
+
+  if [[ $VERSION2 =~ ^[0-9] ]]
+  then
+    TO=${PROJECT}-${VERSION2}
+  else
+    TO=${VERSION2}
+  fi
 
   git fetch --tags
 
