@@ -7,7 +7,7 @@ shopt -s lastpipe
 CURRENT_DIRECTORY=`pwd`
 SCRIPT_DIRECTORY=`dirname "$0"`
 SCRIPT_NAME=`basename "$0"`
-PROJECTS=("xwiki-common" "xwiki-rendering" "xwiki-platform")
+PROJECTS=("xwiki-commons" "xwiki-rendering" "xwiki-platform")
 COMPONENTS_SCRIPT="retrieve_components.py"
 BRANCH=$2
 
