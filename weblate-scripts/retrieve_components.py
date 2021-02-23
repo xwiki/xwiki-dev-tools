@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python
 
 ## This script aims at displaying the template path for each component on a given project
 ## information are directly retrieved from the XWiki.org Weblate instance.
