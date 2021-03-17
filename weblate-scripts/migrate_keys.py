@@ -83,11 +83,14 @@ def process_source(source_file, source_basename, source_type, key_list):
     for lang in languages_keys.keys():
         file_name = get_translation_file_name(source_file, source_type, lang)
         properties, xml = open_or_create_translation(source_file, file_name, source_type, lang)
-        for key in key_list:
-            value = properties.get_value(key)
+        for entry in key_list:
+            parts = entry.split('=', 1)
+            oldKey = parts[0]
+            newKey = oldKey if len(parts) < 2 else parts[1]
+            value = properties.get_value(oldKey)
             if value:
-                languages_keys[lang].append((key, value))
-                properties.remove_key(key)
+                languages_keys[lang].append((newKey, value))
+                properties.remove_key(oldKey)
         if source_type == FileType.PROPERTIES:
             properties.write(file_name)
         else:

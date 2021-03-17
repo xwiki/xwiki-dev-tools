@@ -33,6 +33,10 @@ bin
 # NetBeans
 nbproject
 
+# Python
+__pycache__
+*.pyc
+
 # Other
 *~
 *.log.*

@@ -289,7 +289,7 @@ class PropertiesFile(object):
             if match:
                 key, value = match.group(1).strip(), self.unescape(match.group(2).strip())
                 if key in self.properties:
-                    print "Warning: {} already exists.".format(key)
+                    print("Warning: {} already exists.".format(key))
                 self.properties[key] = value
 
     def is_empty(self):
