@@ -110,13 +110,13 @@
       <exclusions>
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-web</artifactId>
+          <artifactId>xwiki-platform-web-war</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-web</artifactId>
+      <artifactId>xwiki-platform-web-war</artifactId>
       <version>${platform.version}</version>
       <type>pom</type>
     </dependency>
