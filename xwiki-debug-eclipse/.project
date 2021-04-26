@@ -50,52 +50,52 @@
 		<link>
 			<name>src/main/resources</name>
 			<type>2</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/resources</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/resources</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/redirect</name>
 			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/redirect</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/redirect</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/resources</name>
 			<type>2</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/resources</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/resources</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/templates</name>
 			<type>2</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/templates</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-templates/src/main/resources</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/WEB-INF/cache</name>
 			<type>2</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/cache</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/WEB-INF/cache</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/WEB-INF/fonts</name>
 			<type>2</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/fonts</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/WEB-INF/fonts</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/WEB-INF/observation</name>
 			<type>2</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/observation</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/WEB-INF/observation</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/WEB-INF/portlet.xml</name>
 			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/portlet.xml</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/WEB-INF/portlet.xml</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/WEB-INF/sun-web.xml</name>
 			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/sun-web.xml</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/WEB-INF/sun-web.xml</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/WEB-INF/web.xml</name>
 			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/src/main/webapp/WEB-INF/web.xml</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/WEB-INF/web.xml</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/skins/flamingo</name>
