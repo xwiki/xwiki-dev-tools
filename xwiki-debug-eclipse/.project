@@ -65,7 +65,7 @@
 		<link>
 			<name>src/main/webapp/templates</name>
 			<type>2</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-templates/src/main/resources</locationURI>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-templates/src/main/resources/templates</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/WEB-INF/cache</name>
