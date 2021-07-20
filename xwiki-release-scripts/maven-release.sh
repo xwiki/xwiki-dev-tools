@@ -78,7 +78,7 @@ function check_env() {
   fi
 
   # Check that we're in the right directory
-  if [[ ! -d xwiki-commons || ! -d xwiki-rendering || ! -d xwiki-platform || ! -d xwiki-enterprise ]]
+  if [[ ! -d xwiki-commons || ! -d xwiki-rendering || ! -d xwiki-platform ]]
   then
     echo -e "\033[1;31mPlease go to the xwiki-trunks directory where the XWiki sources are checked out\033[0m"
     exit -1
