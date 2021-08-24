@@ -233,6 +233,10 @@ function release_maven() {
   TEST_SKIP="-DskipTests"
   DB_PROFILE=hsqldb
 
+  # FIXME: Workaround what looks like a Maven release or clean plugin bug until we find/fix the root cause
+  echo -e "\033[0;32m* delete target root folder\033[0m"
+  rm -rf target || exit -2
+
   echo -e "\033[0;32m* release:prepare\033[0m"
   mvn release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution,docker -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
