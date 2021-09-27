@@ -55,7 +55,7 @@ function update() {
       N=$((N+1))
       # Iterate on all paths from the list of components and checkout the changes from master on the translation
       # and on the source file translation
-      $SCRIPT_DIRECTORY/$COMPONENTS_SCRIPT $PROJECT | while read -r component; do
+      $SCRIPT_DIRECTORY/$COMPONENTS_SCRIPT $project | while read -r component; do
         if [[ -f $component ]]; then
           git checkout master -- $component
 
