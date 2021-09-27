@@ -33,7 +33,7 @@ function checkout() {
 
 function update() {
   N=0
-  for project in $PROJECTS; do
+  for project in ${PROJECTS[@]}; do
       echo "Updating $project translations..."
       cd $project
       # Ensure that all commits from master are retrieved, since we'll update from it.
