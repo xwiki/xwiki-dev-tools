@@ -1,3 +1,0 @@
-#Format: Name of the component; Relative path to the translation file; Repository url; License
-xwiki-commons-extension-api; xwiki-commons-core/xwiki-commons-extension/xwiki-commons-extension-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-commons; LGPL-2.1
-xwiki-commons-job; xwiki-commons-core/xwiki-commons-job/xwiki-commons-job-api/src/main/resources/ApplicationResources.properties; https://github.com/xwiki/xwiki-commons; LGPL-2.1

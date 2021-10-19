@@ -1,8 +1,14 @@
 #!/bin/bash
+## Following options  are needed to avoid the subshell issue because of using a while read loop with a pipe.
+## See: https://mywiki.wooledge.org/BashFAQ/024
+set +m
+shopt -s lastpipe
+
 CURRENT_DIRECTORY=`pwd`
 SCRIPT_DIRECTORY=`dirname "$0"`
 SCRIPT_NAME=`basename "$0"`
-FILES="$SCRIPT_DIRECTORY/translation_list_%s.txt"
+PROJECTS=("xwiki-commons" "xwiki-rendering" "xwiki-platform")
+COMPONENTS_SCRIPT="retrieve_components.py"
 BRANCH=$2
 
 function usage {
@@ -27,11 +33,9 @@ function checkout() {
 
 function update() {
   N=0
-  for f in *; do
-    FILE=`printf $FILES $f`
-    if [[ -f $FILE ]]; then
-      echo "Updating $f translations..."
-      cd $f
+  for project in ${PROJECTS[@]}; do
+      echo "Updating $project translations..."
+      cd $project
       # Ensure that all commits from master are retrieved, since we'll update from it.
       git checkout master
       git pull --rebase origin master
@@ -51,29 +55,27 @@ function update() {
       N=$((N+1))
       # Iterate on all paths from the list of components and checkout the changes from master on the translation
       # and on the source file translation
-      PATHS=`awk -F';' 'NF && $0!~/^#/{print $2}' $FILE`
-      for p in $PATHS; do
-        if [[ -f $p ]]; then
-          git checkout master -- $p
+      $SCRIPT_DIRECTORY/$COMPONENTS_SCRIPT $project | while read -r component; do
+        if [[ -f $component ]]; then
+          git checkout master -- $component
 
-          p_prop="${p/.properties/_*.properties}"
-          p_xml="${p/.xml/.*.xml}"
+          p_prop="${component/.properties/_*.properties}"
+          p_xml="${component/.xml/.*.xml}"
 
           # we don't want the checkout to fail if the pattern does not exist in master
           # (could be the case if the component does not have any translation yet on master)
           # Note that some not nice error logs might still occur, such as:
           # error: pathspec 'xwiki-platform-core/xwiki-platform-captcha/xwiki-platform-captcha-ui/src/main/resources/XWiki/Captcha/Translations.*.xml' did not match any file(s) known to git.
           # Those are not nice to have, but not harmful.
-          if [[ $p != $p_prop ]]; then
+          if [[ $component != $p_prop ]]; then
             git checkout master -- $p_prop || true
-          elif [[ $p != $p_xml ]]; then
+          elif [[ $component != $p_xml ]]; then
             git checkout master -- $p_xml || true
           fi
         fi
       done
       cd $CURRENT_DIRECTORY
       echo
-    fi
   done
   echo "$N project(s) updated."
   echo "After reviewing the changes, you can run '$SCRIPT_NAME push $BRANCH' "
@@ -81,11 +83,9 @@ function update() {
 }
 
 function push() {
-  for f in *; do
-    FILE=`printf $FILES $f`
-    if [[ -f $FILE ]]; then
-      echo "Pushing $f translations..."
-      cd $f
+  for project in $PROJECTS; do
+      echo "Pushing $project translations..."
+      cd $project
       checkout
       if [[ $? != 0 ]]; then
         cd $CURRENT_DIRECTORY
@@ -99,16 +99,13 @@ function push() {
       fi
       cd $CURRENT_DIRECTORY
       echo
-    fi
   done
 }
 
 function clean() {
-  for f in *; do
-    FILE=`printf $FILES $f`
-    if [[ -f $FILE ]]; then
-      echo "Cleaning $f..."
-      cd $f
+  for project in $PROJECTS; do
+      echo "Cleaning $project..."
+      cd $project
       checkout
       if [[ $? != 0 ]]; then
         cd $CURRENT_DIRECTORY
@@ -118,7 +115,6 @@ function clean() {
       git reset --hard && git clean -dxf
       cd $CURRENT_DIRECTORY
       echo
-    fi
   done
 }
 
