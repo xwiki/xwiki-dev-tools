@@ -83,7 +83,7 @@ function update() {
 }
 
 function push() {
-  for project in $PROJECTS; do
+  for project in ${PROJECTS[@]}; do
       echo "Pushing $project translations..."
       cd $project
       checkout
@@ -103,7 +103,7 @@ function push() {
 }
 
 function clean() {
-  for project in $PROJECTS; do
+  for project in ${PROJECTS[@]}; do
       echo "Cleaning $project..."
       cd $project
       checkout
