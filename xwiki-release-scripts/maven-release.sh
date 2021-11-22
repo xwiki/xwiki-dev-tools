@@ -107,7 +107,7 @@ function check_versions() {
     VERSION_STUB=`echo $VERSION | cut -d. -f1,2 | cut -d- -f1`
     let NEXT_SNAPSHOT_VERSION=`echo ${VERSION_STUB} | cut -d. -f2`+1
     NEXT_SNAPSHOT_VERSION=`echo ${VERSION_STUB} | cut -d. -f1`.${NEXT_SNAPSHOT_VERSION}-SNAPSHOT
-    echo "What is the next SNAPSHOT version?"
+    echo "What is the next SNAPSHOT version in release branch?"
     read -e -p "${NEXT_SNAPSHOT_VERSION}> " tmp
     if [[ $tmp ]]
     then
@@ -143,7 +143,7 @@ function stabilize_branch() {
   then
     let NEXT_TRUNK_VERSION=`echo ${VERSION_STUB} | cut -d. -f2`+1
     NEXT_TRUNK_VERSION=`echo ${VERSION_STUB} | cut -d. -f1`.${NEXT_TRUNK_VERSION}-SNAPSHOT
-    echo "What is the next master version?"
+    echo "What is the next version in master branch?"
     read -e -p "${NEXT_TRUNK_VERSION}> " tmp
     if [[ $tmp ]]
     then
