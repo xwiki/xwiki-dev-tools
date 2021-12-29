@@ -98,6 +98,11 @@
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/WEB-INF/web.xml</locationURI>
 		</link>
 		<link>
+			<name>src/main/webapp/WEB-INF/xwiki-locales.txt</name>
+			<type>1</type>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/WEB-INF/xwiki-locales.txt</locationURI>
+		</link>
+		<link>
 			<name>src/main/webapp/skins/flamingo</name>
 			<type>2</type>
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/xwiki-platform-flamingo-skin-resources/src/main/resources/flamingo</locationURI>
