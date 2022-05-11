@@ -234,10 +234,16 @@ function release_maven() {
   rm -rf target || exit -2
 
   echo -e "\033[0;32m* release:prepare\033[0m"
-  mvn --batch-mode release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution,docker -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
+  # Note: We disable the Gradle Enterprise local and remote caches to make sure everything is rebuilt and to avoid
+  # any security issue (e.g. if the remote cache has been compromised for example).
+  # Hence the: -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false
+  mvn --batch-mode release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution,docker -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
   echo -e "\033[0;32m* release:perform\033[0m"
-  mvn --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true" || exit -2
+  # Note: We disable the Gradle Enterprise local and remote caches to make sure everything is rebuilt and to avoid
+  # any security issue (e.g. if the remote cache has been compromised for example).
+  # Hence the: -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false
+  mvn --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false -P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false" || exit -2
 
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git checkout ${TAG_NAME} -q
