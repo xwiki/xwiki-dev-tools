@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>14.5-SNAPSHOT</version>
+    <version>14.6-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki</artifactId>
@@ -139,7 +139,7 @@
     </dependency>
 
     <!--  -->
-    <!-- Some more extensions -->
+    <!-- Be able to install snapshot extensions -->
     <!--  -->
 
     <dependency>
