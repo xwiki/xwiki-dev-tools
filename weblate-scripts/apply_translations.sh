@@ -10,6 +10,7 @@ SCRIPT_NAME=`basename "$0"`
 PROJECTS=("xwiki-commons" "xwiki-rendering" "xwiki-platform")
 COMPONENTS_SCRIPT="retrieve_components.py"
 BRANCH=$2
+TMP_TRANSLATIONS="/tmp/xwiki-translations.tmp"
 
 function usage {
   echo "Usage: $SCRIPT_NAME [target] branchname"
@@ -26,9 +27,46 @@ function checkout() {
     git checkout $BRANCH
     if [[ $? != 0 ]]; then
       echo "Branch $BRANCH not found."
-      return -1
+      return 1
     fi
     return 0
+}
+
+function updateCurrentProject() {
+    # Ensure that all commits from master are retrieved, since we'll update from it.
+    git checkout master
+    git pull --rebase origin master
+    declare -A RELEASE_WEBLATE
+    # Ensure to not aggregate information to old data
+    rm -f $TMP_TRANSLATIONS
+    # Retrieve the list of components from weblate
+    $SCRIPT_DIRECTORY/$COMPONENTS_SCRIPT $project | while read -r component; do
+      ## We store values of translations file available in master, since it's those that we will commit back.
+      if [[ -f $component ]]; then
+        echo $component >> $TMP_TRANSLATIONS
+
+        p_prop="${component/.properties/_*.properties}"
+        p_xml="${component/.xml/.*.xml}"
+        if [[ $component != $p_prop ]]; then
+          echo $p_prop >> $TMP_TRANSLATIONS
+        elif [[ $component != $p_xml ]]; then
+          echo $p_xml >> $TMP_TRANSLATIONS
+        fi
+      fi
+    done
+    checkout
+    if [[ $? != 0 ]]; then
+      return $?
+    fi
+    git pull --rebase origin $BRANCH
+    if [[ $? != 0 ]]; then
+      echo "Couldn't pull new changes."
+      return $?
+    fi
+    # Iterate on all paths we stored and apply them to the current branch
+    cat $TMP_TRANSLATIONS | while read -r translation_file; do
+      git checkout master -- $translation_file
+    done
 }
 
 function update() {
@@ -36,44 +74,7 @@ function update() {
   for project in ${PROJECTS[@]}; do
       echo "Updating $project translations..."
       cd $project
-      # Ensure that all commits from master are retrieved, since we'll update from it.
-      git checkout master
-      git pull --rebase origin master
-      checkout
-      if [[ $? != 0 ]]; then
-        cd $CURRENT_DIRECTORY
-        echo
-        continue
-      fi
-      git pull --rebase origin $BRANCH
-      if [[ $? != 0 ]]; then
-        echo "Couldn't pull new changes."
-        cd $CURRENT_DIRECTORY
-        echo
-        continue
-      fi
-      N=$((N+1))
-      # Iterate on all paths from the list of components and checkout the changes from master on the translation
-      # and on the source file translation
-      $SCRIPT_DIRECTORY/$COMPONENTS_SCRIPT $project | while read -r component; do
-        if [[ -f $component ]]; then
-          git checkout master -- $component
-
-          p_prop="${component/.properties/_*.properties}"
-          p_xml="${component/.xml/.*.xml}"
-
-          # we don't want the checkout to fail if the pattern does not exist in master
-          # (could be the case if the component does not have any translation yet on master)
-          # Note that some not nice error logs might still occur, such as:
-          # error: pathspec 'xwiki-platform-core/xwiki-platform-captcha/xwiki-platform-captcha-ui/src/main/resources/XWiki/Captcha/Translations.*.xml' did not match any file(s) known to git.
-          # Those are not nice to have, but not harmful.
-          if [[ $component != $p_prop ]]; then
-            git checkout master -- $p_prop || true
-          elif [[ $component != $p_xml ]]; then
-            git checkout master -- $p_xml || true
-          fi
-        fi
-      done
+      updateCurrentProject
       cd $CURRENT_DIRECTORY
       echo
   done
@@ -118,8 +119,39 @@ function clean() {
   done
 }
 
+function checkDirectories() {
+  for project in ${PROJECTS[@]}; do
+    if [[ ! -d $project ]]; then
+      echo "Cannot find directory $project"
+      return 1
+    fi
+  done
+  return 0
+}
+
+function guessCurrentProject() {
+  current_dir=`basename $CURRENT_DIRECTORY`
+  for project in ${PROJECTS[@]}; do
+    if [[ $project == $current_dir ]]; then
+      return 0
+    fi
+  done
+  echo "Cannot guess the current project"
+  return 1
+}
+
 if [[ "$1" == 'update' ]] && [[ -n "$BRANCH" ]]; then
-  update
+  checkDirectories
+  if [[ $? != 0 ]]; then
+    guessCurrentProject
+    if [[ $? == 0 ]]; then
+      echo "Performing update on $project."
+      updateCurrentProject
+    fi
+  else
+    echo "Performing update on all commons, rendering and platform."
+    update
+  fi
 elif [[ "$1" == 'push' ]] && [[ -n "$BRANCH" ]]; then
   push
 elif [[ "$1" == 'clean' ]] && [[ -n "$BRANCH" ]]; then
