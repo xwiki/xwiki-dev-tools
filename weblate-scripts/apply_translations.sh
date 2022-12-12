@@ -45,8 +45,8 @@ function updateCurrentProject() {
     git checkout master
     git pull --rebase origin master
     # Find latest tag related to the branch
-    versionPattern=$(echo "$BRANCH" | sed -e 's/x/*/' -e 's/stable-/*/')
-    tag=$(git tag -l --sort=-refname "$versionPattern" |head -n 1)
+    versionPattern=$(echo "$BRANCH" | sed -e 's/.x/*/' -e 's/stable/*/')
+    tag=$(git tag -l --sort=-taggerdate "$versionPattern" |head -n 1)
     echo "Latest tag found: $tag"
     # Find date of this tag
     tagDate=$(git log -1 --format=%ai "$tag")
