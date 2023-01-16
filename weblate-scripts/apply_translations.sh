@@ -37,7 +37,7 @@ function checkout() {
 function computeAuthors() {
   limitDate=$1
   filePath=$2
-  git log --pretty=format:"%an <%ae> %+(trailers:key=Co-authored-by,only=false,valueonly=true,unfold=true)" --since="$limitDate" "$filePath" | sort -u >> "${TMP_TRANSLATIONS_AUTHORS_INFO}_${project}.txt"
+  git log --pretty=format:"%an <%ae> %+(trailers:key=Co-authored-by,only=true,valueonly=true,unfold=true)" --since="$limitDate" "$filePath" | sort -u >> "${TMP_TRANSLATIONS_AUTHORS_INFO}_${project}.txt"
 }
 
 function updateCurrentProject() {

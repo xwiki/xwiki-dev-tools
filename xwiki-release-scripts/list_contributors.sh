@@ -49,14 +49,13 @@ for PROJECT in ${PROJECTS[@]}; do
   fi
 
   ## We want to retrieve both the authors and the co-authors of commits, that's why we include the Co-authored-by trailer
-  ## `only=false` means that we don't ignore logs if the trailers is missing
+  ## `only=true` means that we only take value for this trailers key (we ignore other possible trailers)
   ## `valueonly=true` means that we don't want to display the key
   ## `unfold=true` means that in case of multiple co-authors we display them all
   ## The first sed command is there to remove email addresses
   ## The second sed command is there to add a "* " prefix on each line
   ## The sort command is there to filter out multiple entries
-  git log --pretty=format:"%an %+(trailers:key=Co-authored-by,only=false,valueonly=true,unfold=true)" $FROM..$TO | sed -e 's#<.*>##' | sed -e 's/^\(.\)/* \1/' | sort -u >> $TMP_FILE
-
+  git log --pretty=format:"%an %+(trailers:key=Co-authored-by,only=true,valueonly=true,unfold=true)" $FROM..$TO | sed -e 's#<.*>##' | sed -e 's/^\(.\)/* \1/' | sort -u >> $TMP_FILE
   cd ..
 done
 
