@@ -26,13 +26,12 @@ function usage {
 }
 
 function checkout() {
-    git checkout $BRANCH
-    if [[ $? != 0 ]]; then
+    git checkout -q $BRANCH && return 0 || {
       echo "Branch $BRANCH not found."
       return 1
-    fi
-    return 0
+    }
 }
+
 
 function computeAuthors() {
   limitDate=$1
