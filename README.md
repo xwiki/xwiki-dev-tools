@@ -35,6 +35,6 @@
 <hr>
 <h1 align="center">License</h1>
 
-- The XWiki Development Experience Enhancement sub-projects are released under the Apache 2.0 license. See the LICENSE file in each sub-project's directory for more information.
+- The XWiki Development Experience Enhancement sub-projects are released under the GNU LESSER GENERAL PUBLIC LICENSE Version 2.1, February 1999. See the LICENSE file in each sub-project's directory for more information.
 <hr>
 <p  align="center">Please refer to READMEs in the subprojects for more information.</p>
