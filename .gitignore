@@ -10,9 +10,6 @@ target-eclipse
 atlassian-ide-plugin.xml
 
 # Eclipse
-.classpath
-.project
-.settings
 .checkstyle
 .fbprefs
 bin

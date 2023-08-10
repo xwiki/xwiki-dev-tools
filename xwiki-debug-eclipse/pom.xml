@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>15.0-SNAPSHOT</version>
+    <version>15.7-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki</artifactId>
@@ -78,23 +78,23 @@
       <version>${mariadb.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
+      <groupId>${hsqldb.groupId}</groupId>
+      <artifactId>${hsqldb.artifactId}</artifactId>
       <version>${hsqldb.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.derby</groupId>
-      <artifactId>derby</artifactId>
+      <groupId>${derby.groupId}</groupId>
+      <artifactId>${derby.artifactId}</artifactId>
       <version>${derby.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
+      <groupId>${pgsql.groupId}</groupId>
+      <artifactId>${pgsql.artifactId}</artifactId>
       <version>${pgsql.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.oracle.ojdbc</groupId>
-      <artifactId>ojdbc8</artifactId>
+      <groupId>${oracle.groupId}</groupId>
+      <artifactId>${oracle.artifactId}</artifactId>
       <version>${oracle.version}</version>
     </dependency>
 
@@ -147,6 +147,11 @@
       <artifactId>xwiki-commons-extension-repository-maven-snapshots</artifactId>
       <version>${commons.version}</version>
     </dependency>
+
+    <!--  -->
+    <!-- Some more extensions -->
+    <!--  -->
+
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>

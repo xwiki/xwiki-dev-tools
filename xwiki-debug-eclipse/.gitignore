@@ -1,35 +1,10 @@
-# Build
-target
-target-eclipse
-
-# Eclipse
-.fbprefs
-bin
-.externalToolBuilders
-.checkstyle
-
 # XWiki
 hibernate.cfg.xml
 xwiki.cfg
 xwiki.properties
 
-# Warkaround a EGit bug that makes it see linked resource as if it was unversionned folders
-# See https://bugs.eclipse.org/bugs/show_bug.cgi?id=333338
-src/main/resources/logback.xml
-src/main/webapp/resources
-src/main/webapp/skins
-src/main/webapp/templates
-src/main/webapp/WEB-INF/cache
-src/main/webapp/WEB-INF/fonts
-src/main/webapp/WEB-INF/observation
-src/main/webapp/WEB-INF/portlet.xml
-src/main/webapp/WEB-INF/struts.tld
-src/main/webapp/WEB-INF/struts-bean.tld
-src/main/webapp/WEB-INF/struts-config.xml
-src/main/webapp/WEB-INF/struts-form.tld
-src/main/webapp/WEB-INF/struts-html.tld
-src/main/webapp/WEB-INF/struts-logic.tld
-src/main/webapp/WEB-INF/struts-template.tld
-src/main/webapp/WEB-INF/sun-web.xml
-src/main/webapp/WEB-INF/web.xml
-src/main/webapp/redirect
+# Eclipse
+org.eclipse.m2e.wtp.prefs
+org.eclipse.wst.common.project.facet.core.prefs.xml
+org.eclipse.wst.validation.prefs
+sf.eclipse.javacc.prefs
