@@ -4,8 +4,9 @@ CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdou
 echo "Current version: $CURRENT_VERSION"
 BASE_VERSION=${CURRENT_VERSION%%-*}
 echo "Base version: $BASE_VERSION"
-BRANCH_VERSION=$BASE_VERSION-$(git branch --show-current)-SNAPSHOT
-echo "Branch version: $BRANCH_VERSION"
+NEW_VERSION=$BASE_VERSION-$(git branch --show-current)-SNAPSHOT
+echo "New version: $NEW_VERSION"
 
-mvn -f pom.xml versions:set -DnewVersion=${BRANCH_VERSION} -DallowSnapshots=true -DgenerateBackupPoms=false -Plegacy,integration-tests,snapshot,docker
-mvn versions:update-parent -DallowSnapshots=true -DparentVersion=15.7-feature-deploy-jakarta-SNAPSHOT -DgenerateBackupPoms=false -N
+mvn -f pom.xml versions:set -DnewVersion=${NEW_VERSION} -DallowSnapshots=true -DgenerateBackupPoms=false -Plegacy,integration-tests,snapshot,docker
+mvn versions:update-parent -DallowSnapshots=true -DparentVersion=${NEW_VERSION} -DgenerateBackupPoms=false -N
+sed -e  "s/<commons.version>.*<\/commons.version>/<commons.version>${NEW_VERSION}<\/commons.version>/" -i pom.xml || true
