@@ -15,7 +15,7 @@ if [ -d "$XWIKI_DEV_TOOLS" ] ; then
 fi
 ```
 
-You can then open a new shell or execute the following if you want to make those commands available in an already open shell.
+You can then open a new shell or execute the following if you want to make those commands available in an already open shell:
 
 ```bash
 source ~/.profile
