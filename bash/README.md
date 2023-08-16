@@ -11,7 +11,7 @@ To make those command line helpers available to your user, you can add the follo
 # add XWiki bash helpers to the PATH
 XWIKI_DEV_TOOLS="/your/path/to/xwiki-dev-tools"
 if [ -d "$XWIKI_DEV_TOOLS" ] ; then
-    PATH="$XWIKI_DEV_TOOLS"
+    PATH="$XWIKI_DEV_TOOLS:$PATH"
 fi
 ```
 
