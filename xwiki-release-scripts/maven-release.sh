@@ -151,7 +151,7 @@ function stabilize_branch() {
     fi
     # Let maven update the version for all the submodules
     # TODO: Remove the office-tests profile when all branches we release have versions >= 11.0
-    mvn release:branch -DbranchName=$STABLE_BRANCH -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -DpushChanges=false -Pci,hsqldb,mysql,pgsql,derby,jetty,glassfish,integration-tests,office-tests,legacy,standalone,flavor-integration-tests,distribution,docker
+    mvn release:branch -DbranchName=$STABLE_BRANCH -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -DpushChanges=false -Pci,integration-tests,office-tests,legacy,standalone,flavor-integration-tests,distribution,docker
     git pull --rebase
     # We must update the root parent manually
     # Using versions:update-parent here is not safe because this version of the parent pom might not exist yet
@@ -227,7 +227,6 @@ function pre_update_parent_versions() {
 # Invoke mvn release:prepare, followed by mvn release:perform, then create a GPG-signed git tag.
 function release_maven() {
   TEST_SKIP="-DskipTests"
-  DB_PROFILE=hsqldb
 
   # FIXME: Workaround what looks like a Maven release or clean plugin bug until we find/fix the root cause
   echo -e "\033[0;32m* delete target root folder\033[0m"
@@ -237,13 +236,13 @@ function release_maven() {
   # Note: We disable the Gradle Enterprise local and remote caches to make sure everything is rebuilt and to avoid
   # any security issue (e.g. if the remote cache has been compromised for example).
   # Hence the: -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false
-  mvn --batch-mode release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Phsqldb,mysql,pgsql,derby,jetty,glassfish,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution,docker -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
+  mvn --batch-mode release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Plegacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution,docker -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
   echo -e "\033[0;32m* release:perform\033[0m"
   # Note: We disable the Gradle Enterprise local and remote caches to make sure everything is rebuilt and to avoid
   # any security issue (e.g. if the remote cache has been compromised for example).
   # Hence the: -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false
-  mvn --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false -P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution ${TEST_SKIP} -Darguments="-P${DB_PROFILE},jetty,legacy,integration-tests,office-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false" || exit -2
+  mvn --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false -Plegacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution ${TEST_SKIP} -Darguments="-Plegacy,integration-tests,office-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false" || exit -2
 
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git checkout ${TAG_NAME} -q
