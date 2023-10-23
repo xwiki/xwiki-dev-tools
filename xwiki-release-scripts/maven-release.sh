@@ -181,8 +181,8 @@ function check_branch() {
   RELEASE_FROM_BRANCH=master
   if [[ $CURRENT_VERSION == $VERSION_STUB ]]
   then
-    # Offer to create the stable branch if it doesn't exist and the released version is not a milestone.
-    if [[ -z `echo $VERSION | grep '-milestone-'` && -z `git branch -r | grep $STABLE_BRANCH` ]]
+    # Offer to create the stable branch if it doesn't exist
+    if [[ -z `git branch -r | grep $STABLE_BRANCH` ]]
     then
       stabilize_branch
     fi
@@ -349,7 +349,7 @@ function display_help() {
   echo "* Configure a proper global .giconfig file holding the release manager's username/email address"
   echo "* Setup a GPG signing key corresponding to the email address above"
   echo "* Change to the xwiki-trunks directory, where the xwiki-commons, xwiki-rendering, xwiki-platform and xwiki-enterprise have been checked out"
-  echo "* [Optional] Export a VERSION shell variable holding the name of the version being released, in the X.Y-milestone-Z format"
+  echo "* [Optional] Export a VERSION shell variable holding the name of the version being released, in the X.Y-rc-Z format"
   echo "The release script will check and refuse to proceed if these steps haven't been performed."
 }
 
