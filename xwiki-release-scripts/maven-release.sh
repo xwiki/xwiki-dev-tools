@@ -104,9 +104,10 @@ function check_versions() {
   # Check next SNAPSHOT version
   if [[ -z $NEXT_SNAPSHOT_VERSION ]]
   then
-    VERSION_STUB=`echo $VERSION | cut -d. -f1,2 | cut -d- -f1`
-    let NEXT_SNAPSHOT_VERSION=`echo ${VERSION_STUB} | cut -d. -f2`+1
-    NEXT_SNAPSHOT_VERSION=`echo ${VERSION_STUB} | cut -d. -f1`.${NEXT_SNAPSHOT_VERSION}-SNAPSHOT
+    # Extract the 3rd part of the version and increment it
+    let NEXT_SNAPSHOT_VERSION=`echo ${VERSION} | cut -d- -f1 | cut -d. -f3`+1
+    # Extract the first 2 parts of the version and append the incremented 3rd part and the -SNAPSHOT suffix
+    NEXT_SNAPSHOT_VERSION=`echo ${VERSION} | cut -d. -f1-2`.${NEXT_SNAPSHOT_VERSION}-SNAPSHOT
     echo "What is the next SNAPSHOT version in release branch?"
     read -e -p "${NEXT_SNAPSHOT_VERSION}> " tmp
     if [[ $tmp ]]
@@ -141,8 +142,21 @@ function stabilize_branch() {
   read -e -p "[Y|n]> " CONFIRM
   if [[ $CONFIRM != 'n' ]]
   then
-    let NEXT_TRUNK_VERSION=`echo ${VERSION_STUB} | cut -d. -f2`+1
-    NEXT_TRUNK_VERSION=`echo ${VERSION_STUB} | cut -d. -f1`.${NEXT_TRUNK_VERSION}-SNAPSHOT
+    # Extract the 2nd part of the version and increment it
+    let NEXT_TRUNK_VERSION=`echo ${VERSION} | cut -d. -f2`+1
+    # Check if we should start a new cycle or not
+    if (($NEXT_TRUNK_VERSION > 10))
+    then
+      # New cycle
+      # Extract the 1rst part of the version and increment it
+      let NEXT_TRUNK_VERSION=`echo ${VERSION} | cut -d. -f1`+1
+      # Append .0.0-SNAPSHOT suffix to the incremented 1st part of the version
+      NEXT_TRUNK_VERSION=${NEXT_TRUNK_VERSION}.0.0-SNAPSHOT
+    else
+      # Same cycle
+      # Extract the 1st part of the version and append the incremented 2nd part and the .0-SNAPSHOT suffix
+      NEXT_TRUNK_VERSION=`echo ${VERSION} | cut -d. -f1`.${NEXT_TRUNK_VERSION}.0-SNAPSHOT
+    fi
     echo "What is the next version in master branch?"
     read -e -p "${NEXT_TRUNK_VERSION}> " tmp
     if [[ $tmp ]]
@@ -164,35 +178,22 @@ function stabilize_branch() {
     git push origin master
     git push origin $STABLE_BRANCH
     CURRENT_VERSION=`echo $NEXT_TRUNK_VERSION | cut -d- -f1`
-    RELEASE_FROM_BRANCH=$STABLE_BRANCH
   fi
 }
 
 # Check which branch should be the basis for the release.
-# - If the released version corresponds to the master, then use master.
-# - If the released version is a -rc-1 version and we're releasing from master, then offer to create a stable branch and move the master to the next version.
-# - If the released version doesn't have an associated stable branch, then stop the process, since there's no valid source branch to release from.
-# In the end, a variable called RELEASE_FROM_BRANCH will hold the name of the source branch to start the release from (master or stable-X.Y).
+# Make sure the stable branch corresponding to the release version exist and create it if it does not
+# In the end, a variable called RELEASE_FROM_BRANCH will hold the name of the source branch to start the release from (stable-X.Y).
 function check_branch() {
   CURRENT_VERSION=`mvn help:evaluate -Dexpression='project.version' -N | grep -v '\[' | grep -v 'Download' | cut -d- -f1`
-  VERSION_STUB=`echo $VERSION | cut -d. -f1,2 | cut -d- -f1`
+  VERSION_STUB=`echo $VERSION | cut -d. -f1-2`
   STABLE_BRANCH=stable-${VERSION_STUB}.x
 
-  RELEASE_FROM_BRANCH=master
-  if [[ $CURRENT_VERSION == $VERSION_STUB ]]
+  RELEASE_FROM_BRANCH=$STABLE_BRANCH
+  # Offer to create the stable branch if it doesn't exist
+  if [[ -z `git branch -r | grep $STABLE_BRANCH` ]]
   then
-    # Offer to create the stable branch if it doesn't exist
-    if [[ -z `git branch -r | grep $STABLE_BRANCH` ]]
-    then
-      stabilize_branch
-    fi
-  else
-    RELEASE_FROM_BRANCH=$STABLE_BRANCH
-    if [[ -z `git branch -r | grep ${RELEASE_FROM_BRANCH}` ]]
-    then
-      echo -e "\033[1;31mThe release must be performed from the ${RELEASE_FROM_BRANCH} branch, but it doesn't seem to exist yet.\033[0m"
-      exit -2
-    fi
+    stabilize_branch
   fi
 
   echo
