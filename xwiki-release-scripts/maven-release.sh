@@ -98,6 +98,12 @@ function check_versions() {
     export VERSION=$VERSION
   fi
 
+  if ! [[ $VERSION =~ [0-9]+.[0-9]+.[0-9]+(-rc-[0-9])?$ ]]
+  then
+    echo -e "The version $VERSION is wrong. Format must be <major>.<minor>.<bugfix>[-rc-<rc number>]"
+    exit -1
+  fi
+
   # Set the name of the release branch
   export RELEASE_BRANCH=release-${VERSION}
 
