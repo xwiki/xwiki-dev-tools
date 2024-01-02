@@ -122,6 +122,30 @@ function check_versions() {
     fi
     export NEXT_SNAPSHOT_VERSION=$NEXT_SNAPSHOT_VERSION
   fi
+
+  # Select the JDK version to use
+  if [[ -z $RELEASE_JDK_VERSION ]]
+  then
+    # Get the major part of the verion being released
+    let VERSION_MAJOR=`echo ${VERSION} | cut -d- -f1 | cut -d. -f1`
+    # XWiki 16+ requires Java 17
+    if (($VERSION_MAJOR < 16))
+    then
+      RELEASE_JDK_VERSION=11
+    else
+      RELEASE_JDK_VERSION=17
+    fi
+    echo "What is the version of Java to use to release XWiki ${VERSION}?"
+    read -e -p "${RELEASE_JDK_VERSION}> " tmp
+    if [[ $tmp ]]
+    then
+      RELEASE_JDK_VERSION=${tmp}
+    fi
+    export RELEASE_JDK_VERSION=$RELEASE_JDK_VERSION
+  fi
+  # Set the selected Java version
+  export JAVA_HOME=${HOME}/java$RELEASE_JDK_VERSION
+  export PATH=$JAVA_HOME/bin:$PATH
 }
 
 # Clean up the sources, discarding any changes in the local workspace not found in the local git clone and switching back to the master branch.
