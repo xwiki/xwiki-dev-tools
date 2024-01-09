@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+CURRENT_VERSION=$(mvn -N help:evaluate -Dexpression=project.version -q -DforceStdout)
 echo "Current version: $CURRENT_VERSION"
 BASE_VERSION=${CURRENT_VERSION%%-*}
 echo "Base version: $BASE_VERSION"
