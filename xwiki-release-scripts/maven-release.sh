@@ -110,10 +110,22 @@ function check_versions() {
   # Check next SNAPSHOT version
   if [[ -z $NEXT_SNAPSHOT_VERSION ]]
   then
-    # Extract the 3rd part of the version and increment it
-    let NEXT_SNAPSHOT_VERSION=`echo ${VERSION} | cut -d- -f1 | cut -d. -f3`+1
-    # Extract the first 2 parts of the version and append the incremented 3rd part and the -SNAPSHOT suffix
-    NEXT_SNAPSHOT_VERSION=`echo ${VERSION} | cut -d. -f1-2`.${NEXT_SNAPSHOT_VERSION}-SNAPSHOT
+    # Resolve the next SNAPSHOT suggestion
+    ISRC=`echo ${VERSION} | cut -d- -f2`
+    if [[ $ISRC == 'rc' ]]
+    then
+      # It's a RC version so we keep the same SNAPSHOT
+      # Extract the base version
+      BASE_VERSION=`echo ${VERSION} | cut -d- -f1`
+      # Append the -SNAPSHOT suffix
+      NEXT_SNAPSHOT_VERSION=${BASE_VERSION}-SNAPSHOT
+    else
+      # It's a final version so we need to increment the minor part
+      # Extract the 3rd part of the version and increment it
+      let NEXT_SNAPSHOT_VERSION=`echo ${VERSION} | cut -d- -f1 | cut -d. -f3`+1
+      # Extract the first 2 parts of the version and append the incremented 3rd part and the -SNAPSHOT suffix
+      NEXT_SNAPSHOT_VERSION=`echo ${VERSION} | cut -d. -f1-2`.${NEXT_SNAPSHOT_VERSION}-SNAPSHOT
+    fi
     echo "What is the next SNAPSHOT version in release branch?"
     read -e -p "${NEXT_SNAPSHOT_VERSION}> " tmp
     if [[ $tmp ]]
