@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ ! -d ".git" ]; then
+  >&2 echo "Should be executed at the root of the git workspace!"
+  exit 1
+fi
+
 CURRENT_VERSION=$(mvn -N help:evaluate -Dexpression=project.version -q -DforceStdout)
 echo "Current version: $CURRENT_VERSION"
 BASE_VERSION=${CURRENT_VERSION%%-*}
