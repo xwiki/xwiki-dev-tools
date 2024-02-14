@@ -1,8 +1,10 @@
 #!/bin/bash
 
 if [ ! -d ".git" ]; then
-  >&2 echo "Should be executed at the root of the git workspace!"
-  exit 1
+  if [ ! -f ".git" ]; then
+    >&2 echo "Should be executed at the root of the git workspace!"
+    exit 1
+  fi
 fi
 
 CURRENT_VERSION=$(mvn -N help:evaluate -Dexpression=project.version -q -DforceStdout)
