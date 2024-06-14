@@ -25,7 +25,9 @@ then
   echo "Options:"
   echo "-h: Display this help."
   echo "-a: Replace the version in all pom files without going though Maven (much faster, but cannot be used if you don't want to change the parent for example)."
-  echo "-v <current version>: Indicate the current version, faster and less fragile than asking Maven... For example, it's a good workaround when Maven fail to find the current version because of some pom customization."
+  echo "-v <current version>: Indicate the current version to replace, faster and less fragile than asking Maven... For example, it's a good workaround when Maven fail to find the current version because of some pom customization."
+  echo ""
+  echo "Example: set-branch-version.sh -av 16.5.0-SNAPSHOT"
 
   exit 0
 fi
