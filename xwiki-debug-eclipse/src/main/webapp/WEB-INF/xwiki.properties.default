@@ -542,14 +542,20 @@ extension.oldflavors=com.xpn.xwiki.products:xwiki-enterprise-wiki
 # solr.type=embedded
 
 #-# [Since 4.5M1]
-#-# The location where the embedded Solr instance stores its configuration and the indexed data.
-#-# The default is the subfolder "solr" inside the folder defined by the property "environment.permanentDirectory".
-# solr.embedded.home=/var/local/xwiki/solr
+#-# The location where the embedded Solr instance home folder is located.
+#-# The default is the subfolder "store/solr" inside folder defined by the property "environment.permanentDirectory".
+# solr.embedded.home=/var/local/xwiki/store/solr
 
-#-# [Since 4.5M1]
-#-# The URL to use to connect to the remote solr server.
-#-# The default value assumes that the remote Solr server is started in a different process on the same machine, using the default port.
-# solr.remote.url=http://localhost:8983/solr
+#-# [Since 12.2]
+#-# The URL of the Solr server (the root server and not the URL of a core).
+#-# The default value assumes that the remote Solr server is started in a different process on the same machine,
+#-# using the default port.
+# solr.remote.baseURL=http://localhost:8983/solr
+
+#-# [Since 12.6]
+#-# The prefix to add in front on each remote core name to avoid collisions with non-XWiki cores.
+#-# The default is "xwiki" which will produce names likes "xwiki_events" for example.
+# solr.remote.corePrefix=xwiki
 
 #-# [Since 5.1M1]
 #-# Elements to index are not sent to the Solr server one by one but in batch to improve performances.
@@ -568,10 +574,20 @@ extension.oldflavors=com.xpn.xwiki.products:xwiki-enterprise-wiki
 # solr.indexer.queue.capacity=100000
 
 #-# [Since 6.1M2]
-#-# Indicating if a synchronization between SOLR index and XWiki database should be run at startup.
-#-# Synchronization can be started from search administration.
+#-# Indicates if a synchronization between SOLR index and XWiki database should be performed at startup.
+#-# Synchronization can be started from the search administration UI.
 #-# The default is true.
 # solr.synchronizeAtStartup=false
+
+#-# [Since 12.5RC1]
+#-# Indicates which wiki synchronization to perform when the "solr.synchronizeAtStartup" property is set to true.
+#-# Two modes are available:
+#-#   - WIKI: indicate that the synchronization is performed when each wiki is accessed for the first time.
+#-#   - FARM: indicate that the synchronization is performed once for the full farm when XWiki is started.
+#-# For large farms and in order to spread the machine's indexing load, the WIKI value is recommended, especially if
+#-# some wikis are not used.
+#-# The default is:
+# solr.synchronizeAtStartupMode=FARM
 
 #-------------------------------------------------------------------------------------
 # Security
