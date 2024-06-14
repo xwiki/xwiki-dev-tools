@@ -23,7 +23,7 @@ then
   echo ""
   echo "Options:"
   echo "-h: Display this help."
-  echo "-v: Indicate the current version (faster and less fragile than asking Maven...)."
+  echo "-v: Indicate the current version (faster and less fragile than asking Maven...). For example, it's a good workaround when Maven fail to find the current version because of some pom customization."
 
   exit 0
 fi
