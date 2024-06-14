@@ -1,7 +1,7 @@
 # Bash helpers for various common tasks of XWiki devs
 
-* `set-branch-version.sh`: switch the version of the current Maven project to a branch name based version (used for example to build feature-deploy-* branches on CI) to not collide with the standard version
-* `reset-branch-version.sh`: reset back the version of the current Maven project to a more standard versioning to reduce the number of changes when you want to commit or diff your own
+* `set-branch-version.sh`: switch the version of the current Maven project to a branch name based version (used for example to build feature-deploy-* branches on CI) to not collide with the standard version, see `set-branch-version.sh -h` for more details
+* `reset-branch-version.sh`: reset back the version of the current Maven project to a more standard versioning to reduce the number of changes when you want to commit or diff your own, see `reset-branch-version.sh -h` for more details
 
 # Install
 
