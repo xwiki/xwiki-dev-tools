@@ -43,7 +43,7 @@ echo "Repository: $REPOSITORY"
 
 GREEN='\033[0;32m'
 find . -type f -name 'pom.xml' | xargs sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g"
-echo "${GREEN}Replaced version ${CURRENT_VERSION} by ${NEW_VERSION} in all pom files"
+echo -e "${GREEN}Replaced version ${CURRENT_VERSION} by ${NEW_VERSION} in all pom files"
 
 if [[ $REPOSITORY == 'xwiki-platform' ]]
 then
