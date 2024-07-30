@@ -1,7 +1,7 @@
 # Command line helpers for various common tasks of XWiki devs
 
-* `set-branch-version.sh`: switch the version of the current Maven project to a branch name based version (used for example to build feature-deploy-* branches on CI) to not collide with the standard version, see `set-branch-version.sh -h` for more details
-* `reset-branch-version.sh`: reset back the version of the current Maven project to a more standard versioning to reduce the number of changes when you want to commit or diff your own, see `reset-branch-version.sh -h` for more details
+* `xbranch-set-version.sh`: switch the version of the current Maven project to a branch name based version (used for example to build feature-deploy-* branches on CI) to not collide with the standard version, see `set-branch-version.sh -h` for more details
+* `xbranch-reset-version.sh`: reset back the version of the current Maven project to a more standard versioning to reduce the number of changes when you want to commit or diff your own, see `reset-branch-version.sh -h` for more details
 * `get-failing-tests.py`: get the list of tests that are failing in a given Jenkins build and the Maven commands to 
   re-execute these tests, see `get-failing-tests.py -h` for more details.
 
