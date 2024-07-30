@@ -18,7 +18,7 @@ done
 
 if [ $help ]
 then
-  echo "Usage: set-branch-version.sh [option]"
+  echo "Usage: xbranch-set-version.sh [option]"
   echo "Set the version in the pom files to match the name of the git branch, to avoid colliding with the main branch on which the current feature branch is based."
   echo "For example if the current version is 16.5.0-SNAPSHOT and the feature branch name is feature-deploy-jakarta then new version will be 16.5.0-feature-deploy-jakarta-SNAPSHOT."
   echo ""
@@ -27,7 +27,7 @@ then
   echo "-a: Replace the version in all pom files without going though Maven (much faster, but cannot be used if you don't want to change the parent for example)."
   echo "-v <current version>: Indicate the current version to replace, faster and less fragile than asking Maven... For example, it's a good workaround when Maven fail to find the current version because of some pom customization."
   echo ""
-  echo "Example: set-branch-version.sh -av 16.5.0-SNAPSHOT"
+  echo "Example: xbranch-set-version.sh -av 16.5.0-SNAPSHOT"
 
   exit 0
 fi

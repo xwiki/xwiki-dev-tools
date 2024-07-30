@@ -17,7 +17,7 @@ done
 
 if [ $help ]
 then
-  echo "Usage: reset-branch-version.sh [option]"
+  echo "Usage: xbranch-reset-version.sh [option]"
   echo "Reset the version in the pom files to what is expected for main branch on which the current feature branch is based."
   echo "For example if the current version is 16.5.0-feature-deploy-jakarta-SNAPSHOT and the feature branch name is feature-deploy-jakarta then new reset version will be 16.5.0-SNAPSHOT."
   echo ""
@@ -25,7 +25,7 @@ then
   echo "-h: Display this help."
   echo "-v <current version>: Indicate the current version to replace, faster and less fragile than asking Maven... For example, it's a good workaround when Maven fail to find the current version because of some pom customization."
   echo ""
-  echo "Example: reset-branch-version.sh -av 16.5.0-feature-deploy-jakarta-SNAPSHOT"
+  echo "Example: xbranch-reset-version.sh -av 16.5.0-feature-deploy-jakarta-SNAPSHOT"
 
   exit 0
 fi
