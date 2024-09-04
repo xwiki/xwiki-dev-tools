@@ -25,7 +25,7 @@ then
   echo "-h: Display this help."
   echo "-v <current version>: Indicate the current version to replace, faster and less fragile than asking Maven... For example, it's a good workaround when Maven fail to find the current version because of some pom customization."
   echo ""
-  echo "Example: xbranch-reset-version.sh -av 16.5.0-feature-deploy-jakarta-SNAPSHOT"
+  echo "Example: xbranch-reset-version.sh -v 16.5.0-feature-deploy-jakarta-SNAPSHOT"
 
   exit 0
 fi
@@ -34,6 +34,10 @@ if [[ -z $CURRENT_VERSION ]]; then
   CURRENT_VERSION=$(mvn -N help:evaluate -Dexpression=project.version -q -DforceStdout)
 fi
 echo "Current version: $CURRENT_VERSION"
+if [[ $CURRENT_VERSION == *$'\n'* ]]; then
+  >&2 echo "The resolved current version appears to contain a new line, something must have gone wrong!"
+  exit 1
+fi
 BASE_VERSION=${CURRENT_VERSION%%-*}
 echo "Base version: $BASE_VERSION"
 NEW_VERSION=$BASE_VERSION-SNAPSHOT

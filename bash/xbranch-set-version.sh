@@ -36,6 +36,10 @@ if [[ -z $CURRENT_VERSION ]]; then
   CURRENT_VERSION=$(mvn -N help:evaluate -Dexpression=project.version -q -DforceStdout)
 fi
 echo "Current version: $CURRENT_VERSION"
+if [[ $CURRENT_VERSION == *$'\n'* ]]; then
+  >&2 echo "The resolved current version appears to contain a new line, something must have gone wrong!"
+  exit 1
+fi
 BASE_VERSION=${CURRENT_VERSION%%-*}
 echo "Base version: $BASE_VERSION"
 NEW_VERSION=$BASE_VERSION-$(git branch --show-current)-SNAPSHOT
