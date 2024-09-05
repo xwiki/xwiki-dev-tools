@@ -102,12 +102,14 @@ update_repository $RECOMMENDED_REP ".*-${RECOMMENDED_BRANCH}\(\.[0-9]+\)*\(-[0-9
 if [ -d $RELEASES_REP ]; then
   echo "Generates releases index"
 
-  dpkg-scanpackages -m $RELEASES_REP/org /dev/null > $RELEASES_REP/Packages.tmp && mv -f $RELEASES_REP/Packages.tmp $RELEASES_REP/Packages
-  gzip -9c $RELEASES_REP/Packages > $RELEASES_REP/Packages.gz.tmp && mv -f $RELEASES_REP/Packages.gz.tmp $RELEASES_REP/Packages.gz
+  dpkg-scanpackages -m $RELEASES_REP/org /dev/null > $RELEASES_REP/Packages.tmp && chmod 644 $RELEASES_REP/Packages.tmp && mv -f $RELEASES_REP/Packages.tmp $RELEASES_REP/Packages
+  gzip -9c $RELEASES_REP/Packages > $RELEASES_REP/Packages.gz.tmp && chmod 644 $RELEASES_REP/Packages.gz.tmp && mv -f $RELEASES_REP/Packages.gz.tmp $RELEASES_REP/Packages.gz
 
   rm -rf $RELEASES_REP/Release $RELEASES_REP/Release.gpg
   apt-ftparchive -c=$RELEASES_REP/Release.conf release $RELEASES_REP > $RELEASES_REP/Release
+  chmod 644 $RELEASES_REP/Release
   gpg --digest-algo SHA512 -abs --default-key $GPG_KEY -o $RELEASES_REP/Release.gpg $RELEASES_REP/Release
+  chmod 644 $RELEASES_REP/Release.gpg
 fi
 
 ## snapshots
