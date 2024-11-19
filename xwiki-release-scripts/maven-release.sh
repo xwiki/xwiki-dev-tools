@@ -257,7 +257,7 @@ function create_release_branch() {
 # The changes will be committed as a new git version.
 function pre_update_parent_versions() {
   echo -e "\033[0;32m* Preparing project for release\033[0m"
-  mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$VERSION] -N -q
+  mvn versions:update-parent -DgenerateBackupPoms=false -DskipResolution=true -DparentVersion=$VERSION -N -q
   sed -e "s/<commons.version>.*<\/commons.version>/<commons.version>${VERSION}<\/commons.version>/" -i pom.xml
   PROJECT_NAME=`mvn help:evaluate -Dexpression='project.artifactId' -N | grep -v '\[' | grep -v 'Download'`
   TAG_NAME=${PROJECT_NAME}-${VERSION}
