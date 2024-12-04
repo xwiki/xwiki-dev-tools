@@ -1,0 +1,33 @@
+#!/bin/bash
+## Find the XWiki version
+XMAVEN_XWIKI_VERSION=$(mvn -N help:evaluate -Dexpression=commons.version -q -DforceStdout)
+echo "The version of XWiki is $XMAVEN_XWIKI_VERSION."
+## Extract the major version
+EXTRACT_MAJORVERSION_REGEX="[0-9]+"
+if [[ $XMAVEN_XWIKI_VERSION =~ $EXTRACT_MAJORVERSION_REGEX ]]; then
+    XMAVEN_XWIKI_MAJOR_VERSION=${BASH_REMATCH[0]}
+    if [ 14 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
+        XMAVEN_JAVA_VERSION=8
+    elif [ 16 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
+        XMAVEN_JAVA_VERSION=11
+    elif [ 18 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
+        XMAVEN_JAVA_VERSION=17
+    fi
+    echo "The version of Java to use for XWiki $XMAVEN_XWIKI_VERSION is Java $XMAVEN_JAVA_VERSION."
+    JAVA_PATHS=$(update-alternatives --list java)
+    while IFS= read -r javapath; do
+        EXTRACT_VERSION_REGEX="[0-9]+"
+        if [[ $javapath =~ $EXTRACT_VERSION_REGEX ]]; then
+            if [ ${BASH_REMATCH[0]} -eq $XMAVEN_JAVA_VERSION ]; then
+              XMAVEN_JAVA_PATH=${javapath%/*}
+              XMAVEN_JAVA_HOME=${XMAVEN_JAVA_PATH%/*}
+              echo "Found a path for Java $XMAVEN_JAVA_VERSION at $XMAVEN_JAVA_PATH."
+              export PATH=$XMAVEN_JAVA_PATH:$PATH
+              export JAVA_HOME=$XMAVEN_JAVA_HOME
+              export JRE_HOME=$XMAVEN_JAVA_HOME
+              break
+            fi
+        fi
+    done <<< "$JAVA_PATHS"
+fi
+mvn $@

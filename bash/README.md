@@ -5,6 +5,7 @@
 * `get-failing-tests.py`: get the list of tests that are failing in a given Jenkins build and the Maven commands to 
   re-execute these tests, see `get-failing-tests.py -h` for more details.
 * `mvn-sha256sum.sh`: Print the SHA256 (256-bit) checksums of a Maven artifact, see `mvn-sha256sum.sh -h` for more details.
+* `xmvn`: A special version of `mvn` which adds the automatic switch to the right Java version based on the current resolved pom `commons.version` value.
 
 # Install
 
