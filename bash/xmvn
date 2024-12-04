@@ -1,11 +1,11 @@
 #!/bin/bash
 ## Find the XWiki version
 XMAVEN_XWIKI_VERSION=$(mvn -N help:evaluate -Dexpression=commons.version -q -DforceStdout)
-echo "The version of XWiki is $XMAVEN_XWIKI_VERSION."
 ## Extract the major version
 EXTRACT_MAJORVERSION_REGEX="[0-9]+"
 if [[ $XMAVEN_XWIKI_VERSION =~ $EXTRACT_MAJORVERSION_REGEX ]]; then
     XMAVEN_XWIKI_MAJOR_VERSION=${BASH_REMATCH[0]}
+    echo "The version of XWiki is $XMAVEN_XWIKI_VERSION and the major version $XMAVEN_XWIKI_MAJOR_VERSION."
     if [ 14 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
         XMAVEN_JAVA_VERSION=8
     elif [ 16 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
