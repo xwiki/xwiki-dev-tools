@@ -179,31 +179,48 @@ function update_sources() {
 # Offer to create a stable branch and move the master to the next version.
 # After the switch to the new version, also update the root module parent version and the value for the commons.version property, if any.
 function stabilize_branch() {
-  echo "Do you want to create the stable branch and move trunk to the next version?"
-  unset CONFIRM
-  read -e -p "[Y|n]> " CONFIRM
-  if [[ $CONFIRM != 'n' ]]
+  if [[ -z $CREATE_STABLE_BRANCH ]]
   then
-    # Extract the 2nd part of the version and increment it
-    let NEXT_TRUNK_VERSION=`echo ${VERSION} | cut -d. -f2`+1
-    # Check if we should start a new cycle or not
-    if (($NEXT_TRUNK_VERSION > 10))
+    echo "Do you want to create the stable branch and move trunk to the next version?"
+    unset CONFIRM
+    read -e -p "[Y|n]> " CONFIRM
+    if [[ $CONFIRM != 'n' ]]
     then
-      # New cycle
-      # Extract the 1rst part of the version and increment it
-      let NEXT_TRUNK_VERSION=`echo ${VERSION} | cut -d. -f1`+1
-      # Append .0.0-SNAPSHOT suffix to the incremented 1st part of the version
-      NEXT_TRUNK_VERSION=${NEXT_TRUNK_VERSION}.0.0-SNAPSHOT
-    else
-      # Same cycle
-      # Extract the 1st part of the version and append the incremented 2nd part and the .0-SNAPSHOT suffix
-      NEXT_TRUNK_VERSION=`echo ${VERSION} | cut -d. -f1`.${NEXT_TRUNK_VERSION}.0-SNAPSHOT
+      export CREATE_STABLE_BRANCH=true
     fi
-    echo "What is the next version in master branch?"
-    read -e -p "${NEXT_TRUNK_VERSION}> " tmp
-    if [[ $tmp ]]
+  else
+    echo "Creating the stable branch and moving trunk to the next version"
+  fi
+  if [[ ! -z $CREATE_STABLE_BRANCH ]]
+  then
+    if [[ -z $NEXT_TRUNK_VERSION ]]
     then
-      NEXT_TRUNK_VERSION=${tmp}
+      # Extract the 2nd part of the version and increment it
+      let NEXT_TRUNK_VERSION=`echo ${VERSION} | cut -d. -f2`+1
+      # Check if we should start a new cycle or not
+      if (($NEXT_TRUNK_VERSION > 10))
+      then
+        # New cycle
+        # Extract the 1rst part of the version and increment it
+        let NEXT_TRUNK_VERSION=`echo ${VERSION} | cut -d. -f1`+1
+        # Append .0.0-SNAPSHOT suffix to the incremented 1st part of the version
+        NEXT_TRUNK_VERSION=${NEXT_TRUNK_VERSION}.0.0-SNAPSHOT
+      else
+        # Same cycle
+        # Extract the 1st part of the version and append the incremented 2nd part and the .0-SNAPSHOT suffix
+        NEXT_TRUNK_VERSION=`echo ${VERSION} | cut -d. -f1`.${NEXT_TRUNK_VERSION}.0-SNAPSHOT
+      fi
+      echo "What is the next version in master branch?"
+      read -e -p "${NEXT_TRUNK_VERSION}> " tmp
+      if [[ $tmp ]]
+      then
+        NEXT_TRUNK_VERSION=${tmp}
+      fi
+
+      # Remember the next trunk version for the next time
+      export NEXT_TRUNK_VERSION=$NEXT_TRUNK_VERSION
+    else
+      echo "Using the next version in master branch: $NEXT_TRUNK_VERSION"
     fi
     # Let maven update the version for all the submodules
     # TODO: Remove the office-tests profile when all branches we release have versions >= 11.0
