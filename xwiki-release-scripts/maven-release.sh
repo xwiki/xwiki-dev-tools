@@ -307,6 +307,9 @@ function release_maven() {
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git checkout ${TAG_NAME} -q
   git tag -s -f -m "Tagging ${TAG_NAME}" ${TAG_NAME}
+
+  echo -e "\033[0;32m* Creating the GitHub release\033[0m"
+  mvn build-helper:regex-properties@default github-release:github-release -N -e
 }
 
 # Update the root project's parent version and version variables, if needed.
