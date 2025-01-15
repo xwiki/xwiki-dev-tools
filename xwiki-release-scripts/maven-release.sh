@@ -307,9 +307,6 @@ function release_maven() {
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git checkout ${TAG_NAME} -q
   git tag -s -f -m "Tagging ${TAG_NAME}" ${TAG_NAME}
-
-  echo -e "\033[0;32m* Creating the GitHub release\033[0m"
-  mvn build-helper:regex-properties@default github-release:github-release -N -e
 }
 
 # Update the root project's parent version and version variables, if needed.
@@ -350,10 +347,16 @@ function post_cleanup() {
   git clean -dxfq
 }
 
-# Push the signed tag to the upstream repository.
+# Push the signed tag to the upstream repository and create the associated GitHub release
 function push_tag() {
   echo -e "\033[0;32m* Pushing tag\033[0m"
   git push --tags
+
+  echo -e "\033[0;32m* Creating the GitHub release\033[0m"
+  # We are using a Maven plugin to do the GitHub release, se we need the right pom version
+  git checkout ${TAG_NAME}
+  mvn build-helper:regex-properties@default github-release:github-release -N -e
+  git checkout master -q
 }
 
 # Wrapper function that calls all the other release steps, for one project only.
