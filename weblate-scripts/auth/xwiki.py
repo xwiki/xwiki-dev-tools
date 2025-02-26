@@ -22,10 +22,7 @@ from social_core.backends.oauth import BaseOAuth2
 class XWikiOAuth2(BaseOAuth2):
     name = 'XWiki'
     ID_KEY = 'sub'
-    ## We cannot direct to the load balancer since all request should be made on same instance
-    ## and we cannot guarantee that first request won't be done on node1 and then on node2.
-    ## So to avoid the problem we direct requests to node1 directly.
-    XWIKI_URL = 'https://www.xwikiorg-node1.xwikisas.com/xwiki'
+    XWIKI_URL = 'https://www.xwiki.org/xwiki'
     AUTHORIZATION_URL = '{0}/oidc/authorization'.format(XWIKI_URL)
     ACCESS_TOKEN_URL = '{0}/oidc/token'.format(XWIKI_URL)
     REDIRECT_STATE = False
