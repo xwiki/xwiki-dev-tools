@@ -25,7 +25,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>nu.validator</groupId>
   <artifactId>validator</artifactId>
-  <version>25.5.12</version>
+  <version>${version}</version>
   <name>The Nu Html Checker</name>
   <description>An HTML-checking library (used by https://checker.html5.org/ and https://html5.validator.nu)</description>
   <url>https://validator.github.io/validator/</url>
