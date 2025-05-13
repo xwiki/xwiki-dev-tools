@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>nu.validator</groupId>
+  <artifactId>validator</artifactId>
+  <version>25.5.12</version>
+  <name>The Nu Html Checker</name>
+  <description>An HTML-checking library (used by https://checker.html5.org/ and https://html5.validator.nu)</description>
+  <url>https://validator.github.io/validator/</url>
+  <licenses>
+    <license>
+      <name>The MIT License</name>
+      <url>https://raw.githubusercontent.com/validator/validator/master/LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>hsivonen</id>
+      <name>Henri Sivonen</name>
+      <email>hsivonen@iki.fi</email>
+      <url>https://hsivonen.iki.fi/</url>
+    </developer>
+    <developer>
+      <id>sideshowbarker</id>
+      <name>Michael[tm] Smith</name>
+      <email>mike@w3.org</email>
+      <url>https://people.w3.org/mike/</url>
+    </developer>
+  </developers>
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/validator/validator/issues</url>
+  </issueManagement>
+  <scm>
+    <connection>scm:git:git://github.com/validator/validator.git</connection>
+    <developerConnection>scm:git:git://github.com/validator/validator.git</developerConnection>
+    <url>https://github.com/validator/validator</url>
+  </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>nexus.xwiki.org</id>
+      <name>XWiki Externals Repository</name>
+      <url>https://nexus.xwiki.org/nexus/content/repositories/externals/</url>
+    </repository>
+  </distributionManagement>
+</project>
