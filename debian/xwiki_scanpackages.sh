@@ -33,9 +33,9 @@ SNAPSHOTS_REP="snapshots"
 RELEASES_REP="releases"
 STABLE_REP="stable"
 LTS_REP="lts"
+LTS_LATEST_REP="lts-latest"
 LTS_BRANCH="16.10"
-RECOMMENDED_REP="recommended"
-RECOMMENDED_BRANCH="16.10"
+LTS_LATEST_BRANCH="16.10"
 GPG_KEY="93CC9C13"
 
 cd "$ROOT_REP"
@@ -95,8 +95,8 @@ update_repository $LTS_REP ".*-${LTS_BRANCH}\(\.[0-9]+\)*\(-[0-9]+\)*.deb"
 ## stable
 update_repository $STABLE_REP ".*\.[0-9]+\(-[0-9]+\)*.deb"
 
-## recommended
-update_repository $RECOMMENDED_REP ".*-${RECOMMENDED_BRANCH}\(\.[0-9]+\)*\(-[0-9]+\)*.deb"
+## LTS-LATEST
+update_repository $LTS_LATEST_REP ".*-${LTS_LATEST_BRANCH}\(\.[0-9]+\)*\(-[0-9]+\)*.deb"
 
 ## releases
 if [ -d $RELEASES_REP ]; then
