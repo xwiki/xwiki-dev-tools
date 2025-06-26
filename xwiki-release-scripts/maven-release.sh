@@ -40,6 +40,13 @@ function init() {
 function check_env() {
   echo -e "\033[0;32m* Checking environment\033[0m"
 
+  # Check that we're in the right directory
+  if [[ ! -d xwiki-commons || ! -d xwiki-rendering || ! -d xwiki-platform ]]
+  then
+    echo -e "\033[1;31mPlease go to the xwiki-trunks directory where the XWiki sources are checked out\033[0m"
+    exit -1
+  fi
+
   # Check that the proper username/email is configured in the global git configuration
   RELEASER_EMAIL=`git config --global --get user.email`
   if [[ $RELEASER_EMAIL == 'build.noreply@xwiki.org' ]]
@@ -72,13 +79,6 @@ function check_env() {
     # Test GPG passphrase
     echo "Test GPG passphrase" | gpg -o /dev/null -as - || exit
   fi
-
-  # Check that we're in the right directory
-  if [[ ! -d xwiki-commons || ! -d xwiki-rendering || ! -d xwiki-platform ]]
-  then
-    echo -e "\033[1;31mPlease go to the xwiki-trunks directory where the XWiki sources are checked out\033[0m"
-    exit -1
-  fi
 }
 
 function clean_env() {
@@ -104,60 +104,63 @@ function check_versions() {
     exit -1
   fi
 
-  # Set the name of the release branch
-  export RELEASE_BRANCH=release-${VERSION}
-
-  # Check next SNAPSHOT version
-  if [[ -z $NEXT_SNAPSHOT_VERSION ]]
+  if [ $do_release ]
   then
-    # Resolve the next SNAPSHOT suggestion
-    ISRC=`echo ${VERSION} | cut -d- -f2`
-    if [[ $ISRC == 'rc' ]]
-    then
-      # It's a RC version so we keep the same SNAPSHOT
-      # Extract the base version
-      BASE_VERSION=`echo ${VERSION} | cut -d- -f1`
-      # Append the -SNAPSHOT suffix
-      NEXT_SNAPSHOT_VERSION=${BASE_VERSION}-SNAPSHOT
-    else
-      # It's a final version so we need to increment the minor part
-      # Extract the 3rd part of the version and increment it
-      let NEXT_SNAPSHOT_VERSION=`echo ${VERSION} | cut -d- -f1 | cut -d. -f3`+1
-      # Extract the first 2 parts of the version and append the incremented 3rd part and the -SNAPSHOT suffix
-      NEXT_SNAPSHOT_VERSION=`echo ${VERSION} | cut -d. -f1-2`.${NEXT_SNAPSHOT_VERSION}-SNAPSHOT
-    fi
-    echo "What is the next SNAPSHOT version in release branch?"
-    read -e -p "${NEXT_SNAPSHOT_VERSION}> " tmp
-    if [[ $tmp ]]
-    then
-      NEXT_SNAPSHOT_VERSION=${tmp}
-    fi
-    export NEXT_SNAPSHOT_VERSION=$NEXT_SNAPSHOT_VERSION
-  fi
+    # Set the name of the release branch
+    export RELEASE_BRANCH=release-${VERSION}
 
-  # Select the JDK version to use
-  if [[ -z $RELEASE_JDK_VERSION ]]
-  then
-    # Get the major part of the verion being released
-    let VERSION_MAJOR=`echo ${VERSION} | cut -d- -f1 | cut -d. -f1`
-    # XWiki 16+ requires Java 17
-    if (($VERSION_MAJOR < 16))
+    # Check next SNAPSHOT version
+    if [[ -z $NEXT_SNAPSHOT_VERSION ]]
     then
-      RELEASE_JDK_VERSION=11
-    else
-      RELEASE_JDK_VERSION=17
+      # Resolve the next SNAPSHOT suggestion
+      ISRC=`echo ${VERSION} | cut -d- -f2`
+      if [[ $ISRC == 'rc' ]]
+      then
+        # It's a RC version so we keep the same SNAPSHOT
+        # Extract the base version
+        BASE_VERSION=`echo ${VERSION} | cut -d- -f1`
+        # Append the -SNAPSHOT suffix
+        NEXT_SNAPSHOT_VERSION=${BASE_VERSION}-SNAPSHOT
+      else
+        # It's a final version so we need to increment the minor part
+        # Extract the 3rd part of the version and increment it
+        let NEXT_SNAPSHOT_VERSION=`echo ${VERSION} | cut -d- -f1 | cut -d. -f3`+1
+        # Extract the first 2 parts of the version and append the incremented 3rd part and the -SNAPSHOT suffix
+        NEXT_SNAPSHOT_VERSION=`echo ${VERSION} | cut -d. -f1-2`.${NEXT_SNAPSHOT_VERSION}-SNAPSHOT
+      fi
+      echo "What is the next SNAPSHOT version in release branch?"
+      read -e -p "${NEXT_SNAPSHOT_VERSION}> " tmp
+      if [[ $tmp ]]
+      then
+        NEXT_SNAPSHOT_VERSION=${tmp}
+      fi
+      export NEXT_SNAPSHOT_VERSION=$NEXT_SNAPSHOT_VERSION
     fi
-    echo "What is the version of Java to use to release XWiki ${VERSION}?"
-    read -e -p "${RELEASE_JDK_VERSION}> " tmp
-    if [[ $tmp ]]
+
+    # Select the JDK version to use
+    if [[ -z $RELEASE_JDK_VERSION ]]
     then
-      RELEASE_JDK_VERSION=${tmp}
+      # Get the major part of the verion being released
+      let VERSION_MAJOR=`echo ${VERSION} | cut -d- -f1 | cut -d. -f1`
+      # XWiki 16+ requires Java 17
+      if (($VERSION_MAJOR < 16))
+      then
+        RELEASE_JDK_VERSION=11
+      else
+        RELEASE_JDK_VERSION=17
+      fi
+      echo "What is the version of Java to use to release XWiki ${VERSION}?"
+      read -e -p "${RELEASE_JDK_VERSION}> " tmp
+      if [[ $tmp ]]
+      then
+        RELEASE_JDK_VERSION=${tmp}
+      fi
+      export RELEASE_JDK_VERSION=$RELEASE_JDK_VERSION
     fi
-    export RELEASE_JDK_VERSION=$RELEASE_JDK_VERSION
+    # Set the selected Java version
+    export JAVA_HOME=${HOME}/java$RELEASE_JDK_VERSION
+    export PATH=$JAVA_HOME/bin:$PATH
   fi
-  # Set the selected Java version
-  export JAVA_HOME=${HOME}/java$RELEASE_JDK_VERSION
-  export PATH=$JAVA_HOME/bin:$PATH
 }
 
 # Clean up the sources, discarding any changes in the local workspace not found in the local git clone and switching back to the master branch.
@@ -252,12 +255,15 @@ function check_branch() {
   # Offer to create the stable branch if it doesn't exist
   if [[ -z `git branch -r | grep $STABLE_BRANCH` ]]
   then
-    stabilize_branch
+      stabilize_branch
   fi
 
-  echo
-  echo -e "\033[0;32mReleasing version \033[1;32m${VERSION}\033[0;32m from branch \033[1;32m${RELEASE_FROM_BRANCH}\033[0m"
-  echo
+  if [ $do_release ]
+  then
+    echo
+    echo -e "\033[0;32mReleasing version \033[1;32m${VERSION}\033[0;32m from branch \033[1;32m${RELEASE_FROM_BRANCH}\033[0m"
+    echo
+  fi
 }
 
 # Create a temporary branch to be used for the release, starting from the branch detected by check_branch() and set in the RELEASE_FROM_BRANCH variable.
@@ -366,13 +372,16 @@ function release_project() {
   pre_cleanup
   update_sources
   check_branch
-  create_release_branch
-  pre_update_parent_versions
-  release_maven
-  post_update_parent_versions
-  push_release
-  post_cleanup
-  push_tag
+  if [[ $do_release == true ]]
+  then
+    create_release_branch
+    pre_update_parent_versions
+    release_maven
+    post_update_parent_versions
+    push_release
+    post_cleanup
+    push_tag
+  fi
   cd ..
 }
 
@@ -382,18 +391,31 @@ function release_all() {
   init
   check_env
   check_versions
-  echo              "*****************************"
-  echo -e "\033[1;32m    Releasing xwiki-commons\033[0m"
-  echo              "*****************************"
-  release_project xwiki-commons
-  echo              "*****************************"
-  echo -e "\033[1;32m    Releasing xwiki-rendering\033[0m"
-  echo              "*****************************"
-  release_project xwiki-rendering
-  echo              "*****************************"
-  echo -e "\033[1;32m    Releasing xwiki-platform\033[0m"
-  echo              "*****************************"
-  release_project xwiki-platform
+
+  if [ $do_xwiki_commons ]
+  then
+    echo              "*****************************"
+    echo -e "\033[1;32m    Releasing xwiki-commons\033[0m"
+    echo              "*****************************"
+    release_project xwiki-commons
+  fi
+
+  if [ $do_xwiki_rendering ]
+  then
+    echo              "*****************************"
+    echo -e "\033[1;32m    Releasing xwiki-rendering\033[0m"
+    echo              "*****************************"
+    release_project xwiki-rendering
+  fi
+
+  if [ $do_xwiki_platform ]
+  then
+    echo              "*****************************"
+    echo -e "\033[1;32m    Releasing xwiki-platform\033[0m"
+    echo              "*****************************"
+    release_project xwiki-platform
+  fi
+
   echo -e "\033[1;32mAll done!\033[0m"
   clean_env
 }
@@ -402,12 +424,16 @@ function release_all() {
 function display_help() {
   echo "XWiki Release script - Part 1"
   echo ""
+  echo "Options:"
+  echo "-r: Disable actual release (usually when you only want to create the branches)."
+  echo "-C: Disable xwiki-commons handling."
+  echo "-R: Disable xwiki-rendering handling."
+  echo "-P: Disable xwiki-platform handling."
+  echo ""
   echo "This script performs the technical release:"
   echo "* Create a release branch"
   echo "* Update the root project's parent version and the commons.version variable, if needed"
   echo "* Invoke the maven release process (mvn release:prepare and mvn release:perform)"
-## TODO: put back when fixed
-#  echo "* Generate a clirr report"
   echo "* Create GPG-signed tags and push them to the upstream repository"
   echo "* [Optional] Branch the current master into a stable release and update the master to the next version"
   echo ""
@@ -419,11 +445,38 @@ function display_help() {
   echo "The release script will check and refuse to proceed if these steps haven't been performed."
 }
 
-# Main code that gets executed. Invoke either display_help or release_all.
-if [[ $1 == '--help' || $1 == '-h' ]]
+do_release=true
+do_xwiki_commons=true
+do_xwiki_rendering=true
+do_xwiki_platform=true
+while getopts ":hbrCRP" o
+do
+    case "${o}" in
+        r)
+          do_release=false
+          ;;
+        C)
+          do_xwiki_commons=false
+          ;;
+        R)
+          do_xwiki_rendering=false
+          ;;
+        P)
+          do_xwiki_platform=false
+          ;;
+        h)
+          help=true
+          ;;
+        ?)
+          help=true
+          ;;
+    esac
+done
+
+if [ $help ]
 then
   display_help
-  exit -1
+  exit 0
 else
   release_all
 fi
