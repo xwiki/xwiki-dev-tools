@@ -453,15 +453,21 @@ while getopts ":hbrCRP" o
 do
     case "${o}" in
         r)
+          echo "You called the script with skipping the actual release: "
+          echo "the script will still ask all the questions related to the versions and will create the branches but it will stop before performing the actual release."
+          echo "Do not worry if you see logs containing 'Releasing xwiki-xxx' this is only the call for setting the versions."
           do_release=false
           ;;
         C)
+          echo "The script will skip releasing xwiki-commons."
           do_xwiki_commons=false
           ;;
         R)
+          echo "The script will skip releasing xwiki-rendering."
           do_xwiki_rendering=false
           ;;
         P)
+          echo "The script will skip releasing xwiki-platform."
           do_xwiki_platform=false
           ;;
         h)
