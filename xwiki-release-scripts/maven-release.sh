@@ -104,7 +104,7 @@ function check_versions() {
     exit -1
   fi
 
-  if [ "$do_release" = true ]
+  if [[ $do_release == 'true' ]]
   then
     # Set the name of the release branch
     export RELEASE_BRANCH=release-${VERSION}
@@ -258,7 +258,7 @@ function check_branch() {
       stabilize_branch
   fi
 
-  if [ "$do_release" = true ]
+  if [[ $do_release = 'true' ]]
   then
     echo
     echo -e "\033[0;32mReleasing version \033[1;32m${VERSION}\033[0;32m from branch \033[1;32m${RELEASE_FROM_BRANCH}\033[0m"
@@ -392,7 +392,7 @@ function release_all() {
   check_env
   check_versions
 
-  if [ "$do_xwiki_commons" = true ]
+  if [[ $do_xwiki_commons = 'true' ]]
   then
     echo              "*****************************"
     echo -e "\033[1;32m    Releasing xwiki-commons\033[0m"
@@ -400,7 +400,7 @@ function release_all() {
     release_project xwiki-commons
   fi
 
-  if [ "$do_xwiki_rendering" = true ]
+  if [[ $do_xwiki_rendering = 'true' ]]
   then
     echo              "*****************************"
     echo -e "\033[1;32m    Releasing xwiki-rendering\033[0m"
@@ -408,7 +408,7 @@ function release_all() {
     release_project xwiki-rendering
   fi
 
-  if [ "$do_xwiki_platform" = true ]
+  if [[ $do_xwiki_platform = 'true' ]]
   then
     echo              "*****************************"
     echo -e "\033[1;32m    Releasing xwiki-platform\033[0m"
