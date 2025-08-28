@@ -104,7 +104,7 @@ function check_versions() {
     exit -1
   fi
 
-  if [ $do_release ]
+  if [ "$do_release" = true ]
   then
     # Set the name of the release branch
     export RELEASE_BRANCH=release-${VERSION}
@@ -258,7 +258,7 @@ function check_branch() {
       stabilize_branch
   fi
 
-  if [ $do_release ]
+  if [ "$do_release" = true ]
   then
     echo
     echo -e "\033[0;32mReleasing version \033[1;32m${VERSION}\033[0;32m from branch \033[1;32m${RELEASE_FROM_BRANCH}\033[0m"
