@@ -12,21 +12,23 @@ COMPONENTS_SCRIPT="retrieve_components.py"
 CURRENT_DIRECTORY=`pwd`
 PROJECT=`basename "$CURRENT_DIRECTORY"`
 
-START_COMMIT=$1
-END_COMMIT=$2
-OPTIONAL1=$3
-OPTIONAL2=$4
-OPTIONAL3=$5
+BRANCH=$1
+START_COMMIT=$2
+END_COMMIT=$3
+OPTIONAL1=$4
+OPTIONAL2=$5
+OPTIONAL3=$6
 
 ([ "$OPTIONAL1" == '--verbose' ] || [ "$OPTIONAL2" == '--verbose' ] || [ "$OPTIONAL3" == '--verbose' ]) && VERBOSE_ENABLED=true || VERBOSE_ENABLED=false
 ([ "$OPTIONAL1" == '--diff' ] || [ "$OPTIONAL2" == '--diff' ] || [ "$OPTIONAL3" == '--diff' ]) && DIFF_ENABLED=true || DIFF_ENABLED=false
 ([ "$OPTIONAL1" == '--diffAll' ] || [ "$OPTIONAL2" == '--diffAll' ] || [ "$OPTIONAL3" == '--diffAll' ]) && DIFFALL_ENABLED=true || DIFFALL_ENABLED=false
 
 function usage() {
-  echo "Usage: $SCRIPT_NAME start_commit end_commit [options]"
+  echo "Usage: $SCRIPT_NAME branch start_commit end_commit [options]"
   echo "Parameters:"
+  echo "  branch        The branch name defined by the component. Most of the time should be master, except for a LTS bug fix release, where it should be the name of the branch."
   echo "  start_commit  The git commit/tag ID to compare from"
-  echo "  end_commit    the git commit/tag ID to compare to"
+  echo "  end_commit    The git commit/tag ID to compare to"
   echo "Options:"
   echo "  --diff        Include the diff on each translated file that was modified"
   echo "  --diffAll     Include the diff on each translated file that was modified, including formatting changes that are skipped by the report"
@@ -41,7 +43,7 @@ function showDiff {
   git --no-pager diff --color=always $START_COMMIT..$END_COMMIT -- $1
 }
 
-if [[ -z "$START_COMMIT" ]] || [[ -z "$END_COMMIT" ]]; then
+if [[ -z "$START_COMMIT" ]] || [[ -z "$END_COMMIT" ]] || [[ -z "$BRANCH" ]]; then
   usage
 fi
 
@@ -62,7 +64,11 @@ UPDATED_LANGUAGES=()
 
 echo "Listing [$PROJECT] translation changes between [$START_COMMIT] and [$END_COMMIT]..."
 
-$SCRIPT_DIRECTORY/$COMPONENTS_SCRIPT $PROJECT | while read -r TRANSLATION_BASE_FILE; do
+if [ "$VERBOSE_ENABLED" == true ]; then
+    echo "Calling $SCRIPT_DIRECTORY/$COMPONENTS_SCRIPT $PROJECT $BRANCH"
+fi
+
+$SCRIPT_DIRECTORY/$COMPONENTS_SCRIPT $PROJECT $BRANCH | while read -r TRANSLATION_BASE_FILE; do
   if [ "$VERBOSE_ENABLED" == true ]; then
     echo "Checking file [$TRANSLATION_BASE_FILE]..."
   fi
