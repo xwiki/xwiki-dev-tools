@@ -304,6 +304,14 @@ function release_maven() {
   # Hence the: -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false
   mvn -e --batch-mode release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Plegacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution,docker -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
+  # Before the executing the perform make sure any required parent is indeed as published as the Maven Central plugin is claiming
+  while ! mvn -N help:effective-pom > effective.log 2>&1
+  do
+    echo "Failed to resolve the effective pom (see effective.log for more details), trying again in 1 min..."
+    sleep 60
+  done
+  rm effective.log
+
   echo -e "\033[0;32m* release:perform\033[0m"
   # Note: We disable the Gradle Enterprise local and remote caches to make sure everything is rebuilt and to avoid
   # any security issue (e.g. if the remote cache has been compromised for example).
