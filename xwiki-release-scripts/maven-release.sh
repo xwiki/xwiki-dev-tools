@@ -304,13 +304,19 @@ function release_maven() {
   # Hence the: -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false
   mvn -e --batch-mode release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Plegacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution,docker -Dgradle.cache.local.enabled=false -Dgradle.cache.remote.enabled=false -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
-  # Before the executing the perform make sure any required parent is indeed as published as the Maven Central plugin is claiming
-  while ! mvn -N help:effective-pom > effective.log 2>&1
+  # Before executing the perform, make sure any required parent is indeed as published as the Maven Central plugin is claiming
+  PARENT="$(mvn -N help:evaluate -Dexpression=project.parent.groupId -q -DforceStdout):$(mvn -N help:evaluate -Dexpression=project.parent.artifactId -q -DforceStdout):$VERSION:pom"
+  echo "Make sure $PARENT is available remotely"
+  TMP="$(pwd)/tmp-checkonline"
+  mkdir -p $TMP
+  cd $TMP
+  while ! mvn dependency:get -U -Dartifact=$PARENT -Dmaven.repo.local=$TMP/repository/ > $TMP/log.txt 2>&1
   do
-    echo "Failed to resolve the effective pom (see effective.log for more details), trying again in 1 min..."
+    echo "Failed to get the parent pom remotely (see $TMP/log.txt for more details), trying again in 1 min..."
     sleep 60
   done
-  rm effective.log
+  cd ..
+  rm -rf $TMP
 
   echo -e "\033[0;32m* release:perform\033[0m"
   # Note: We disable the Gradle Enterprise local and remote caches to make sure everything is rebuilt and to avoid
