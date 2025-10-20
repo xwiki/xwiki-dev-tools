@@ -306,17 +306,20 @@ function release_maven() {
 
   # Before executing the perform, make sure any required parent is indeed as published as the Maven Central plugin is claiming
   PARENT="$(mvn -N help:evaluate -Dexpression=project.parent.groupId -q -DforceStdout):$(mvn -N help:evaluate -Dexpression=project.parent.artifactId -q -DforceStdout):$VERSION:pom"
-  echo "Make sure $PARENT is available remotely"
-  TMP="$(pwd)/tmp-checkonline"
-  mkdir -p $TMP
-  cd $TMP
-  while ! mvn dependency:get -U -Dartifact=$PARENT -Dmaven.repo.local=$TMP/repository/ > $TMP/log.txt 2>&1
-  do
-    echo "Failed to get the parent pom remotely (see $TMP/log.txt for more details), trying again in 1 min..."
-    sleep 60
-  done
-  cd ..
-  rm -rf $TMP
+  # We assume a parent never contains a white space (meaning we got an error, most probably due to no having a parent at all)
+  if ! [[ $PARENT == *$' '* ]]; then
+    echo "Make sure $PARENT is available remotely"
+    TMP="$(pwd)/tmp-checkonline"
+    mkdir -p $TMP
+    cd $TMP
+    while ! mvn dependency:get -U -Dartifact=$PARENT -Dmaven.repo.local=$TMP/repository/ > $TMP/log.txt 2>&1
+    do
+      echo "Failed to get the parent pom remotely (see $TMP/log.txt for more details), trying again in 1 min..."
+      sleep 60
+    done
+    cd ..
+    rm -rf $TMP
+  fi
 
   echo -e "\033[0;32m* release:perform\033[0m"
   # Note: We disable the Develocity local and remote caches to make sure everything is rebuilt and to avoid
