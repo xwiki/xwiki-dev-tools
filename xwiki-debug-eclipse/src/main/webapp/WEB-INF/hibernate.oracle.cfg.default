@@ -87,7 +87,7 @@
     <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     -->
 
-    <property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:49161/xe</property>
+    <property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:1521/xwiki</property>
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
     <property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>

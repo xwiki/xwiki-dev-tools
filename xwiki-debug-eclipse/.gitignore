@@ -8,3 +8,4 @@ org.eclipse.m2e.wtp.prefs
 org.eclipse.wst.common.project.facet.core.prefs.xml
 org.eclipse.wst.validation.prefs
 sf.eclipse.javacc.prefs
+org.sonarlint.eclipse.core.prefs

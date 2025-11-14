@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>18.0.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.dev</groupId>
   <artifactId>xwiki</artifactId>
@@ -70,7 +70,6 @@
     <dependency>
       <groupId>${hsqldb.groupId}</groupId>
       <artifactId>${hsqldb.artifactId}</artifactId>
-      <version>${hsqldb.version}</version>
     </dependency>
     <dependency>
       <groupId>${mysql.groupId}</groupId>
@@ -122,12 +121,6 @@
       <version>${platform.version}</version>
       <type>pom</type>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-like-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
 
     <!--  -->
     <!-- Be able to install snapshot extensions -->
@@ -148,6 +141,81 @@
       <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>
       <version>${platform.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-repository-server-api</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+
+<!--
+    <dependency>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>macro-job</artifactId>
+      <version>2.2-SNAPSHOT</version>
+    </dependency>
+-->
+
+<!--
+    <dependency>
+      <groupId>org.xwiki.contrib.oidc</groupId>
+      <artifactId>oidc-authenticator</artifactId>
+      <version>2.18.2-SNAPSHOT</version>
+    </dependency>
+-->
+
+<!-- 
+    <dependency>
+      <groupId>org.xwiki.contrib.ldap</groupId>
+      <artifactId>ldap-authenticator</artifactId>
+      <version>9.8.1-SNAPSHOT</version>
+    </dependency>
+-->
+
+<!--
+    <dependency>
+      <groupId>org.xwiki.contrib.replication</groupId>
+      <artifactId>replication-ui</artifactId>
+      <version>2.3.1-SNAPSHOT</version>
+      <type>xar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+-->
+
+<!--
+    <dependency>
+      <groupId>com.xwiki.projects.rr</groupId>
+      <artifactId>xwiki-rr-data-labelling-extensions-labelling-ui</artifactId>
+      <version>2.4-SNAPSHOT</version>
+      <type>xar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.rendering</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+-->
   </dependencies>
   <build>
     <plugins>
@@ -165,6 +233,30 @@
       </plugin>
     </plugins>
   </build>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-oldcore</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.rendering</groupId>
+        <artifactId>xwiki-rendering-transformation-macro</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-job-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-rendering-signature</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <repositories>
     <repository>

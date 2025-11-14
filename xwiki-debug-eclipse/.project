@@ -2,9 +2,6 @@
 <projectDescription>
 	<name>xwiki-debug-eclipse</name>
 	<comment></comment>
-	<projects>
-		<project>macro-job</project>
-	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.wst.jsdt.core.javascriptValidator</name>
@@ -118,9 +115,14 @@
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-tree/xwiki-platform-tree-war/src/main/webapp/templates/tree_macros.vm</locationURI>
 		</link>
 		<link>
+			<name>src/main/webapp/resources/uicomponents/widgets/liveData.js</name>
+			<type>1</type>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-war/src/main/webapp/resources/uicomponents/widgets/liveData.js</locationURI>
+		</link>
+		<link>
 			<name>src/main/webapp/resources/uicomponents/widgets/tree.js</name>
 			<type>1</type>
-			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-tree/xwiki-platform-tree-war/src/main/webapp/resources/uicomponents/widgets/tree.js</locationURI>
+			<locationURI>XWIKIPLATFORM//xwiki-platform-core/xwiki-platform-livedata/xwiki-platform-livedata-war/src/main/webapp/resources/uicomponents/widgets/liveData.js</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/skins/flamingo/less/bootstrap</name>

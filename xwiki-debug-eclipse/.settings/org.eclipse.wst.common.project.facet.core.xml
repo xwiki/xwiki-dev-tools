@@ -2,6 +2,6 @@
 <faceted-project>
   <installed facet="jst.jaxrs" version="1.0"/>
   <installed facet="jst.jsf" version="2.2"/>
-  <installed facet="jst.web" version="3.1"/>
-  <installed facet="jst.java" version="17"/>
+  <installed facet="jst.web" version="5.0"/>
+  <installed facet="jst.java" version="21"/>
 </faceted-project>
