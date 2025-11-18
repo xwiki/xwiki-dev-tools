@@ -226,8 +226,7 @@ function stabilize_branch() {
       echo "Using the next version in master branch: $NEXT_TRUNK_VERSION"
     fi
     # Let maven update the version for all the submodules
-    # TODO: Remove the office-tests profile when all branches we release have versions >= 11.0
-    mvn -e release:branch -DbranchName=$STABLE_BRANCH -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -DpushChanges=false -Pci,integration-tests,office-tests,legacy,standalone,flavor-integration-tests,distribution,docker
+    mvn -e release:branch -DbranchName=$STABLE_BRANCH -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -DpushChanges=false -Pci,integration-tests,legacy,standalone,flavor-integration-tests,distribution,docker
     git pull --rebase
     # We must update the root parent manually
     # Using versions:update-parent here is not safe because this version of the parent pom might not exist yet
@@ -302,7 +301,7 @@ function release_maven() {
   # Note: We disable the Develocity local and remote caches to make sure everything is rebuilt and to avoid
   # any security issue (e.g. if the remote cache has been compromised for example).
   # Hence the: -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false
-  mvn -e --batch-mode release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Plegacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution,docker -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
+  mvn -e --batch-mode release:prepare -DpushChanges=false -DlocalCheckout=true -DreleaseVersion=${VERSION} -DdevelopmentVersion=${NEXT_SNAPSHOT_VERSION} -Dtag=${TAG_NAME} -DautoVersionSubmodules=true -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Darguments="-N ${TEST_SKIP}" ${TEST_SKIP} || exit -2
 
   # Before executing the perform, make sure any required parent is indeed as published as the Maven Central plugin is claiming
   PARENT="$(mvn -N help:evaluate -Dexpression=project.parent.groupId -q -DforceStdout):$(mvn -N help:evaluate -Dexpression=project.parent.artifactId -q -DforceStdout):$VERSION:pom"
@@ -325,7 +324,7 @@ function release_maven() {
   # Note: We disable the Develocity local and remote caches to make sure everything is rebuilt and to avoid
   # any security issue (e.g. if the remote cache has been compromised for example).
   # Hence the: -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false
-  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,office-tests,standalone,flavor-integration-tests,distribution ${TEST_SKIP} -Darguments="-Plegacy,integration-tests,office-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
+  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution ${TEST_SKIP} -Darguments="-Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
 
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git checkout ${TAG_NAME} -q
