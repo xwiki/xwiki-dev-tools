@@ -1,6 +1,6 @@
 #!/bin/bash
 # Try to find the Java version from the pom
-XMAVEN_JAVA_VERSION=$(mvn -N help:evaluate -Dexpression=xwiki.java.version -q -DforceStdout)
+XMAVEN_JAVA_VERSION=$(mvn -N help:evaluate -Dexpression=xwiki.java.version -q -DforceStdout | tail -n 1)
 MAJORVERSION_REGEX="[0-9]+"
 if [[ $XMAVEN_JAVA_VERSION =~ $MAJORVERSION_REGEX ]]; then
     echo "The version of Java to use is $XMAVEN_JAVA_VERSION."
