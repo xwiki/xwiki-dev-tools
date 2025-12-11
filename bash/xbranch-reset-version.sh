@@ -54,3 +54,9 @@ then
   sed -e "s/<platform.version>.*<\/platform.version>/<platform.version>\${commons.version}<\/platform.version>/" -i pom.xml
   echo -e "${GREEN}Reseted the <platform.version> property to \${commons.version}"
 fi
+
+if [[ $REPOSITORY == 'xwiki-rendering' ]]
+then
+  sed -e "s/<rendering.version>.*<\/rendering.version>/<rendering.version>\${commons.version}<\/rendering.version>/" -i pom.xml
+  echo -e "${GREEN}Reseted the <rendering.version> property to \${commons.version}"
+fi

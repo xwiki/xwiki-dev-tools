@@ -69,4 +69,10 @@ else
     sed -e "s/<platform.version>.*<\/platform.version>/<platform.version>${NEW_VERSION}<\/platform.version>/" -i pom.xml
     echo -e "${GREEN}Force the <platform.version> property to ${NEW_VERSION}"
   fi
+
+  if [[ $REPOSITORY == 'xwiki-rendering' ]]
+  then
+    sed -e "s/<rendering.version>.*<\/rendering.version>/<rendering.version>${NEW_VERSION}<\/rendering.version>/" -i pom.xml
+    echo -e "${GREEN}Force the <rendering.version> property to ${NEW_VERSION}"
+  fi
 fi
