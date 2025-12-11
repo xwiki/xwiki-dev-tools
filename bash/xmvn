@@ -25,7 +25,12 @@ else
 fi
 if [[ $XMAVEN_JAVA_VERSION ]]; then
     # Find the installed versions of the java command line
-    JAVA_PATHS=$(update-alternatives --list java)
+    # Check if update-alternatives is available, otherwise use ls
+    if command -v update-alternatives &> /dev/null; then
+      JAVA_PATHS=$(update-alternatives --list java)
+    else
+      JAVA_PATHS=$(ls /usr/lib/jvm/java-*/bin/java)
+    fi
     while IFS= read -r javapath; do
         # Extract the Java major version from the path
         if [[ $javapath =~ $MAJORVERSION_REGEX ]]; then
