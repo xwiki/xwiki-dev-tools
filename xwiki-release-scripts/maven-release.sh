@@ -163,6 +163,43 @@ function check_versions() {
   fi
 }
 
+function set_packages_version() {
+  if [ -z "$1" ]; then
+      echo "Missing version parameter" >&2
+      exit 1
+  fi
+  
+  version="$1"
+  current_directory="$(dirname "$(readlink -f "$0")")/.."
+  
+
+  find "$current_directory" -type d -name "node_modules" -prune -o -name "package.json" -print | \
+  grep -v "^$current_directory/package.json$" | \
+  while IFS= read -r pkg_path; do
+      
+      ## private or unnamed packages are skipped
+      is_skipped=$(jq -r '.private' "$pkg_path")
+      
+      if [ "$is_skipped" = "true" ]; then
+          continue
+      fi
+  
+      # Create a temporary file in case of issue during the version patch
+      temp_file=$(mktemp)
+      
+      # Update the version with jq on the temp file, and replace the original file with the patch version if no
+      # problem was encountered.
+      if ! jq ".version = \"$version\"" "$pkg_path" > "$temp_file"; then
+          relative_pkg_path=$(realpath --relative-to="$current_directory" "$pkg_path")
+          echo "Failed to update $relative_pkg_path: jq error" >&2
+          rm -f "$temp_file"
+          continue
+      fi
+  
+      mv "$temp_file" "$pkg_path"
+  done
+}
+
 # Clean up the sources, discarding any changes in the local workspace not found in the local git clone and switching back to the master branch.
 function pre_cleanup() {
   echo -e "\033[0;32m* Cleaning up\033[0m"
@@ -273,19 +310,27 @@ function create_release_branch() {
   CURRENT_VERSION=`mvn help:evaluate -Dexpression='project.version' -N | grep -v '\[' | grep -v 'Download' | cut -d- -f1`
 }
 
+function pre_update_versions() {
+  echo -e "\033[0;32m* Preparing project for release\033[0m"
+  pre_update_parent_versions
+  pre_update_packages_versions
+  git add pom.xml
+  git commit -m "[release] Preparing release ${TAG_NAME}" -q
+}
+
 # Update the root project's parent version and version variables, if needed.
 # For xwiki-commons updates the value for the commons.version variable.
 # For the other projects it changes the version of the parent in the current repository root pom.
 # The changes will be committed as a new git version.
 function pre_update_parent_versions() {
-  echo -e "\033[0;32m* Preparing project for release\033[0m"
   mvn versions:update-parent -DgenerateBackupPoms=false -DskipResolution=true -DparentVersion=$VERSION -N -q
   sed -e "s/<commons.version>.*<\/commons.version>/<commons.version>${VERSION}<\/commons.version>/" -i pom.xml
   PROJECT_NAME=`mvn help:evaluate -Dexpression='project.artifactId' -N | grep -v '\[' | grep -v 'Download'`
   TAG_NAME=${PROJECT_NAME}-${VERSION}
+}
 
-  git add pom.xml
-  git commit -m "[release] Preparing release ${TAG_NAME}" -q
+function pre_update_packages_versions() {
+  set_packages_version $VERSION
 }
 
 # Perform the actual maven release.
@@ -331,14 +376,18 @@ function release_maven() {
   git tag -s -f -m "Tagging ${TAG_NAME}" ${TAG_NAME}
 }
 
+function post_update_versions() {
+  echo -e "\033[0;32m* Go back to branch ${RELEASE_BRANCH}\033[0m"
+  git checkout ${RELEASE_BRANCH}
+  post_update_parent_versions
+  post_update_packages_versions
+}
+
 # Update the root project's parent version and version variables, if needed.
 # For xwiki-commons updates the value for the commons.version variable.
 # For the other projects it changes the version of the parent in the current repository root pom.
 # The changes will be committed as a new git version.
 function post_update_parent_versions() {
-  echo -e "\033[0;32m* Go back to branch ${RELEASE_BRANCH}\033[0m"
-  git checkout ${RELEASE_BRANCH}
-
   echo -e "\033[0;32m* Update parent to ${NEXT_SNAPSHOT_VERSION} after release\033[0m"
   xsltproc -o pom.xml --stringparam parentversion "${NEXT_SNAPSHOT_VERSION}" $PRGDIR/set-parent-version.xslt pom.xml
   echo -e "\033[0;32m* Update commons.version to ${NEXT_SNAPSHOT_VERSION} after release\033[0m"
@@ -346,6 +395,13 @@ function post_update_parent_versions() {
 
   git add pom.xml
   git commit -m "[release] Update parent after release ${TAG_NAME}" -q
+}
+
+function post_update_packages_versions() {
+  echo -e "\033[0;32m* Update packages to ${NEXT_SNAPSHOT_VERSION} after release\033[0m"
+  set_packages_version $NEXT_SNAPSHOT_VERSION
+  git add .
+  git commit -m "[release] Update packages after release ${TAG_NAME}" -q
 }
 
 # Push changes made to the release branch (new SNAPSHOT version, etc)
@@ -391,9 +447,9 @@ function release_project() {
   if [[ $do_release == true ]]
   then
     create_release_branch
-    pre_update_parent_versions
+    pre_update_versions
     release_maven
-    post_update_parent_versions
+    post_update_versions
     push_release
     post_cleanup
     push_tag
