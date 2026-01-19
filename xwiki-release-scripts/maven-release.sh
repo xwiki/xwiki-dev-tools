@@ -174,8 +174,7 @@ function set_packages_version() {
   fi
   
   version="$1"
-  current_directory="$(dirname "$(readlink -f "$0")")/.."
-  
+  current_directory=$PWD
 
   find "$current_directory" -type d -name "node_modules" -prune -o -name "package.json" -print | \
   grep -v "^$current_directory/package.json$" | \
@@ -319,6 +318,7 @@ function pre_update_versions() {
   pre_update_parent_versions
   pre_update_packages_versions
   git add pom.xml
+  git add xwiki-platform-core/xwiki-platform-node/
   git commit -m "[release] Preparing release ${TAG_NAME}" -q
 }
 
