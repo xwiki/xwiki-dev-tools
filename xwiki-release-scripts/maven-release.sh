@@ -140,14 +140,18 @@ function check_versions() {
     # Select the JDK version to use
     if [[ -z $RELEASE_JDK_VERSION ]]
     then
-      # Get the major part of the verion being released
+      # Get the major part of the version being released
       let VERSION_MAJOR=`echo ${VERSION} | cut -d- -f1 | cut -d. -f1`
       # XWiki 16+ requires Java 17
       if (($VERSION_MAJOR < 16))
       then
         RELEASE_JDK_VERSION=11
-      else
+      # XWiki 18+ requires Java 21
+      elif (($VERSION_MAJOR < 18))
+      then
         RELEASE_JDK_VERSION=17
+      else
+        RELEASE_JDK_VERSION=21
       fi
       echo "What is the version of Java to use to release XWiki ${VERSION}?"
       read -e -p "${RELEASE_JDK_VERSION}> " tmp
