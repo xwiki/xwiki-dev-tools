@@ -404,7 +404,8 @@ function post_update_parent_versions() {
 function post_update_packages_versions() {
   echo -e "\033[0;32m* Update packages to ${NEXT_SNAPSHOT_VERSION} after release\033[0m"
   set_packages_version $NEXT_SNAPSHOT_VERSION
-  git add .
+  ## We need to be selective otherwise other files such as pom.xml.releaseBackup are also included
+  git add '**/package.json'
   git commit -m "[release] Update packages after release ${TAG_NAME}" -q
 }
 
