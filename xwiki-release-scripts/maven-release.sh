@@ -268,6 +268,9 @@ function stabilize_branch() {
     # Let maven update the version for all the submodules
     mvn -e release:branch -DbranchName=$STABLE_BRANCH -DautoVersionSubmodules -DdevelopmentVersion=${NEXT_TRUNK_VERSION} -DpushChanges=false -Pci,integration-tests,legacy,standalone,flavor-integration-tests,distribution,docker
     git pull --rebase
+    set_packages_version $NEXT_TRUNK_VERSION
+    git add '**/package.json'
+    git commit -m "[branch] prepare node packages for next development iteration" -q
     # We must update the root parent manually
     # Using versions:update-parent here is not safe because this version of the parent pom might not exist yet
     # mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -DallowSnapshots=true -N -q
