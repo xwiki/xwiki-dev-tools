@@ -322,7 +322,8 @@ function pre_update_versions() {
   pre_update_parent_versions
   pre_update_packages_versions
   git add pom.xml
-  git add xwiki-platform-core/xwiki-platform-node/
+  ## We need to be selective otherwise other files such as pom.xml.releaseBackup are also included
+  git add '**/package.json'
   git commit -m "[release] Preparing release ${TAG_NAME}" -q
 }
 
@@ -377,7 +378,7 @@ function release_maven() {
   # Note: We disable the Develocity local and remote caches to make sure everything is rebuilt and to avoid
   # any security issue (e.g. if the remote cache has been compromised for example).
   # Hence the: -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false
-  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution ${TEST_SKIP} -Darguments="-Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
+  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Darguments="-Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
 
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git checkout ${TAG_NAME} -q
