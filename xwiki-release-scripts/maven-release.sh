@@ -278,7 +278,7 @@ function stabilize_branch() {
     # We must update commons.version manually
     sed -e "s/<commons.version>.*<\/commons.version>/<commons.version>${NEXT_TRUNK_VERSION}<\/commons.version>/" -i pom.xml
     git add pom.xml
-    git commit -m "[branch] Post release branch creation dependency update on master" -q
+    git commit -m "[branch] prepare for next development iteration (custom)" -q
     git push origin master
     git push origin $STABLE_BRANCH
     CURRENT_VERSION=`echo $NEXT_TRUNK_VERSION | cut -d- -f1`
