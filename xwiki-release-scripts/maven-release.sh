@@ -271,7 +271,6 @@ function stabilize_branch() {
     ## We must update the node packages version manually to the next development version.
     set_packages_version $NEXT_TRUNK_VERSION
     git add '**/package.json'
-    git commit -m "[branch] prepare node packages for next development iteration" -q
     # We must update the root parent manually
     # Using versions:update-parent here is not safe because this version of the parent pom might not exist yet
     # mvn versions:update-parent -DgenerateBackupPoms=false -DparentVersion=[$NEXT_TRUNK_VERSION] -DallowSnapshots=true -N -q
@@ -279,7 +278,7 @@ function stabilize_branch() {
     # We must update commons.version manually
     sed -e "s/<commons.version>.*<\/commons.version>/<commons.version>${NEXT_TRUNK_VERSION}<\/commons.version>/" -i pom.xml
     git add pom.xml
-    git commit -m "[branch] Updating inter-project dependencies on master" -q
+    git commit -m "[branch] Post release branch creation dependency update on master" -q
     git push origin master
     git push origin $STABLE_BRANCH
     CURRENT_VERSION=`echo $NEXT_TRUNK_VERSION | cut -d- -f1`
