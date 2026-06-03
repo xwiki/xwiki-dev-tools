@@ -1,0 +1,9 @@
+{
+  "name": "xwiki-core",
+  "description": "Org-wide XWiki conventions, MCP servers and dev skills for all xwiki GitHub org repos",
+  "version": "0.1.0",
+  "author": {
+    "name": "XWiki Development Team",
+    "url": "https://xwiki.org"
+  }
+}
