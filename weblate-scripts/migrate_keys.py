@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 # ---------------------------------------------------------------------------
 # See the NOTICE file distributed with this work for additional
@@ -45,7 +45,7 @@ def open_or_create_translation(base_file_name, file_name, file_type, lang):
     xml = None
     if file_type == FileType.PROPERTIES:
         if os.path.isfile(file_name):
-            with open(file_name, "r") as f:
+            with open(file_name, "r", encoding="ISO-8859-1") as f:
                 document = f.read()
             properties.load(document)
     else:
@@ -117,8 +117,7 @@ def process_destination(destination_file, destination_type, languages_keys):
 def main():
     """Main function"""
     source_file, destination_file, key_list_file = parse_arguments()
-    source_basename, source_extension = source_file.rsplit('.', 1)
-    destination_basename, destination_extension = destination_file.rsplit('.', 1)
+    source_basename, _ = source_file.rsplit('.', 1)
 
     if not os.path.isfile(key_list_file):
         sys.exit('The specified key_list is not a file')
