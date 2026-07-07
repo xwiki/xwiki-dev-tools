@@ -1,50 +1,53 @@
 #!/bin/bash
-# Try to find the Java version from the pom
-XMAVEN_JAVA_VERSION=$(mvn -N help:evaluate -Dexpression=xwiki.java.version -q -DforceStdout | tail -n 1)
-MAJORVERSION_REGEX="[0-9]+"
-if [[ $XMAVEN_JAVA_VERSION =~ $MAJORVERSION_REGEX ]]; then
-    echo "The version of Java to use is $XMAVEN_JAVA_VERSION."
-else
-    # Try to find the XWiki version from the pom (to deduce the Java version from it)
-    XMAVEN_XWIKI_VERSION=$(mvn -N help:evaluate -Dexpression=commons.version -q -DforceStdout)
-    # Extract the major version
-    if [[ $XMAVEN_XWIKI_VERSION =~ $MAJORVERSION_REGEX ]]; then
-        XMAVEN_XWIKI_MAJOR_VERSION=${BASH_REMATCH[0]}
-        echo "The version of XWiki is $XMAVEN_XWIKI_VERSION and the major version $XMAVEN_XWIKI_MAJOR_VERSION."
-        if [ 14 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
-            XMAVEN_JAVA_VERSION=8
-            echo "The version of Java to use is $XMAVEN_JAVA_VERSION."
-        elif [ 16 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
-            XMAVEN_JAVA_VERSION=11
-            echo "The version of Java to use is $XMAVEN_JAVA_VERSION."
-        elif [ 18 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
-            XMAVEN_JAVA_VERSION=17
-            echo "The version of Java to use is $XMAVEN_JAVA_VERSION."
-        fi
-    fi
-fi
-if [[ $XMAVEN_JAVA_VERSION ]]; then
-    # Find the installed versions of the java command line
-    # Check if update-alternatives is available, otherwise use ls
-    if command -v update-alternatives &> /dev/null; then
-      JAVA_PATHS=$(update-alternatives --list java)
+# Only try to find the Java version from the pom if the current folder is a Maven project
+if [[ -f pom.xml ]]; then
+    MAJORVERSION_REGEX="[0-9]+"
+    # Try to find the Java version from the pom
+    XMAVEN_JAVA_VERSION=$(mvn -N help:evaluate -Dexpression=xwiki.java.version -q -DforceStdout | tail -n 1)
+    if [[ $XMAVEN_JAVA_VERSION =~ $MAJORVERSION_REGEX ]]; then
+        echo "The version of Java to use is $XMAVEN_JAVA_VERSION."
     else
-      JAVA_PATHS=$(ls /usr/lib/jvm/java-*/bin/java)
-    fi
-    while IFS= read -r javapath; do
-        # Extract the Java major version from the path
-        if [[ $javapath =~ $MAJORVERSION_REGEX ]]; then
-            # Match the path version with the required version
-            if [ ${BASH_REMATCH[0]} -eq $XMAVEN_JAVA_VERSION ]; then
-              XMAVEN_JAVA_PATH=${javapath%/*}
-              XMAVEN_JAVA_HOME=${XMAVEN_JAVA_PATH%/*}
-              echo "Found a path for Java $XMAVEN_JAVA_VERSION at $XMAVEN_JAVA_PATH."
-              export PATH=$XMAVEN_JAVA_PATH:$PATH
-              export JAVA_HOME=$XMAVEN_JAVA_HOME
-              export JRE_HOME=$XMAVEN_JAVA_HOME
-              break
+        # Try to find the XWiki version from the pom (to deduce the Java version from it)
+        XMAVEN_XWIKI_VERSION=$(mvn -N help:evaluate -Dexpression=commons.version -q -DforceStdout)
+        # Extract the major version
+        if [[ $XMAVEN_XWIKI_VERSION =~ $MAJORVERSION_REGEX ]]; then
+            XMAVEN_XWIKI_MAJOR_VERSION=${BASH_REMATCH[0]}
+            echo "The version of XWiki is $XMAVEN_XWIKI_VERSION and the major version $XMAVEN_XWIKI_MAJOR_VERSION."
+            if [ 14 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
+                XMAVEN_JAVA_VERSION=8
+                echo "The version of Java to use is $XMAVEN_JAVA_VERSION."
+            elif [ 16 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
+                XMAVEN_JAVA_VERSION=11
+                echo "The version of Java to use is $XMAVEN_JAVA_VERSION."
+            elif [ 18 -gt $XMAVEN_XWIKI_MAJOR_VERSION ]; then
+                XMAVEN_JAVA_VERSION=17
+                echo "The version of Java to use is $XMAVEN_JAVA_VERSION."
             fi
         fi
-    done <<< "$JAVA_PATHS"
+    fi
+    if [[ $XMAVEN_JAVA_VERSION ]]; then
+        # Find the installed versions of the java command line
+        # Check if update-alternatives is available, otherwise use ls
+        if command -v update-alternatives &> /dev/null; then
+          JAVA_PATHS=$(update-alternatives --list java)
+        else
+          JAVA_PATHS=$(ls /usr/lib/jvm/java-*/bin/java)
+        fi
+        while IFS= read -r javapath; do
+            # Extract the Java major version from the path
+            if [[ $javapath =~ $MAJORVERSION_REGEX ]]; then
+                # Match the path version with the required version
+                if [ ${BASH_REMATCH[0]} -eq $XMAVEN_JAVA_VERSION ]; then
+                  XMAVEN_JAVA_PATH=${javapath%/*}
+                  XMAVEN_JAVA_HOME=${XMAVEN_JAVA_PATH%/*}
+                  echo "Found a path for Java $XMAVEN_JAVA_VERSION at $XMAVEN_JAVA_PATH."
+                  export PATH=$XMAVEN_JAVA_PATH:$PATH
+                  export JAVA_HOME=$XMAVEN_JAVA_HOME
+                  export JRE_HOME=$XMAVEN_JAVA_HOME
+                  break
+                fi
+            fi
+        done <<< "$JAVA_PATHS"
+    fi
 fi
 mvn $@
