@@ -42,7 +42,7 @@ def retrieve_changes_from_url_and_get_language(url, payload, inspected_translati
 
 def count_language_if_needed(result, inspected_translations, branch, languages, projects, token):
     if result['translation'] not in inspected_translations:
-        print("Inspecting change: {}".format(result['translation']))
+        print("Inspecting change: {} about translation {}".format(result['url'], result['translation']))
         response = requests.get(result['translation'], headers=get_token_header(token))
         response.raise_for_status()
         json = response.json()
@@ -75,7 +75,7 @@ def retrieve_languages_for_changes(date_previous_version, date_next_version, bra
     languages = []
     retrieve_changes_from_url_and_get_language(WEBLATE_CHANGES_ENDPOINT, request_payload, inspected_translations,
                                                branch, languages, projects, token)
-    return languages
+    return sorted(languages)
 
 def find_date_for_version(version, repository):
     ## FIXME: only works for XS right now
