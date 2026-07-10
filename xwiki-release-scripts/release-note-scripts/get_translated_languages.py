@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+import os.path
 
 import requests
 import argparse
 import re
 import datetime as dt
 
+WEBLATE_TOKEN_FILE="~/.weblate_token"
 WEBLATE_REST_API_ENDPOINT = "https://l10n.xwiki.org/api/"
 WEBLATE_CHANGES_ENDPOINT = WEBLATE_REST_API_ENDPOINT + "changes/"
 XWIKI_PROJECTS_SLUG = ['xwiki-platform', 'xwiki-commons', 'xwiki-rendering']
@@ -17,7 +19,9 @@ BRANCH_LTS = 'lts'
 BRANCH_MID_YEAR_LTS = 'mid-year-lts'
 
 def get_token_header(token):
-    return {'Authorization': 'Token {}'.format(token)}
+    if token:
+        return {'Authorization': 'Token {}'.format(token)}
+    return None
 
 def retrieve_changes_from_url_and_get_language(url, payload, inspected_translations, branch, languages, projects,
                                                token):
@@ -25,7 +29,11 @@ def retrieve_changes_from_url_and_get_language(url, payload, inspected_translati
     response.raise_for_status()
     json = response.json()
     if payload:
-        print("Found {} results from Weblate API for translation changes.".format(json['count']))
+        print("Found a total of {} results from Weblate API for translation changes.".format(json['count']))
+        print("{} authorized requests remaining to Weblate REST API - Reset to {} in {} seconds".format(
+            response.headers['X-RateLimit-Remaining'],
+            response.headers['X-RateLimit-Limit'],
+            response.headers['X-RateLimit-Reset']))
     for result in json['results']:
         count_language_if_needed(result, inspected_translations, branch, languages, projects, token)
     if json['next']:
@@ -97,6 +105,14 @@ def find_branch_from_minor(minor_version):
     else:
         return BRANCH_MASTER
 
+def load_token_from_file():
+    token_file = os.path.expanduser(WEBLATE_TOKEN_FILE)
+    if os.path.isfile(token_file):
+        with open(token_file, "r") as file:
+            token = file.read()
+            return token.strip()
+    return None
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Compute contributed languages from one version to another')
     parser.add_argument('previous_version', metavar='previous_version', help='Previous version')
@@ -106,7 +122,6 @@ def parse_arguments():
                                                                          'argument is used)')
     parser.add_argument('-t', '--token', metavar='token', help='Weblate token in case of authenticated request')
     return parser.parse_args()
-
 
 def main():
     args = parse_arguments()
@@ -136,7 +151,12 @@ def main():
         raise RuntimeError("Cannot find previous version date")
     print("Start looking for translations between {} and {} on branch {} ".format(previous_version_date,
                                                                                next_version_date, branch))
-    languages = retrieve_languages_for_changes(previous_version_date, next_version_date, branch, projects, args.token)
+    token = args.token or load_token_from_file()
+    if not token:
+        print("WARNING: No Weblate token provided, the request will be performed with anonymous user which have a "
+              "limited rate.")
+
+    languages = retrieve_languages_for_changes(previous_version_date, next_version_date, branch, projects, token)
     print("Languages: \n%s" % ','.join(languages))
 
 if __name__ == "__main__":
