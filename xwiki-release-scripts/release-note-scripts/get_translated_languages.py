@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import os.path
+import os
+import subprocess
 
 import requests
 import argparse
@@ -11,8 +13,9 @@ WEBLATE_REST_API_ENDPOINT = "https://l10n.xwiki.org/api/"
 WEBLATE_CHANGES_ENDPOINT = WEBLATE_REST_API_ENDPOINT + "changes/"
 XWIKI_PROJECTS_SLUG = ['xwiki-platform', 'xwiki-commons', 'xwiki-rendering']
 BRANCH_PATTERN = re.compile('stable-\\d+\\.(?P<minor>\\d+)\\.x')
-VERSION_PATTERN = re.compile('\\d+\\.(?P<minor>\\d+).*')
+VERSION_PATTERN = re.compile('^(?P<major>\\d+)\\.(?P<minor>\\d+).*')
 GITHUB_TAG_ENDPOINT = "https://api.github.com/repos/xwiki/xwiki-platform/git/matching-refs/tags/"
+BRANCH_VERSION_CREATION_DATE_PATTERN = re.compile('^.*stable-\\d+\\.\\d+\\.x@{(?P<creationDate>.+)}.*')
 
 BRANCH_MASTER = 'master'
 BRANCH_LTS = 'lts'
@@ -123,10 +126,23 @@ def parse_arguments():
     parser.add_argument('-t', '--token', metavar='token', help='Weblate token in case of authenticated request')
     return parser.parse_args()
 
+def find_branch_creation_date(branch_name):
+    command = "git reflog --date=iso8601 " + branch_name
+    result = subprocess.check_output(command, shell=True, text=True)
+    ## Example of result:
+    ## 064af0220b2 (HEAD -> stable-18.6.x, origin/stable-18.6.x) stable-18.6.x@{2026-07-16 11:17:44 +0200}: branch: Created from refs/remotes/origin/stable-18.6.x
+    matcher = BRANCH_VERSION_CREATION_DATE_PATTERN.match(result)
+    if not matcher:
+        raise RuntimeError("Cannot find creation date for branch {} obtained git command output: {}".format(
+            branch_name, result))
+    return dt.datetime.fromisoformat(matcher.group('creationDate'))
+
 def main():
     args = parse_arguments()
     previous_version = args.previous_version
     next_version = args.next_version
+    current_directory = os.getcwd()
+
     if args.project:
         projects = [args.project]
         if not args.repository:
@@ -135,18 +151,22 @@ def main():
     else:
         projects = XWIKI_PROJECTS_SLUG
         repository = "https://github.com/xwiki/xwiki-platform"
-    matchVersion = VERSION_PATTERN.match(next_version)
-    if not matchVersion:
+    next_version_matcher = VERSION_PATTERN.match(next_version)
+    if not next_version_matcher:
         raise RuntimeError("The version number is invalid.")
-    branch = find_branch_from_minor(matchVersion.group('minor'))
-    previous_version_date = find_date_for_version(previous_version, repository)
-    if next_version:
-        next_version_date = find_date_for_version(next_version, repository)
-        if not next_version_date:
-            raise RuntimeError("The next version number is invalid - Cannot find next version date.")
-    else:
-        next_version_date = dt.datetime.now().isoformat()
 
+    previous_version_date = find_date_for_version(previous_version, repository)
+    is_first_rc = next_version.endswith('-rc-1')
+    if is_first_rc:
+        branch = BRANCH_MASTER
+        next_version_branch = "stable-{}.{}.x".format(next_version_matcher.group('major'), next_version_matcher.group('minor'))
+        next_version_date = find_branch_creation_date(next_version_branch)
+    else:
+        branch = find_branch_from_minor(next_version_matcher.group('minor'))
+        next_version_date = find_date_for_version(next_version, repository)
+
+    if not previous_version_date:
+        raise RuntimeError("Cannot find next version date")
     if not previous_version_date:
         raise RuntimeError("Cannot find previous version date")
     print("Start looking for translations between {} and {} on branch {} ".format(previous_version_date,
