@@ -285,15 +285,21 @@ function stabilize_branch() {
   fi
 }
 
+# Compute the name of the stable branch the release starts from (stable-X.Y.x), setting
+# VERSION_STUB, STABLE_BRANCH and RELEASE_FROM_BRANCH from the version being released.
+# Shared by check_branch() (normal flow) and resume_project_after_publish() (resume flow).
+function compute_release_source_branch() {
+  VERSION_STUB=`echo $VERSION | cut -d. -f1-2`
+  STABLE_BRANCH=stable-${VERSION_STUB}.x
+  RELEASE_FROM_BRANCH=$STABLE_BRANCH
+}
+
 # Check which branch should be the basis for the release.
 # Make sure the stable branch corresponding to the release version exist and create it if it does not
 # In the end, a variable called RELEASE_FROM_BRANCH will hold the name of the source branch to start the release from (stable-X.Y).
 function check_branch() {
   CURRENT_VERSION=`mvn help:evaluate -Dexpression='project.version' -N | grep -v '\[' | grep -v 'Download' | cut -d- -f1`
-  VERSION_STUB=`echo $VERSION | cut -d. -f1-2`
-  STABLE_BRANCH=stable-${VERSION_STUB}.x
-
-  RELEASE_FROM_BRANCH=$STABLE_BRANCH
+  compute_release_source_branch
   # Offer to create the stable branch if it doesn't exist
   if [[ -z `git branch -r | grep $STABLE_BRANCH` ]]
   then
@@ -326,6 +332,14 @@ function pre_update_versions() {
   git commit -m "[release] Preparing release ${TAG_NAME}" -q
 }
 
+# Compute PROJECT_NAME (the Maven artifactId of the current project) and the corresponding
+# release TAG_NAME (artifactId-version).
+# Shared by pre_update_parent_versions() (normal flow) and resume_project_after_publish() (resume flow).
+function compute_tag_name() {
+  PROJECT_NAME=`mvn help:evaluate -Dexpression='project.artifactId' -N | grep -v '\[' | grep -v 'Download'`
+  TAG_NAME=${PROJECT_NAME}-${VERSION}
+}
+
 # Update the root project's parent version and version variables, if needed.
 # For xwiki-commons updates the value for the commons.version variable.
 # For the other projects it changes the version of the parent in the current repository root pom.
@@ -333,8 +347,7 @@ function pre_update_versions() {
 function pre_update_parent_versions() {
   mvn versions:update-parent -DgenerateBackupPoms=false -DskipResolution=true -DparentVersion=$VERSION -N -q
   sed -e "s/<commons.version>.*<\/commons.version>/<commons.version>${VERSION}<\/commons.version>/" -i pom.xml
-  PROJECT_NAME=`mvn help:evaluate -Dexpression='project.artifactId' -N | grep -v '\[' | grep -v 'Download'`
-  TAG_NAME=${PROJECT_NAME}-${VERSION}
+  compute_tag_name
 }
 
 function pre_update_packages_versions() {
@@ -342,7 +355,10 @@ function pre_update_packages_versions() {
 }
 
 # Perform the actual maven release.
-# Invoke mvn release:prepare, followed by mvn release:perform, then create a GPG-signed git tag.
+# Invoke mvn release:prepare, followed by mvn release:perform (which builds and publishes the
+# artifacts to the remote repository: Maven Central for xwiki-commons/xwiki-rendering,
+# nexus.xwiki.org for xwiki-platform). The GPG-signed tag and the remaining steps are done
+# afterwards by finish_release_after_publish() so they can be replayed on their own when resuming.
 function release_maven() {
   TEST_SKIP="-DskipTests"
 
@@ -378,10 +394,27 @@ function release_maven() {
   # any security issue (e.g. if the remote cache has been compromised for example).
   # Hence the: -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false
   mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Darguments="-Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
+}
 
+# Create the GPG-signed git tag for the release. release:prepare only creates an unsigned tag,
+# this overwrites it with a signed one. Requires TAG_NAME to be set.
+function create_signed_tag() {
   echo -e "\033[0;32m* Creating GPG-signed tag\033[0m"
   git checkout ${TAG_NAME} -q
   git tag -s -f -m "Tagging ${TAG_NAME}" ${TAG_NAME}
+}
+
+# All the steps that must run once the artifacts have been published by release_maven
+# (release:perform): sign the tag, bump the release branch to the next SNAPSHOT, merge and push
+# it, clean up and push the tag + create the GitHub release.
+# This is the single source of truth for the post-publish steps, shared by the normal release
+# flow (release_project) and the resume-after-publish flow (resume_project_after_publish).
+function finish_release_after_publish() {
+  create_signed_tag
+  post_update_versions
+  push_release
+  post_cleanup
+  push_tag
 }
 
 function post_update_versions() {
@@ -446,10 +479,59 @@ function push_tag() {
   git checkout master -q
 }
 
+# Resume a project's release right after the Maven publish (release:perform) succeeded but a
+# later step failed (typically Central returning a 502 while polling the deployment status).
+# This skips create_release_branch/pre_update_versions/release_maven (prepare+perform+publish)
+# and runs only the post-publish steps. It relies on the release branch, the SNAPSHOT-bumping
+# commit and the tag created by release:prepare being still present in the local clone, so the
+# repository must NOT have been cleaned since the failed run.
+# WARNING: only use this once you have confirmed on the Central portal that the artifacts for
+# this project have actually been published.
+function resume_project_after_publish() {
+  echo -e "\033[0;33m* Resuming $1 right after the Maven publish\033[0m"
+
+  # The normal flow sets a number of variables in the steps we are skipping here
+  # (create_release_branch, pre_update_versions, ...). We reconstruct the ones consumed by
+  # finish_release_after_publish() using the same helpers the normal flow uses:
+  #  - RELEASE_FROM_BRANCH / STABLE_BRANCH: normally set by check_branch()
+  #  - PROJECT_NAME / TAG_NAME:             normally set by pre_update_parent_versions()
+  # VERSION, NEXT_SNAPSHOT_VERSION and RELEASE_BRANCH come from check_versions(), PRGDIR from init().
+  # IMPORTANT: if finish_release_after_publish() ever starts depending on another variable set
+  # earlier in the normal flow, reconstruct it here too, otherwise resuming will break.
+  compute_release_source_branch
+  compute_tag_name
+
+  # Fail fast if the local state left by the failed run is gone. finish_release_after_publish()
+  # checks out and force-signs ${TAG_NAME}: if the tag (or the release branch) no longer exists
+  # locally - e.g. the clone was cleaned since the failed run, or a wrong VERSION was given - the
+  # checkout would silently fail and the signed tag would land on whatever is checked out (master)
+  # and then get pushed. Refuse to resume in that case rather than pushing a wrong tag.
+  if ! git rev-parse --verify --quiet "refs/tags/${TAG_NAME}" > /dev/null
+  then
+    echo -e "\033[1;31mCannot resume $1: the tag ${TAG_NAME} does not exist in this clone.\033[0m"
+    echo -e "\033[1;31mThe release branch and tag from the failed run must still be present; a resume is not possible on a cleaned clone.\033[0m"
+    exit -1
+  fi
+  if ! git rev-parse --verify --quiet "refs/heads/${RELEASE_BRANCH}" > /dev/null
+  then
+    echo -e "\033[1;31mCannot resume $1: the release branch ${RELEASE_BRANCH} does not exist in this clone.\033[0m"
+    exit -1
+  fi
+
+  finish_release_after_publish
+}
+
 # Wrapper function that calls all the other release steps, for one project only.
 # The first (mandatory) parameter is the name of the subdirectory where the project sources are (xwiki-commons, xwiki-enterprise, etc).
 function release_project() {
   cd $1
+  # If this project is the one to resume after a failed publish, run only the post-publish steps.
+  if [[ $do_release == true && "$RESUME_AFTER_PUBLISH_PROJECT" == "$1" ]]
+  then
+    resume_project_after_publish $1
+    cd ..
+    return
+  fi
   pre_cleanup
   update_sources
   check_branch
@@ -458,17 +540,70 @@ function release_project() {
     create_release_branch
     pre_update_versions
     release_maven
-    post_update_versions
-    push_release
-    post_cleanup
-    push_tag
+    finish_release_after_publish
   fi
   cd ..
+}
+
+# Validate the -p (resume after publish) option and, since the release order is fixed
+# (commons -> rendering -> platform), automatically skip every project ordered before the
+# resume target: resuming a project means the ones released before it necessarily already
+# succeeded, so re-running them would attempt to re-release and re-publish them.
+function check_resume_after_publish() {
+  [[ -z $RESUME_AFTER_PUBLISH_PROJECT ]] && return
+
+  if [[ $do_release == false ]]
+  then
+    echo -e "\033[1;31m-p cannot be combined with -r: there is nothing to resume when the actual release is disabled.\033[0m"
+    exit -1
+  fi
+
+  case $RESUME_AFTER_PUBLISH_PROJECT in
+    xwiki-commons)
+      if [[ $do_xwiki_commons == false ]]
+      then
+        echo -e "\033[1;31m-p commons conflicts with -C (which disables xwiki-commons).\033[0m"
+        exit -1
+      fi
+      ;;
+    xwiki-rendering)
+      if [[ $do_xwiki_rendering == false ]]
+      then
+        echo -e "\033[1;31m-p rendering conflicts with -R (which disables xwiki-rendering).\033[0m"
+        exit -1
+      fi
+      if [[ $do_xwiki_commons == true ]]
+      then
+        echo -e "\033[0;33m* Resuming xwiki-rendering: xwiki-commons is already released, skipping it.\033[0m"
+        do_xwiki_commons=false
+      fi
+      ;;
+    xwiki-platform)
+      if [[ $do_xwiki_platform == false ]]
+      then
+        echo -e "\033[1;31m-p platform conflicts with -P (which disables xwiki-platform).\033[0m"
+        exit -1
+      fi
+      if [[ $do_xwiki_commons == true ]]
+      then
+        echo -e "\033[0;33m* Resuming xwiki-platform: xwiki-commons is already released, skipping it.\033[0m"
+        do_xwiki_commons=false
+      fi
+      if [[ $do_xwiki_rendering == true ]]
+      then
+        echo -e "\033[0;33m* Resuming xwiki-platform: xwiki-rendering is already released, skipping it.\033[0m"
+        do_xwiki_rendering=false
+      fi
+      ;;
+  esac
 }
 
 # Wrapper function that calls release_project for each XWiki project in order: commons, rendering, platform, enterprise.
 # This is the main function that is called when running the script.
 function release_all() {
+  # Validate the -p option first (it only depends on flags parsed by getopts) so we fail fast on
+  # a bad combination before the gpg setup and the version prompts.
+  check_resume_after_publish
   init
   check_env
   check_versions
@@ -510,6 +645,14 @@ function display_help() {
   echo "-C: Disable xwiki-commons handling."
   echo "-R: Disable xwiki-rendering handling."
   echo "-P: Disable xwiki-platform handling."
+  echo "-p <project>: Resume the given project (commons|rendering|platform) right after the Maven"
+  echo "    publish step, when release:perform published the artifacts to Maven Central but a later"
+  echo "    step failed (e.g. a 502/timeout while polling the deployment status). Only the"
+  echo "    post-publish steps are run for that project (signed tag, version bump, merge/push,"
+  echo "    cleanup, tag push and GitHub release). Projects ordered before it are skipped"
+  echo "    automatically (they are necessarily already released), and the following projects are"
+  echo "    released normally. Requires the local clone to still hold the release branch and tag"
+  echo "    from the failed run, and the artifacts to be confirmed as published on the Central portal."
   echo ""
   echo "This script performs the technical release:"
   echo "* Create a release branch"
@@ -530,9 +673,21 @@ do_release=true
 do_xwiki_commons=true
 do_xwiki_rendering=true
 do_xwiki_platform=true
-while getopts ":hbrCRP" o
+while getopts ":hbrCRPp:" o
 do
     case "${o}" in
+        p)
+          case "${OPTARG}" in
+            commons|xwiki-commons)     RESUME_AFTER_PUBLISH_PROJECT=xwiki-commons ;;
+            rendering|xwiki-rendering) RESUME_AFTER_PUBLISH_PROJECT=xwiki-rendering ;;
+            platform|xwiki-platform)   RESUME_AFTER_PUBLISH_PROJECT=xwiki-platform ;;
+            *)
+              echo "Invalid project for -p: '${OPTARG}' (expected commons, rendering or platform)."
+              exit -1
+              ;;
+          esac
+          echo "The script will resume ${RESUME_AFTER_PUBLISH_PROJECT} right after the Maven publish step (post-publish steps only)."
+          ;;
         r)
           echo "You called the script with skipping the actual release: "
           echo "the script will still ask all the questions related to the versions and will create the branches but it will stop before performing the actual release."
