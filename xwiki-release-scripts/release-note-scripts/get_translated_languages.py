@@ -15,7 +15,6 @@ XWIKI_PROJECTS_SLUG = ['xwiki-platform', 'xwiki-commons', 'xwiki-rendering']
 BRANCH_PATTERN = re.compile('stable-\\d+\\.(?P<minor>\\d+)\\.x')
 VERSION_PATTERN = re.compile('^(?P<major>\\d+)\\.(?P<minor>\\d+).*')
 GITHUB_TAG_ENDPOINT = "https://api.github.com/repos/xwiki/xwiki-platform/git/matching-refs/tags/"
-BRANCH_VERSION_CREATION_DATE_PATTERN = re.compile('^.*stable-\\d+\\.\\d+\\.x@{(?P<creationDate>.+)}.*')
 
 BRANCH_MASTER = 'master'
 BRANCH_LTS = 'lts'
@@ -127,15 +126,9 @@ def parse_arguments():
     return parser.parse_args()
 
 def find_branch_creation_date(branch_name):
-    command = "git reflog --date=iso8601 " + branch_name
+    command = "git show -s --format=%cd --date=iso8601 $(git merge-base {} master)".format(branch_name)
     result = subprocess.check_output(command, shell=True, text=True)
-    ## Example of result:
-    ## 064af0220b2 (HEAD -> stable-18.6.x, origin/stable-18.6.x) stable-18.6.x@{2026-07-16 11:17:44 +0200}: branch: Created from refs/remotes/origin/stable-18.6.x
-    matcher = BRANCH_VERSION_CREATION_DATE_PATTERN.match(result)
-    if not matcher:
-        raise RuntimeError("Cannot find creation date for branch {} obtained git command output: {}".format(
-            branch_name, result))
-    return dt.datetime.fromisoformat(matcher.group('creationDate'))
+    return dt.datetime.fromisoformat(result.strip())
 
 def main():
     args = parse_arguments()
