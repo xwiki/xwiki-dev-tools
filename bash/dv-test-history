@@ -1,0 +1,2316 @@
+#!/usr/bin/env python3
+"""Analyse the failure history of a test using the Develocity API.
+
+Given a test container (class/suite) and optionally a single test case, this
+collects every execution of that test in a time window, groups the failures by
+normalised failure message and stack trace, and reports where, when and how
+often each distinct failure happened -- broken down by the tag combination
+(branch / browser / database / servlet container) the test ran with.
+
+Data sources (all reachable with the Develocity access key):
+  * REST  GET /api/tests/cases        -> outcome per build scan id (1 request)
+  * MCP   execute_query (DRV/Athena)  -> build attributes of all those scans in
+                                         bulk (1 request per 900 scans)
+  * MCP   get_build (failures)        -> message + stack trace of a failure
+                                         (1 request per failing build, cached)
+
+The build attributes also carry the URL of the Jenkins build that published the
+scan, which is used to link the screenshot and the video that Jenkins archived
+for the most recent occurrences of each failure (anonymous requests to
+ci.xwiki.org, 1 per build, cached for a day since Jenkins discards the artifacts
+of old builds).
+
+Credentials are taken from $DEVELOCITY_URL / $DEVELOCITY_ACCESS_KEY or, failing
+that, from the `Authorization: Bearer ...` extraHeader that the Develocity agent
+skills repository leaves in ~/.gitconfig, or from the Develocity MCP server
+configured for Claude Code (`mcpServers` in ~/.claude.json / $CLAUDE_CONFIG_DIR
+or in a project `.mcp.json`).
+
+With --recent-failures it works the other way round and lists the tests that
+failed recently, marking each as a new or an already known failure, to find
+candidates worth analysing.
+
+Examples:
+  dv-test-history 'org.xwiki.panels.test.ui.docker.AllIT$NestedNavigationPanelAdministrationIT#navigationPanelAdministration'
+  dv-test-history --days 60 'https://community.develocity.cloud/scans/tests?...&tests.container=...&tests.test=...'
+  dv-test-history --group-by stack --json out.json 'org.xwiki.foo.AllIT$NestedBarIT'
+  dv-test-history --recent-failures 48
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import datetime as dt
+import hashlib
+import io
+import json
+import math
+import os
+import re
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Iterable
+
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:  # pragma: no cover - Python < 3.9
+    ZoneInfo = None  # type: ignore
+
+DEFAULT_DAYS = 28
+OUTCOMES = ("passed", "failed", "flaky", "skipped", "notSelected")
+# Outcomes that mean "the test ran and we know whether it worked".
+RUN_OUTCOMES = ("passed", "failed", "flaky")
+SQL_CHUNK = 900  # the query API caps result sets at 1000 rows
+MAX_GROUP_COLUMNS = 12  # keep the per-tag and per-week tables readable
+MAX_SUGGESTIONS = 10  # ready-to-run commands printed by --recent-failures
+USER_AGENT = "dv-test-history/1.0"
+
+
+# --------------------------------------------------------------------------- #
+# Credentials
+# --------------------------------------------------------------------------- #
+
+def _bearer(value: str) -> str | None:
+    """Extract the token from an `Authorization` header value."""
+    m = re.search(r"Bearer\s+(\S+)", value)
+    if m:
+        return m.group(1)
+    return value.strip() or None
+
+
+def _credentials_from_git_config() -> tuple[str | None, str | None]:
+    """The bearer token git uses for the Develocity agent skills repository."""
+    try:
+        out = subprocess.run(
+            ["git", "config", "--get-regexp", r"^http\..*\.extraheader$"],
+            capture_output=True, text=True, check=False).stdout
+    except OSError:
+        return None, None
+    for line in out.splitlines():
+        key, _, value = line.partition(" ")
+        m = re.match(r"^http\.(https?://[^/]+)/.*\.extraheader$", key)
+        if not m:
+            continue
+        host = m.group(1)
+        bearer = re.search(r"Bearer\s+(\S+)", value)
+        if bearer and _looks_like_develocity(host):
+            return host, bearer.group(1)
+    return None, None
+
+
+def _looks_like_develocity(text: str) -> bool:
+    text = text.lower()
+    return "develocity" in text or "gradle" in text
+
+
+def _claude_config_files() -> list[str]:
+    """Files where Claude Code stores MCP server definitions, most specific first."""
+    paths = []
+    config_dir = os.environ.get("CLAUDE_CONFIG_DIR")
+    if config_dir:
+        paths.append(os.path.join(config_dir, ".claude.json"))
+    home = os.path.expanduser("~")
+    paths += [os.path.join(home, ".claude", ".claude.json"),
+              os.path.join(home, ".claude.json"),
+              # Project-scoped servers, checked into the repository.
+              os.path.join(os.getcwd(), ".mcp.json")]
+    seen, unique = set(), []
+    for path in paths:
+        if path not in seen:
+            seen.add(path)
+            unique.append(path)
+    return unique
+
+
+def _iter_mcp_servers(data: Any) -> Iterable[tuple[str, dict]]:
+    """Yield the (name, definition) of every MCP server in a Claude config."""
+    if not isinstance(data, dict):
+        return
+    sections = [data.get("mcpServers")]
+    projects = data.get("projects")
+    if isinstance(projects, dict):
+        sections += [p.get("mcpServers") for p in projects.values()
+                     if isinstance(p, dict)]
+    for section in sections:
+        if isinstance(section, dict):
+            for name, definition in section.items():
+                if isinstance(definition, dict):
+                    yield name, definition
+
+
+def _credentials_from_claude_config() -> tuple[str | None, str | None]:
+    """The URL and bearer token of the Develocity MCP server in Claude's config.
+
+    Claude Code stores remote MCP servers as
+    `mcpServers.<name> = {"url": "https://.../mcp", "headers": {"Authorization":
+    "Bearer ..."}}`, either globally in `.claude.json` or per project (there and
+    in a `.mcp.json` next to the sources).
+    """
+    for path in _claude_config_files():
+        try:
+            with open(path, encoding="utf-8") as handle:
+                data = json.load(handle)
+        except (OSError, ValueError):
+            continue
+        for name, server in _iter_mcp_servers(data):
+            server_url = server.get("url") or ""
+            if not isinstance(server_url, str):
+                continue
+            if not _looks_like_develocity(f"{name} {server_url}"):
+                continue
+            headers = server.get("headers")
+            token = None
+            if isinstance(headers, dict):
+                for key, value in headers.items():
+                    if key.lower() == "authorization" and isinstance(value, str):
+                        token = _bearer(value)
+            if not token:
+                continue
+            # The MCP endpoint lives below the Develocity base URL.
+            return re.sub(r"/mcp/?$", "", server_url) or None, token
+    return None, None
+
+
+def resolve_credentials(url: str | None, token: str | None) -> tuple[str, str]:
+    url = url or os.environ.get("DEVELOCITY_URL")
+    token = token or os.environ.get("DEVELOCITY_ACCESS_KEY")
+
+    for source in (_credentials_from_git_config, _credentials_from_claude_config):
+        if url and token:
+            break
+        found_url, found_token = source()
+        url, token = url or found_url, token or found_token
+
+    if url and token:
+        return url.rstrip("/"), token
+
+    raise SystemExit(
+        "Could not determine Develocity credentials. Set DEVELOCITY_URL and "
+        "DEVELOCITY_ACCESS_KEY, or pass --server/--token.")
+
+
+# --------------------------------------------------------------------------- #
+# HTTP / API clients
+# --------------------------------------------------------------------------- #
+
+class DevelocityError(RuntimeError):
+    """A request to Develocity failed."""
+
+
+class Develocity:
+    """Thin client for the Develocity REST API and its MCP endpoint."""
+
+    def __init__(self, base_url: str, token: str, verbose: bool = False):
+        self.base_url = base_url
+        self.token = token
+        self.verbose = verbose
+        self.request_count = 0
+
+    def _open(self, req: urllib.request.Request, attempts: int = 4) -> bytes:
+        delay = 2.0
+        for attempt in range(1, attempts + 1):
+            self.request_count += 1
+            try:
+                with urllib.request.urlopen(req, timeout=120) as resp:
+                    return resp.read()
+            except urllib.error.HTTPError as e:
+                body = e.read().decode("utf-8", "replace")
+                retryable = e.code in (429, 500, 502, 503, 504)
+                if not retryable or attempt == attempts:
+                    raise DevelocityError(
+                        f"{req.get_method()} {req.full_url.split('?')[0]} failed "
+                        f"with HTTP {e.code}: {body[:500]}")
+                self.log(f"HTTP {e.code}, retrying in {delay:.0f}s")
+            except urllib.error.URLError as e:
+                if attempt == attempts:
+                    raise DevelocityError(f"Network error talking to Develocity: {e}")
+                self.log(f"network error ({e}), retrying in {delay:.0f}s")
+            time.sleep(delay)
+            delay *= 2
+        raise AssertionError("unreachable")
+
+    def log(self, message: str) -> None:
+        if self.verbose:
+            print(f"[dv] {message}", file=sys.stderr)
+
+    def get(self, path: str, params: list[tuple[str, str]]) -> Any:
+        url = f"{self.base_url}{path}?{urllib.parse.urlencode(params)}"
+        self.log(f"GET {path} {params}")
+        req = urllib.request.Request(url, headers={
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "application/json",
+            "User-Agent": USER_AGENT,
+        })
+        return json.loads(self._open(req))
+
+    def mcp(self, tool: str, arguments: dict) -> str:
+        """Call an MCP tool over plain HTTP JSON-RPC and return its text content.
+
+        The Develocity MCP endpoint is stateless, so no initialize handshake is
+        needed. This is how we reach data the REST API does not expose (test
+        failure messages and stack traces, and the DRV query API).
+        """
+        payload = {
+            "jsonrpc": "2.0", "id": 1, "method": "tools/call",
+            "params": {"name": tool, "arguments": arguments},
+        }
+        self.log(f"MCP {tool} {json.dumps(arguments)[:160]}")
+        req = urllib.request.Request(
+            f"{self.base_url}/mcp", data=json.dumps(payload).encode(),
+            headers={
+                "Authorization": f"Bearer {self.token}",
+                "Content-Type": "application/json",
+                "Accept": "application/json, text/event-stream",
+                "User-Agent": USER_AGENT,
+            }, method="POST")
+        raw = self._open(req).decode("utf-8", "replace")
+        if raw.startswith("event:") or raw.startswith("data:"):  # SSE framing
+            raw = "\n".join(l[5:].strip() for l in raw.splitlines()
+                            if l.startswith("data:"))
+        response = json.loads(raw)
+        if "error" in response:
+            raise DevelocityError(f"MCP {tool} failed: {response['error']}")
+        result = response["result"]
+        text = "".join(c.get("text", "") for c in result.get("content", []))
+        if result.get("isError"):
+            raise DevelocityError(f"MCP {tool} failed: {text[:800]}")
+        return text
+
+    def sql(self, query: str) -> list[dict[str, str]]:
+        text = self.mcp("execute_query", {"query": query})
+        rows = list(csv.DictReader(io.StringIO(text)))
+        return rows
+
+
+class Cache:
+    """Disk cache for immutable per-build-scan data."""
+
+    def __init__(self, directory: str | None):
+        self.dir = directory
+        if self.dir:
+            os.makedirs(self.dir, exist_ok=True)
+
+    def _path(self, kind: str, key: str) -> str:
+        assert self.dir
+        digest = hashlib.sha1(key.encode()).hexdigest()[:16]
+        return os.path.join(self.dir, f"{kind}-{digest}.json")
+
+    def get(self, kind: str, key: str) -> Any | None:
+        if not self.dir:
+            return None
+        try:
+            with open(self._path(kind, key)) as fh:
+                return json.load(fh)
+        except (OSError, ValueError):
+            return None
+
+    def put(self, kind: str, key: str, value: Any) -> None:
+        if not self.dir:
+            return
+        path = self._path(kind, key)
+        try:
+            with open(path + ".tmp", "w") as fh:
+                json.dump(value, fh)
+            os.replace(path + ".tmp", path)
+        except OSError:
+            pass
+
+
+# --------------------------------------------------------------------------- #
+# Target / time window parsing
+# --------------------------------------------------------------------------- #
+
+def parse_target(target: str) -> tuple[str, str | None, str | None, str | None]:
+    """Return (container, test_name, project_glob, relative_window) from a
+    Develocity tests URL or a `container[#test]` string."""
+    if target.startswith("http://") or target.startswith("https://"):
+        query = urllib.parse.parse_qs(urllib.parse.urlparse(target).query)
+        container = (query.get("tests.container") or [None])[0]
+        if not container:
+            raise SystemExit("URL does not contain a 'tests.container' parameter")
+        test = (query.get("tests.test") or [None])[0]
+        project = (query.get("search.rootProjectNames") or [None])[0]
+        window = (query.get("search.relativeStartTime") or [None])[0]
+        return container, test, project, window
+    container, sep, test = target.partition("#")
+    return container, (test or None), None, None
+
+
+def parse_iso_duration_days(value: str) -> float | None:
+    """Very small ISO-8601 duration parser, enough for P28D / P4W / PT48H."""
+    m = re.fullmatch(r"P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?", value)
+    if not m:
+        return None
+    weeks, days, hours, minutes = (int(g) if g else 0 for g in m.groups())
+    total = weeks * 7 + days + hours / 24 + minutes / 1440
+    return total or None
+
+
+def with_timezone(value: str, tz) -> dt.datetime:
+    parsed = dt.datetime.fromisoformat(value)
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=tz)
+
+
+def resolve_window(args, url_window: str | None, tz) -> tuple[dt.datetime, dt.datetime]:
+    now = dt.datetime.now(tz)
+    to = with_timezone(args.to, tz) if args.to else now
+    if args.since:
+        frm = with_timezone(args.since, tz)
+    else:
+        days = args.days
+        if days is None and url_window:
+            days = parse_iso_duration_days(url_window)
+        days = days if days is not None else DEFAULT_DAYS
+        frm = to - dt.timedelta(days=days)
+    if frm >= to:
+        raise SystemExit("Empty time window: --since must be before --to")
+    return frm, to
+
+
+# --------------------------------------------------------------------------- #
+# Data collection
+# --------------------------------------------------------------------------- #
+
+def build_query(frm: dt.datetime, to: dt.datetime, project: str | None,
+                extra: str | None) -> str:
+    terms = [f'buildStartTime>"{frm.isoformat()}"', f'buildStartTime<"{to.isoformat()}"']
+    if project:
+        terms.append(f"project:{project}")
+    if extra:
+        terms.append(f"({extra})")
+    return " and ".join(terms)
+
+
+def fetch_test_cases(dv: Develocity, container: str, query: str) -> list[dict]:
+    params = [("container", container), ("query", query),
+              ("include", "buildScanIds"), ("include", "workUnits")]
+    params += [("testOutcomes", o) for o in OUTCOMES]
+    response = dv.get("/api/tests/cases", params)
+    return response.get("content", [])
+
+
+def fetch_failing_containers(dv: Develocity, query: str) -> list[dict]:
+    params = [("query", query), ("testOutcomes", "failed"), ("testOutcomes", "flaky")]
+    return dv.get("/api/tests/containers", params).get("content", [])
+
+
+def fetch_build_attributes(dv: Develocity, cache: Cache, scan_ids: list[str],
+                           frm: dt.datetime, to: dt.datetime) -> dict[str, dict]:
+    """Bulk-fetch build attributes via the DRV query API, with a REST fallback
+    for build scans the data warehouse does not know (yet)."""
+    attributes: dict[str, dict] = {}
+    missing: list[str] = []
+    for scan_id in scan_ids:
+        cached = cache.get("attrs", scan_id)
+        # Records cached before the Jenkins build URL was collected lack the key
+        # entirely (an empty string means "this build didn't run on Jenkins"),
+        # so they are fetched again rather than hiding the artifacts.
+        if cached and "jenkins_url" in cached:
+            attributes[scan_id] = cached
+        else:
+            missing.append(scan_id)
+    if not missing:
+        return attributes
+
+    # The partition column is a date, so widen by a day on both sides.
+    frm_date = (frm - dt.timedelta(days=1)).date().isoformat()
+    to_date = (to + dt.timedelta(days=1)).date().isoformat()
+    for start in range(0, len(missing), SQL_CHUNK):
+        chunk = missing[start:start + SQL_CHUNK]
+        id_list = ",".join("'" + i.replace("'", "") + "'" for i in chunk)
+        sql = f"""
+SELECT COALESCE(mavenAttributes.id, gradleAttributes.id) AS id,
+       COALESCE(mavenAttributes.buildStartTime, gradleAttributes.buildStartTime) AS start_time,
+       array_join(COALESCE(mavenAttributes.tags, gradleAttributes.tags), '|') AS tags,
+       COALESCE(mavenAttributes.environment.localHostname, gradleAttributes.environment.localHostname) AS host,
+       COALESCE(mavenAttributes.environment.jvmVersion, gradleAttributes.environment.jvmVersion) AS jvm,
+       COALESCE(mavenAttributes.topLevelProjectName, gradleAttributes.rootProjectName) AS project,
+       COALESCE(mavenAttributes.hasFailed, gradleAttributes.hasFailed) AS build_failed,
+       array_join(transform(filter(COALESCE(mavenAttributes.links, gradleAttributes.links),
+                                   l -> l.label = '{JENKINS_LINK_LABEL}'), l -> l.url), ' ') AS jenkins_url
+FROM build
+WHERE build_start_date BETWEEN DATE '{frm_date}' AND DATE '{to_date}'
+  AND COALESCE(mavenAttributes.id, gradleAttributes.id) IN ({id_list})
+""".strip()
+        try:
+            rows = dv.sql(sql)
+        except DevelocityError as exc:
+            dv.log(f"bulk attribute query failed ({exc}), falling back to REST")
+            rows = []
+        for row in rows:
+            scan_id = row.get("id") or ""
+            if not scan_id:
+                continue
+            record = {
+                "start_time": int(row["start_time"]) if row.get("start_time") else None,
+                "tags": [t for t in (row.get("tags") or "").split("|") if t],
+                "host": row.get("host") or "",
+                "jvm": row.get("jvm") or "",
+                "project": row.get("project") or "",
+                "build_failed": (row.get("build_failed") or "").lower() == "true",
+                # Empty for the builds that did not run on Jenkins (e.g. a local
+                # build), and thus have no archived screenshot to link to.
+                "jenkins_url": (row.get("jenkins_url") or "").split(" ")[0],
+            }
+            attributes[scan_id] = record
+            cache.put("attrs", scan_id, record)
+    still_missing = [i for i in missing if i not in attributes]
+
+    if still_missing:
+        dv.log(f"{len(still_missing)} build scans not in the data warehouse, "
+               f"fetching them individually")
+
+        def fetch_one(scan_id: str) -> tuple[str, dict | None]:
+            for model in ("maven-attributes", "gradle-attributes"):
+                try:
+                    data = dv.get(f"/api/builds/{scan_id}/{model}", [])
+                except DevelocityError:
+                    continue
+                links = {l.get("label"): l.get("url")
+                         for l in (data.get("links") or [])}
+                return scan_id, {
+                    "start_time": data.get("buildStartTime"),
+                    "tags": data.get("tags") or [],
+                    "host": "",
+                    "jvm": "",
+                    "project": data.get("topLevelProjectName")
+                    or data.get("rootProjectName") or "",
+                    "build_failed": bool(data.get("hasFailed")),
+                    "jenkins_url": links.get(JENKINS_LINK_LABEL) or "",
+                }
+            return scan_id, None
+
+        with ThreadPoolExecutor(max_workers=6) as pool:
+            for scan_id, record in pool.map(fetch_one, still_missing):
+                if record:
+                    attributes[scan_id] = record
+                    cache.put("attrs", scan_id, record)
+    return attributes
+
+
+def fetch_build_test_failures(dv: Develocity, cache: Cache, scan_id: str,
+                              wanted: set[tuple[str, str]],
+                              max_pages: int) -> dict:
+    """Return {'total': n, 'failures': [...]} for one build scan.
+
+    Pages through the failure list until every wanted (suite, test) pair has
+    been seen, or the page budget is exhausted.
+    """
+    cache_key = f"{scan_id}|{max_pages}|{sorted(wanted)}"
+    cached = cache.get("failures", cache_key)
+    if cached:
+        return cached
+
+    collected: list[dict] = []
+    total = None
+    pagination: dict | None = None
+    for _ in range(max_pages):
+        arguments: dict[str, Any] = {
+            "buildId": scan_id, "modelCategory": "failures",
+            "modelFilters": {"failureTypes": ["test"]},
+        }
+        if pagination:
+            arguments["pagination"] = pagination
+        data = json.loads(dv.mcp("get_build", arguments))
+        failures = data.get("failures", {})
+        total = failures.get("testFailureCount", total)
+        tool = failures.get("buildToolType") or ""
+        section = failures.get(tool) or {}
+        if not section:
+            for key in ("maven", "gradle", "bazel", "npm", "sbt", "python"):
+                if isinstance(failures.get(key), dict):
+                    section = failures[key]
+                    break
+        entries = section.get("testFailures") or []
+        collected.extend(entries)
+        seen = {(e.get("id", {}).get("suiteName", ""),
+                 e.get("id", {}).get("testName", "")) for e in collected}
+        if wanted and wanted <= seen:
+            break
+        page = ((section.get("_pagination") or {}).get("testFailures") or {})
+        if not page.get("hasMore"):
+            break
+        pagination = page.get("nextPage")
+        if not pagination:
+            break
+
+    result = {"total": total if total is not None else len(collected),
+              "fetched": len(collected), "failures": collected}
+    cache.put("failures", cache_key, result)
+    return result
+
+
+# --------------------------------------------------------------------------- #
+# Failure normalisation
+# --------------------------------------------------------------------------- #
+
+# Lines that only describe the environment, not the failure.
+NOISE_LINE = re.compile(
+    r"^\s*(Build info:|System info:|Driver info:|Capabilities \{|Session ID:"
+    r"|\*\*\* Element info:|Element:|For documentation on this error"
+    r"|Command duration or timeout:|Screenshot:|Page source)")
+
+# chromedriver appends the browser build it ran with to the message, e.g.
+# "(Session info: chrome=149.0.7827.155)". It changes with every browser update
+# and would split one failure into one group per browser release.
+SESSION_INFO = re.compile(r"\s*\(Session info:[^)]*\)")
+
+# Exceptions whose detail message is only the driver's own phrasing of the same
+# problem and therefore carries no information beyond the exception type:
+# geckodriver reports a stale element as "The element with the reference <uuid>
+# is stale; either its node document is not the active document, or it is no
+# longer connected to the DOM", chromedriver as "stale element reference: stale
+# element not found in the current frame". Keeping the wording would split one
+# flaky failure into one group per browser.
+OPAQUE_DETAIL = re.compile(
+    r"^(\s*(?:[\w.$]+\.)?(StaleElementReferenceException))\s*:.*$")
+
+# Frames that only say how the exception object was built, not where the failure
+# happened: the reflective constructor call and the WebDriver response decoding
+# path. Which of them show up depends on the driver, so they too split one
+# failure into several groups.
+PLUMBING_FRAME = re.compile(
+    r"^\s*at (?:java\.lang\.reflect\.|java\.lang\.invoke\.|jdk\.internal\.reflect\."
+    r"|sun\.reflect\.|org\.openqa\.selenium\.json\."
+    r"|org\.openqa\.selenium\.remote\.(?:ErrorCodec|ErrorHandler|Error|W3C|codec\.|http\.))")
+
+SUBSTITUTIONS: list[tuple[re.Pattern[str], str]] = [
+    # Lambda / proxy / generated class names carry a per-JVM counter and address.
+    (re.compile(r"\$\$Lambda[\$/][\w./$]*"), "$$Lambda"),
+    (re.compile(r"\$\$EnhancerBy\w+\$\$\w+"), "$$Enhancer"),
+    (re.compile(r"\bProxy\d+\b"), "Proxy"),
+    # Identity hash codes: SomeObject@6ee78f63
+    (re.compile(r"@[0-9a-fA-F]{4,}\b"), "@<hash>"),
+    (re.compile(r"\b0x[0-9a-fA-F]+\b"), "<hex>"),
+    (re.compile(r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}"
+                r"-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"), "<uuid>"),
+    # Selenium / WebDriver session ids and docker container host names.
+    (re.compile(r"(?i)\b(jsession)?id\s*[=:]\s*[0-9a-fA-F-]{8,}"), r"\1id=<id>"),
+    (re.compile(r"(?i)\bsession\s*(id)?\s*[=:]\s*\S+"), "session=<id>"),
+    (re.compile(r"\b[0-9a-f]{12}\b"), "<hostid>"),
+    (re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"), "<ip>"),
+    (re.compile(r"//[\w.-]+:\d+"), "//<host>:<port>"),
+    # Host names -- the trailing lookahead keeps `org.xwiki.foo.BarIT` in stack
+    # frames from being mangled into `<host>.foo.BarIT`.
+    (re.compile(r"(?i)\b(?:localhost|(?:[\w-]+\.)+(?:xwiki|internal|local))"
+                r"(?![\w.-])"), "<host>"),
+    # Volatile paths and temp directories.
+    (re.compile(r"/tmp/[\w.+-]+"), "/tmp/<tmp>"),
+    (re.compile(r"(?i)\b[a-z]:\\\\[\w\\\\.+-]+"), "<path>"),
+    # Versions reported by the environment.
+    (re.compile(r"(version|revision|os\.version|java\.version|browserVersion)"
+                r"\s*[:=]\s*'[^']*'"), r"\1: '<v>'"),
+    # Timestamps and long numbers (build numbers, pids, epoch millis).
+    (re.compile(r"\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}[.,\d]*(?:Z|[+-]\d{2}:?\d{2})?"),
+     "<timestamp>"),
+    (re.compile(r"\b\d{6,}\b"), "<n>"),
+]
+
+SOURCE_LOCATION = re.compile(r"\(([\w$.-]+\.(?:java|kt|groovy|scala)):\d+\)")
+
+
+def normalise_text(text: str) -> str:
+    for pattern, replacement in SUBSTITUTIONS:
+        text = pattern.sub(replacement, text)
+    return re.sub(r"[ \t]+", " ", text).strip()
+
+
+def message_lines(message: Any) -> list[str]:
+    if message is None:
+        return []
+    if isinstance(message, str):
+        return message.splitlines()
+    if isinstance(message, list):
+        lines: list[str] = []
+        for item in message:
+            if isinstance(item, str):
+                lines.extend(item.splitlines())
+        return lines
+    return [str(message)]
+
+
+def normalise_message(message: Any) -> str:
+    kept = []
+    for line in message_lines(message):
+        if NOISE_LINE.match(line):
+            continue
+        line = SESSION_INFO.sub("", line)
+        line = OPAQUE_DETAIL.sub(r"\1: <driver-specific detail>", line)
+        if line.strip():
+            kept.append(line)
+    return normalise_text("\n".join(kept))
+
+
+def stack_lines(stack: Any) -> list[str]:
+    if stack is None:
+        return []
+    if isinstance(stack, str):
+        return stack.splitlines()
+    if isinstance(stack, list):
+        lines: list[str] = []
+        for item in stack:
+            if isinstance(item, str):
+                lines.extend(item.splitlines())
+        return lines
+    return [str(stack)]
+
+
+def normalise_stack(stack: Any, keep_line_numbers: bool,
+                    max_frames: int = 40) -> str:
+    frames = [l for l in stack_lines(stack) if l.strip()]
+    if not frames:
+        return ""
+    # Never drop everything: a stack made up of plumbing only is all we have.
+    frames = [l for l in frames if not PLUMBING_FRAME.match(l)] or frames
+    frames = frames[:max_frames]
+    out = []
+    for frame in frames:
+        if not keep_line_numbers:
+            frame = SOURCE_LOCATION.sub(r"(\1)", frame)
+        out.append(normalise_text(frame))
+    return "\n".join(out)
+
+
+STACK_FRAME = re.compile(r"^\s*at ([\w.$]+)\.([\w<>$]+)\(([\w$.-]+):(\d+)\)")
+
+
+def assertion_site(stack: Any, container: str) -> str:
+    """`Class.method:line` of the deepest frame that belongs to the test itself.
+
+    That is the line that actually failed, which distinguishes two different
+    assertions inside one long test method -- something the normalised stack
+    trace deliberately no longer does.
+    """
+    # The class the test lives in; nested JUnit suites use Outer$NestedFooIT.
+    simple = container.rsplit(".", 1)[-1].split("$")[-1].removeprefix("Nested")
+    frames = [m for m in (STACK_FRAME.match(l) for l in stack_lines(stack)) if m]
+    if not frames:
+        return "(unknown)"
+    own = [m for m in frames if m.group(1).endswith(simple)] or frames
+    match = own[-1]
+    return f"{match.group(1).rsplit('.', 1)[-1]}.{match.group(2)}:{match.group(4)}"
+
+
+def exception_type(message: Any) -> str:
+    lines = message_lines(message)
+    first = lines[0] if lines else ""
+    m = re.match(r"\s*([\w.$]+(?:Exception|Error|Throwable|Failure))\b", first)
+    return m.group(1) if m else (first.split(":")[0].strip() or "(unknown)")
+
+
+def failure_signature(message: Any, stack: Any, mode: str,
+                      keep_line_numbers: bool,
+                      test: str = "") -> tuple[str, str, str]:
+    """Return (signature, normalised message, normalised stack).
+
+    The test case name is part of the signature so that identical failures of
+    two test cases of the same container never end up in one group.
+    """
+    norm_message = normalise_message(message)
+    norm_stack = normalise_stack(stack, keep_line_numbers)
+    if mode == "stack":
+        key = exception_type(message) + "\n" + norm_stack
+    elif mode == "message":
+        key = norm_message
+    else:
+        key = norm_message + "\n--\n" + norm_stack
+    key = test + "\n" + key
+    return hashlib.sha1(key.encode()).hexdigest()[:10], norm_message, norm_stack
+
+
+# --------------------------------------------------------------------------- #
+# Tags -> configuration dimensions
+# --------------------------------------------------------------------------- #
+
+BROWSERS = ("firefox", "chrome", "edge", "safari")
+DATABASE_RE = re.compile(r"^(mysql|mariadb|postgresql|oracle|hsqldb|mssql|db2)\b", re.I)
+SERVLET_RE = re.compile(r"^(tomcat|jetty|wildfly|glassfish)\b", re.I)
+BRANCH_RE = re.compile(r"^(master|main|trunk|stable-[\w.]+|feature-.*|release-.*)$", re.I)
+# Builds that carry no browser tag run the default browser, so they are counted
+# as that browser -- telling them apart would only split the statistics of a
+# browser-specific failure in two.
+IMPLICIT_BROWSER = "firefox"
+
+
+def dimensions(tags: list[str], jvm: str, host: str) -> dict[str, str]:
+    """Split a tag set into the dimensions that matter for XWiki ITs."""
+    browser = next((t for t in tags if t.lower() in BROWSERS), None)
+    database = next((t for t in tags if DATABASE_RE.match(t)), None)
+    servlet = next((t for t in tags if SERVLET_RE.match(t)), None)
+    branch = next((t for t in tags if BRANCH_RE.match(t)), None)
+    known = {t for t in (browser, database, servlet, branch) if t}
+    other = sorted(t for t in tags if t not in known)
+
+    servlet_jdk = ""
+    if servlet:
+        m = re.search(r"jdk(\d+)", servlet, re.I)
+        servlet_jdk = f"jdk{m.group(1)}" if m else ""
+    maven_jdk = ""
+    if jvm:
+        # e.g. "Eclipse Temurin OpenJDK 64-Bit Server VM 21.0.11+10-LTS" -> jdk21,
+        # "... 1.8.0_402-b06" -> jdk8.
+        m = re.search(r"\b(\d+)\.(\d+)\.\d+", jvm)
+        if m:
+            major, minor = m.group(1), m.group(2)
+            maven_jdk = f"jdk{minor if major == '1' else major}"
+
+    return {
+        "branch": branch or "(none)",
+        "browser": (browser or IMPLICIT_BROWSER).lower(),
+        "database": database or "(unspecified)",
+        "servlet container": servlet or "(unspecified)",
+        "servlet jdk": servlet_jdk or "(unspecified)",
+        "maven jdk": maven_jdk or "(unknown)",
+        "other tags": ", ".join(other) or "(none)",
+    }
+
+
+DIMENSION_ORDER = ["branch", "browser", "database", "servlet container",
+                   "servlet jdk", "maven jdk", "other tags"]
+# Dimensions that make up the "configuration" a test ran in.
+CONFIG_DIMENSIONS = ["branch", "browser", "database", "servlet container"]
+
+
+def config_label(dim: dict[str, str]) -> str:
+    return " / ".join(dim[d] for d in CONFIG_DIMENSIONS)
+
+
+# --------------------------------------------------------------------------- #
+# Jenkins artifacts (screenshots and videos)
+# --------------------------------------------------------------------------- #
+
+# The Develocity link that points at the Jenkins build that published the scan.
+JENKINS_LINK_LABEL = "Jenkins build"
+# The docker-based test framework saves a screenshot (and, when recording is
+# enabled, a video) of every failing UI test as
+# "<configuration>-<class>-<test>[<repetition>].png" / ".flv" (see
+# DockerTestUtils#getResultFileLocation), where <configuration> is
+# "<db>-<dbTag>-<jdbc>-<servletEngine>-<servletTag>-<browser>". The XWiki
+# pipeline archives them as build artifacts (see the archiveArtifacts calls in
+# xwikiBuild.groovy), which is where we read them from.
+SCREENSHOT_EXTENSION = ".png"
+VIDEO_EXTENSION = ".flv"
+ARTIFACT_EXTENSIONS = (SCREENSHOT_EXTENSION, VIDEO_EXTENSION)
+# Artifact listings are only cached for a day: Jenkins discards the artifacts of
+# old builds, and a longer-lived cache would keep linking to files that are gone.
+JENKINS_CACHE_TTL = 24 * 3600
+
+
+class Jenkins:
+    """Reads the artifacts archived by a Jenkins build.
+
+    Jenkins is queried anonymously (ci.xwiki.org allows it) with one
+    `api/json` request per build, which lists the artifacts of the whole
+    pipeline build -- i.e. of every configuration it ran, not only the one of
+    the build scan at hand, hence the per-configuration matching in
+    `find_test_artifacts`.
+    """
+
+    def __init__(self, cache: Cache, verbose: bool = False, timeout: int = 30):
+        self.cache = cache
+        self.verbose = verbose
+        self.timeout = timeout
+        self.request_count = 0
+        self._builds: dict[str, dict | None] = {}
+        # Newest build (per job) whose artifacts Jenkins has already discarded.
+        # Builds are discarded oldest first, so anything older than that in the
+        # same job is gone too and not worth a request.
+        self._discarded: dict[str, int] = {}
+
+    def log(self, message: str) -> None:
+        if self.verbose:
+            print(f"[jenkins] {message}", file=sys.stderr)
+
+    @staticmethod
+    def _job(build_url: str) -> str:
+        return build_url.rstrip("/").rsplit("/", 1)[0]
+
+    def discarded(self, build_url: str, time_ms: int) -> bool:
+        """Whether this build is known to be gone without asking Jenkins."""
+        return time_ms <= self._discarded.get(self._job(build_url), -1)
+
+    def _load(self, build_url: str) -> dict | None:
+        """Return the build's artifact listing, `{'missing': True}` when Jenkins
+        no longer has the build, or None when it could not be fetched."""
+        entry = self.cache.get("jenkins", build_url)
+        if entry and time.time() - entry.get("fetched", 0) < JENKINS_CACHE_TTL:
+            return entry.get("build")
+        tree = "artifacts[relativePath]"
+        url = f"{build_url}api/json?tree={urllib.parse.quote(tree, safe='')}"
+        request = urllib.request.Request(url, headers={
+            "Accept": "application/json", "User-Agent": USER_AGENT})
+        self.request_count += 1
+        self.log(f"GET {url}")
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                data = json.loads(response.read())
+            build = {"artifacts": [a.get("relativePath", "")
+                                   for a in data.get("artifacts") or []]}
+        except urllib.error.HTTPError as error:
+            if error.code != 404:
+                self.log(f"HTTP {error.code} for {build_url}")
+                return None
+            build = {"missing": True}
+        except (urllib.error.URLError, ValueError, OSError) as error:
+            self.log(f"failed to read {build_url}: {error}")
+            return None
+        self.cache.put("jenkins", build_url, {"fetched": time.time(), "build": build})
+        return build
+
+    def prefetch(self, builds: list[tuple[str, int]], jobs: int) -> None:
+        """Fetch the listings of the passed (build URL, build time) pairs."""
+        todo = [url for url in dict.fromkeys(url for url, _ in builds)
+                if url not in self._builds]
+        if not todo:
+            return
+        with ThreadPoolExecutor(max_workers=max(1, jobs)) as pool:
+            for url, build in pool.map(lambda u: (u, self._load(u)), todo):
+                self._builds[url] = build
+        for url, time_ms in builds:
+            build = self._builds.get(url)
+            if build and build.get("missing"):
+                job = self._job(url)
+                self._discarded[job] = max(self._discarded.get(job, -1), time_ms)
+
+    def build(self, build_url: str) -> dict | None:
+        if build_url not in self._builds:
+            self._builds[build_url] = self._load(build_url)
+        return self._builds[build_url]
+
+    @staticmethod
+    def artifact_url(build_url: str, path: str) -> str:
+        return f"{build_url}artifact/{urllib.parse.quote(path, safe='/$')}"
+
+
+def normalise_artifact_test_name(name: str) -> str:
+    """Turn a reported test case name into the name used in artifact names.
+
+    Mirrors normalizeTestName() of the Jenkins pipeline: the framework names the
+    file after the test *method*, so the parameter list (`foo(TestUtils)`) or the
+    display name (`foo{...}`) that JUnit appends has to go, and the index of a
+    parameterized invocation is written without its brackets (`foo[2]` ->
+    `foo2`).
+    """
+    start = name.find("{")
+    end = name.rfind("}")
+    if start < 0:
+        start = name.find("(")
+        end = name.rfind(")")
+    if start >= 0:
+        name = (name[:start] + name[end + 1:]) if end > start else name[:start]
+    return name.replace("[", "").replace("]", "")
+
+
+def matches_artifact_name(file_name: str, pattern: str) -> bool:
+    """Whether the file is the `<class>-<test>` one, i.e. the pattern is followed
+    by a name boundary rather than by more test-name characters -- otherwise a
+    test whose name is a prefix of another one (`saveDocument` vs
+    `saveDocumentWithoutRights`) would match the other test's screenshot."""
+    index = file_name.find(pattern)
+    while index >= 0:
+        end = index + len(pattern)
+        if end >= len(file_name) or not (file_name[end].isalnum()
+                                         or file_name[end] in "_$"):
+            return True
+        index = file_name.find(pattern, index + 1)
+    return False
+
+
+def config_tokens(tags: list[str]) -> list[str]:
+    """The tag values that also appear in the artifact names, normalised the way
+    the test framework writes them (`mysql latest` -> `mysql-latest`)."""
+    picked = [next((t for t in tags if t.lower() in BROWSERS), None),
+              next((t for t in tags if DATABASE_RE.match(t)), None),
+              next((t for t in tags if SERVLET_RE.match(t)), None)]
+    return [t.lower().replace(" ", "-") for t in picked if t]
+
+
+def find_test_artifacts(artifacts: list[str], container: str, test_name: str,
+                        tags: list[str]) -> dict[str, str] | None:
+    """Find the screenshot and the video of one test execution.
+
+    A pipeline build archives the artifacts of all the configurations it ran, so
+    a test that failed in several of them has several screenshots in the same
+    build; the configuration tags of the build scan (browser, database, servlet
+    engine), which the file name carries too, tell them apart. When they don't
+    (e.g. a screenshot of the legacy test framework, whose name has no
+    configuration prefix) the match is only used when it is unambiguous.
+    """
+    # The name is built from the fully qualified class name, but the legacy test
+    # framework used the simple one, so both are accepted.
+    method = normalise_artifact_test_name(test_name)
+    patterns = [f"{container}-{method}",
+                f"{container.rsplit('.', 1)[-1]}-{method}"]
+    # Keyed by file name without the extension, so that the screenshot and the
+    # video of the same execution stay together, and so that the same file
+    # archived from two directories counts once.
+    stems: dict[str, dict[str, Any]] = {}
+    for path in artifacts:
+        file_name = path.rsplit("/", 1)[-1]
+        extension = next((e for e in ARTIFACT_EXTENSIONS
+                          if file_name.endswith(e)), None)
+        if not extension:
+            continue
+        if not any(matches_artifact_name(file_name, p) for p in patterns):
+            continue
+        stem = stems.setdefault(file_name[:-len(extension)], {"paths": []})
+        stem.setdefault(extension, path)
+        stem["paths"].append(path)
+    if not stems:
+        return None
+    tokens = config_tokens(tags)
+    matching = [name for name, files in stems.items()
+                if tokens and any(all(t in p.lower() for t in tokens)
+                                  for p in files["paths"])]
+    if len(matching) == 1:
+        chosen = stems[matching[0]]
+    elif len(stems) == 1:
+        chosen = next(iter(stems.values()))
+    else:
+        # Several candidates and nothing to tell them apart: linking a
+        # screenshot of the wrong configuration would be worse than linking none.
+        return None
+    return {"screenshot": chosen.get(SCREENSHOT_EXTENSION, ""),
+            "video": chosen.get(VIDEO_EXTENSION, "")}
+
+
+def artifact_candidates(members: list[dict]) -> list[dict]:
+    """Order the occurrences of a failure so that the ones to look up first are
+    the most recent, in as many different browsers and configurations as
+    possible -- a screenshot of the same failure in Chrome and in Firefox says
+    more than two screenshots of the same configuration."""
+    remaining = sorted(members, key=lambda m: -m["time"])
+    order: list[dict] = []
+    browsers: set[str] = set()
+    configs: set[str] = set()
+    while remaining:
+        pick = (next((m for m in remaining if m["dim"]["browser"] not in browsers
+                      and m["config"] not in configs), None)
+                or next((m for m in remaining if m["config"] not in configs), None)
+                or remaining[0])
+        remaining.remove(pick)
+        order.append(pick)
+        browsers.add(pick["dim"]["browser"])
+        configs.add(pick["config"])
+    return order
+
+
+def attach_artifacts(jenkins: Jenkins, groups: list[dict], container: str,
+                     limit: int, jobs: int) -> None:
+    """Look up the archived screenshot and video of the most recent occurrences
+    of each failure, and store them as `artifacts` on the group.
+
+    Jenkins discards the artifacts of old builds, so an occurrence can well have
+    none left; each round tries one more occurrence per failure that is still
+    short of `limit` results, and there are a few more rounds than results
+    wanted to absorb those misses without turning this into a crawl.
+    """
+    for group in groups:
+        group["artifacts"] = []
+        group["artifact_queue"] = artifact_candidates(group["executions"])
+        group["artifact_attempts"] = 0
+    for _ in range(limit + 2):
+        batch = []
+        for group in groups:
+            if len(group["artifacts"]) >= limit:
+                continue
+            while group["artifact_queue"]:
+                execution = group["artifact_queue"].pop(0)
+                build_url = execution.get("jenkins") or ""
+                if not build_url:
+                    # Not a Jenkins build (e.g. a scan published by a local
+                    # build), so there are no archived artifacts to look for.
+                    continue
+                if jenkins.discarded(build_url, execution["time"]):
+                    # An older build of a job whose artifacts Jenkins already
+                    # discarded: counted as looked at, but not worth a request.
+                    group["artifact_attempts"] += 1
+                    continue
+                batch.append((group, execution, build_url))
+                break
+        if not batch:
+            break
+        jenkins.prefetch([(url, e["time"]) for _, e, url in batch], jobs)
+        for group, execution, build_url in batch:
+            group["artifact_attempts"] += 1
+            build = jenkins.build(build_url)
+            if not build or build.get("missing"):
+                continue
+            found = find_test_artifacts(build["artifacts"], container,
+                                        execution["test"], execution["tags"])
+            if not found:
+                continue
+            group["artifacts"].append({
+                "time": execution["time"],
+                "config": execution["config"],
+                "scan_id": execution["scan_id"],
+                "build_url": build_url,
+                "screenshot": (Jenkins.artifact_url(build_url, found["screenshot"])
+                               if found["screenshot"] else ""),
+                "video": (Jenkins.artifact_url(build_url, found["video"])
+                          if found["video"] else ""),
+            })
+    for group in groups:
+        group["artifacts"].sort(key=lambda a: -a["time"])
+        group.pop("artifact_queue", None)
+
+
+# --------------------------------------------------------------------------- #
+# Statistics helpers
+# --------------------------------------------------------------------------- #
+
+def fisher_enrichment(a: int, b: int, c: int, d: int) -> float:
+    """One-sided Fisher exact test p-value for enrichment of `a`.
+
+    Contingency table:  [[a, b], [c, d]]  -- rows are the group of interest vs
+    the rest, columns are failure vs no failure.  Returns P(X >= a).
+    """
+    n = a + b + c + d
+    if n == 0 or (a + c) == 0 or (a + b) == 0:
+        return 1.0
+    row1, col1 = a + b, a + c
+    hi = min(row1, col1)
+    denominator = math.comb(n, row1)
+    numerator = sum(math.comb(col1, k) * math.comb(n - col1, row1 - k)
+                    for k in range(a, hi + 1))
+    return min(1.0, numerator / denominator)
+
+
+def fisher_two_proportions(f1: int, n1: int, f2: int, n2: int) -> float:
+    """Two-sided-ish p-value for "failure rate differs between two samples".
+
+    Uses the smaller of the two one-sided Fisher tests, doubled and clamped --
+    good enough to flag interesting changes without pulling in scipy.
+    """
+    a, b, c, d = f1, n1 - f1, f2, n2 - f2
+    if min(n1, n2) == 0:
+        return 1.0
+    p_up = fisher_enrichment(a, b, c, d)
+    p_down = fisher_enrichment(c, d, a, b)
+    return min(1.0, 2 * min(p_up, p_down))
+
+
+def sparkline(values: Iterable[float]) -> str:
+    values = list(values)
+    if not values:
+        return ""
+    blocks = "▁▂▃▄▅▆▇█"
+    top = max(values)
+    if top <= 0:
+        return "▁" * len(values)
+    return "".join(blocks[min(len(blocks) - 1, int(v / top * (len(blocks) - 1) + 0.5))]
+                   for v in values)
+
+
+# --------------------------------------------------------------------------- #
+# Rendering helpers
+# --------------------------------------------------------------------------- #
+
+class Report:
+    def __init__(self) -> None:
+        self.parts: list[str] = []
+
+    def line(self, text: str = "") -> None:
+        self.parts.append(text)
+
+    def table(self, headers: list[str], rows: list[list[str]],
+              aligns: str | None = None) -> None:
+        if not rows:
+            self.line("_(no data)_")
+            self.line()
+            return
+        cells = [[str(c) for c in row] for row in rows]
+        widths = [max(len(headers[i]), *(len(r[i]) for r in cells))
+                  for i in range(len(headers))]
+        aligns = aligns or "l" * len(headers)
+
+        def fmt(row: list[str]) -> str:
+            out = []
+            for i, value in enumerate(row):
+                out.append(value.ljust(widths[i]) if aligns[i] == "l"
+                           else value.rjust(widths[i]))
+            return "| " + " | ".join(out) + " |"
+
+        self.line(fmt(headers))
+        self.line("|" + "|".join(
+            ("-" * (w + 2)) if aligns[i] == "l" else ("-" * (w + 1) + ":")
+            for i, w in enumerate(widths)) + "|")
+        for row in cells:
+            self.line(fmt(row))
+        self.line()
+
+    def __str__(self) -> str:
+        return "\n".join(self.parts) + "\n"
+
+
+def pct(part: int, whole: int) -> str:
+    return f"{100.0 * part / whole:.1f}%" if whole else "-"
+
+
+def fmt_time(ms: int | None, tz) -> str:
+    if not ms:
+        return "-"
+    return dt.datetime.fromtimestamp(ms / 1000, tz).strftime("%Y-%m-%d %H:%M")
+
+
+def fmt_date(ms: int | None, tz) -> str:
+    if not ms:
+        return "-"
+    return dt.datetime.fromtimestamp(ms / 1000, tz).strftime("%Y-%m-%d")
+
+
+def truncate(text: str, limit: int) -> str:
+    return text if len(text) <= limit else text[:limit - 1] + "…"
+
+
+# --------------------------------------------------------------------------- #
+# Main analysis
+# --------------------------------------------------------------------------- #
+
+def collect_executions(cases: list[dict], attributes: dict[str, dict],
+                       test_filter: str | None) -> list[dict]:
+    executions = []
+    for case in cases:
+        full_name = case.get("name", "")
+        case_name = full_name.rsplit(".", 1)[-1] if full_name else ""
+        if test_filter and case_name != test_filter:
+            continue
+        for outcome, scan_ids in (case.get("buildScanIdsByOutcome") or {}).items():
+            if outcome == "notSelected":
+                continue
+            for scan_id in scan_ids:
+                attrs = attributes.get(scan_id)
+                if not attrs or not attrs.get("start_time"):
+                    continue
+                dim = dimensions(attrs["tags"], attrs.get("jvm", ""),
+                                 attrs.get("host", ""))
+                executions.append({
+                    "scan_id": scan_id,
+                    "test": case_name,
+                    "outcome": outcome,
+                    "time": attrs["start_time"],
+                    "tags": attrs["tags"],
+                    "jenkins": attrs.get("jenkins_url", ""),
+                    "dim": dim,
+                    "config": config_label(dim),
+                })
+    executions.sort(key=lambda e: e["time"])
+    return executions
+
+
+def attach_failures(dv: Develocity, cache: Cache, executions: list[dict],
+                    container: str, args, jobs: int) -> None:
+    failing = [e for e in executions if e["outcome"] in ("failed", "flaky")]
+    wanted_by_scan: dict[str, set[tuple[str, str]]] = defaultdict(set)
+    for execution in failing:
+        wanted_by_scan[execution["scan_id"]].add((container, execution["test"]))
+
+    def fetch(scan_id: str) -> tuple[str, dict]:
+        return scan_id, fetch_build_test_failures(
+            dv, cache, scan_id, wanted_by_scan[scan_id], args.max_failure_pages)
+
+    results: dict[str, dict] = {}
+    if wanted_by_scan:
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
+            for scan_id, data in pool.map(fetch, list(wanted_by_scan)):
+                results[scan_id] = data
+
+    for execution in failing:
+        data = results.get(execution["scan_id"]) or {"failures": [], "total": 0}
+        mine = [f for f in data["failures"]
+                if f.get("id", {}).get("suiteName") == container
+                and f.get("id", {}).get("testName") == execution["test"]]
+        execution["build_test_failures"] = data.get("total", 0)
+        execution["co_failing"] = [
+            f"{f.get('id',{}).get('suiteName','').rsplit('.',1)[-1]}."
+            f"{f.get('id',{}).get('testName','')}"
+            for f in data["failures"]
+            if (f.get("id", {}).get("suiteName"), f.get("id", {}).get("testName"))
+            != (container, execution["test"])]
+        if not mine:
+            execution["signature"] = "unknown"
+            execution["message"] = ""
+            execution["stack"] = ""
+            execution["norm_message"] = "(failure details unavailable)"
+            execution["norm_stack"] = ""
+            execution["exception"] = "(unknown)"
+            continue
+        failure = mine[0]
+        signature, norm_message, norm_stack = failure_signature(
+            failure.get("message"), failure.get("stacktrace"),
+            args.group_by, args.keep_line_numbers, execution["test"])
+        execution["signature"] = signature
+        execution["message"] = "\n".join(message_lines(failure.get("message")))
+        execution["stack"] = "\n".join(stack_lines(failure.get("stacktrace")))
+        execution["norm_message"] = norm_message
+        execution["norm_stack"] = norm_stack
+        execution["exception"] = exception_type(failure.get("message"))
+        execution["raw_message"] = re.sub(
+            r"\s+", " ", " ".join(l for l in message_lines(failure.get("message"))
+                                  if not NOISE_LINE.match(l))).strip()
+        execution["site"] = assertion_site(execution["stack"], container)
+        # Stack-only signature, to spot groups that differ only in the message.
+        execution["stack_signature"] = failure_signature(
+            failure.get("message"), failure.get("stacktrace"), "stack",
+            args.keep_line_numbers, execution["test"])[0]
+
+
+def config_stats(executions: list[dict], group_filter: str | None = None) -> dict:
+    """Timeline statistics for one configuration (optionally one failure group)."""
+    runs = [e for e in executions if e["outcome"] in RUN_OUTCOMES]
+    if group_filter:
+        fails = [e for e in runs if e.get("signature") == group_filter]
+    else:
+        fails = [e for e in runs if e["outcome"] in ("failed", "flaky")]
+    # A "pass" is always a genuinely successful execution, also when we look at a
+    # single failure group -- otherwise failures of other groups would be counted
+    # as successes here.
+    passes = [e for e in runs if e["outcome"] == "passed"]
+    fail_ids = {id(e) for e in fails}
+    stats = {
+        "runs": len(runs),
+        "passed": sum(1 for e in runs if e["outcome"] == "passed"),
+        "failed": sum(1 for e in runs if e["outcome"] == "failed"),
+        "flaky": sum(1 for e in runs if e["outcome"] == "flaky"),
+        "skipped": sum(1 for e in executions if e["outcome"] == "skipped"),
+        "fail_count": len(fails),
+        "first_fail": fails[0]["time"] if fails else None,
+        "last_fail": fails[-1]["time"] if fails else None,
+        "last_run": runs[-1] if runs else None,
+        "first_fail_scan": fails[0]["scan_id"] if fails else None,
+        "last_fail_scan": fails[-1]["scan_id"] if fails else None,
+    }
+    if fails:
+        lo, hi = stats["first_fail"], stats["last_fail"]
+        stats["pass_in_span"] = sum(1 for e in passes if lo <= e["time"] <= hi)
+        stats["fail_in_span"] = len(fails)
+        stats["pass_before"] = sum(1 for e in passes if e["time"] < lo)
+        stats["pass_after"] = sum(1 for e in passes if e["time"] > hi)
+        streak, best = 0, 0
+        for e in runs:
+            if id(e) in fail_ids:
+                streak += 1
+                best = max(best, streak)
+            else:
+                streak = 0
+        stats["longest_streak"] = best
+    else:
+        stats.update(pass_in_span=0, fail_in_span=0, pass_before=len(passes),
+                     pass_after=0, longest_streak=0)
+    return stats
+
+
+def dimension_breakdown(runs: list[dict]) -> dict[str, dict]:
+    """Group executions by each tag dimension, flagging useless dimensions."""
+    breakdown: dict[str, dict] = {}
+    for dimension in DIMENSION_ORDER:
+        values: dict[str, list[dict]] = defaultdict(list)
+        for execution in runs:
+            values[execution["dim"][dimension]].append(execution)
+        breakdown[dimension] = {
+            "values": dict(values),
+            # A dimension with almost as many values as executions (typically a
+            # per-container host name) cannot tell us anything.
+            "too_granular": len(values) > max(6, len(runs) / 4),
+        }
+    return breakdown
+
+
+def tag_signals(runs: list[dict], groups: list[dict],
+                breakdown: dict[str, dict]) -> list[dict]:
+    """Tag values in which one failure group is significantly over-represented.
+
+    Signals whose failing executions are a subset of an already accepted,
+    stronger signal are dropped: they are correlates of it (e.g. `tomcat`, which
+    is only ever used together with `chrome`) rather than independent findings.
+    """
+    candidates: list[dict] = []
+    for dimension, data in breakdown.items():
+        if data["too_granular"]:
+            continue
+        for value, subset in data["values"].items():
+            if len(subset) == len(runs):
+                continue
+            subset_ids = {id(e) for e in subset}
+            for group in groups:
+                hits = [e for e in group["executions"] if id(e) in subset_ids]
+                a, total = len(hits), len(group["executions"])
+                threshold = 0.05 if a == total else 0.01
+                if a < 3 or (a < 5 and a != total):
+                    continue
+                p = fisher_enrichment(a, len(subset) - a, total - a,
+                                      len(runs) - len(subset) - (total - a))
+                if p >= threshold:
+                    continue
+                candidates.append({
+                    "group": group["label"], "dimension": dimension,
+                    "value": value, "hits": a, "total": total, "p": p,
+                    "share_of_runs": len(subset) / len(runs),
+                    "scans": frozenset(e["scan_id"] for e in hits),
+                })
+    accepted: list[dict] = []
+    per_group: dict[str, list[frozenset]] = defaultdict(list)
+    for candidate in sorted(candidates, key=lambda c: c["p"]):
+        if any(candidate["scans"] <= seen for seen in per_group[candidate["group"]]):
+            continue
+        per_group[candidate["group"]].append(candidate["scans"])
+        accepted.append(candidate)
+    return accepted
+
+
+def key_findings(ordered: list[dict], by_config: dict[str, list[dict]],
+                 signals: list[dict], change: dict | None, fails: list[dict],
+                 runs: list[dict], to_ms: int, tz,
+                 multi_case: bool = False) -> list[str]:
+    """A handful of sentences summarising what the tables below show."""
+    if not fails:
+        return [f"No failure in {len(runs)} executions in this window."]
+    findings = []
+
+    def name(group: dict) -> str:
+        test = group["executions"][0]["test"]
+        return (f"{group['label']} (`{test}`, `{group['exception']}`)" if multi_case
+                else f"{group['label']}")
+
+    top = ordered[0]
+    if len(ordered) == 1:
+        findings.append(f"A single distinct failure (`{top['exception']}`), "
+                        f"{len(top['executions'])} occurrences.")
+    else:
+        findings.append(
+            f"{len(ordered)} distinct failures; {name(top)} accounts "
+            f"for {pct(len(top['executions']), len(fails))} of all "
+            f"{len(fails)} failures.")
+    for group in ordered[:3]:
+        exclusive = [s for s in signals
+                     if s["group"] == group["label"] and s["hits"] == s["total"]]
+        if exclusive:
+            best = exclusive[0]
+            findings.append(f"{name(group)} happens **only** with "
+                            f"`{best['dimension']} = {best['value']}` "
+                            f"({best['share_of_runs'] * 100:.0f}% of runs, "
+                            f"p={best['p']:.1g}).")
+        else:
+            partial = [s for s in signals if s["group"] == group["label"]]
+            if partial:
+                findings.append(f"{name(group)} is concentrated on "
+                                f"`{partial[0]['dimension']} = "
+                                f"{partial[0]['value']}` "
+                                f"({partial[0]['hits']}/{partial[0]['total']} of its "
+                                f"failures, p={partial[0]['p']:.1g}).")
+    if change and change["p_adjusted"] < 0.05:
+        before = change["before_fails"] / change["before_runs"]
+        after = change["after_fails"] / change["after_runs"]
+        verb = "rose" if after > before else "dropped"
+        findings.append(
+            f"The failure rate {verb} around **{fmt_date(change['cut'], tz)}**: "
+            f"{pct(change['before_fails'], change['before_runs'])} before vs "
+            f"{pct(change['after_fails'], change['after_runs'])} after "
+            f"(p={change['p_adjusted']:.1g}, adjusted).")
+    affected = [config for config, subset in by_config.items()
+                if any(e["outcome"] in ("failed", "flaky") for e in subset)]
+    broken_now = [config for config in affected
+                  if (config_stats(by_config[config])["last_run"] or {})
+                  .get("outcome") in ("failed", "flaky")]
+    findings.append(f"Failed in {len(affected)} of {len(by_config)} configurations; "
+                    f"the most recent run failed in {len(broken_now)} of them"
+                    + (": " + ", ".join(f"`{c}`" for c in sorted(broken_now)[:6])
+                       + (" …" if len(broken_now) > 6 else "")
+                       if broken_now else "."))
+    # Judge the quiet streak only over the configurations that ever failed: a
+    # chrome-only failure cannot be contradicted by clean firefox runs.
+    scoped = [e for e in runs if e["config"] in set(affected)]
+    findings.append(quiet_streak_finding(fails, scoped, len(affected), to_ms))
+    return findings
+
+
+def quiet_streak_finding(fails: list[dict], scoped_runs: list[dict],
+                         config_count: int, to_ms: int) -> str:
+    """State what the clean runs since the last failure are actually worth.
+
+    A handful of passes after a failure means nothing for a test that fails a few
+    percent of the time, so instead of guessing "fixed" this reports how likely
+    the quiet streak is under the failure rate observed in the configurations
+    that are affected at all, and how long a streak would have to be to mean
+    something.
+    """
+    days_quiet = (to_ms - fails[-1]["time"]) / 86400000
+    since = sum(1 for e in scoped_runs if e["time"] > fails[-1]["time"])
+    where = (f"in the {config_count} affected configurations"
+             if config_count > 1 else "in the affected configuration")
+    text = (f"Last failure {days_quiet:.1f} days ago, {since} clean "
+            f"run{'' if since == 1 else 's'} {where} since then")
+    rate = len(fails) / len(scoped_runs) if scoped_runs else 1.0
+    if rate >= 1.0:
+        return text + " — every execution there failed."
+    # Probability of a streak this long if the failure rate had not changed.
+    probability = (1 - rate) ** since
+    needed = math.ceil(math.log(0.05) / math.log(1 - rate))
+    if since and probability < 0.05:
+        return (text + f" — a streak that long is unlikely (p={probability:.2g}) at "
+                f"the {rate * 100:.1f}% failure rate seen there, so the failure "
+                f"plausibly stopped.")
+    return (text + f" — at the {rate * 100:.1f}% failure rate seen there that is no "
+            f"evidence of a fix (p={probability:.2g}); about {needed} consecutive "
+            f"clean runs would be needed to conclude the failure stopped.")
+
+
+def describe_signal(signal: dict) -> str:
+    scope = (f"all {signal['total']}" if signal["hits"] == signal["total"]
+             else f"{signal['hits']} of {signal['total']}")
+    return (f"{signal['group']}: {scope} failures on "
+            f"`{signal['dimension']} = {signal['value']}` "
+            f"({signal['share_of_runs'] * 100:.1f}% of runs), p={signal['p']:.2g}")
+
+
+def weekly_buckets(executions: list[dict], to_ms: int, weeks: int) -> list[dict]:
+    buckets = []
+    week_ms = 7 * 24 * 3600 * 1000
+    for index in range(weeks):
+        hi = to_ms - index * week_ms
+        lo = hi - week_ms
+        inside = [e for e in executions if lo <= e["time"] < hi
+                  and e["outcome"] in RUN_OUTCOMES]
+        buckets.append({"lo": lo, "hi": hi, "executions": inside})
+    return list(reversed(buckets))
+
+
+def rolling_rates(executions: list[dict], frm_ms: int, to_ms: int,
+                  window_days: int = 7) -> list[dict]:
+    day = 24 * 3600 * 1000
+    window = window_days * day
+    points = []
+    hi = frm_ms + window
+    while hi <= to_ms + day:
+        lo = hi - window
+        inside = [e for e in executions if lo <= e["time"] < hi
+                  and e["outcome"] in RUN_OUTCOMES]
+        fails = sum(1 for e in inside if e["outcome"] in ("failed", "flaky"))
+        points.append({"hi": hi, "runs": len(inside), "fails": fails,
+                       "rate": (fails / len(inside)) if inside else 0.0})
+        hi += day
+    return points
+
+
+def best_change_point(executions: list[dict], min_side: int = 20) -> dict | None:
+    """Find the split in time where the failure rate changes most significantly."""
+    runs = [e for e in executions if e["outcome"] in RUN_OUTCOMES]
+    if len(runs) < 2 * min_side:
+        return None
+    total_fails = sum(1 for e in runs if e["outcome"] in ("failed", "flaky"))
+    if total_fails == 0:
+        return None
+    day = 24 * 3600 * 1000
+    days = sorted({e["time"] // day for e in runs})
+    candidates = []
+    for boundary in days[1:]:
+        cut = boundary * day
+        before = [e for e in runs if e["time"] < cut]
+        after = [e for e in runs if e["time"] >= cut]
+        if len(before) < min_side or len(after) < min_side:
+            continue
+        f1 = sum(1 for e in before if e["outcome"] in ("failed", "flaky"))
+        f2 = sum(1 for e in after if e["outcome"] in ("failed", "flaky"))
+        p = fisher_two_proportions(f1, len(before), f2, len(after))
+        candidates.append({"cut": cut, "before_fails": f1, "before_runs": len(before),
+                           "after_fails": f2, "after_runs": len(after), "p": p,
+                           "tests": 0})
+    if not candidates:
+        return None
+    best = min(candidates, key=lambda c: c["p"])
+    best["tests"] = len(candidates)
+    best["p_adjusted"] = min(1.0, best["p"] * len(candidates))
+    return best
+
+
+# --------------------------------------------------------------------------- #
+# Report
+# --------------------------------------------------------------------------- #
+
+def render(dv: Develocity, jenkins: Jenkins, args, container: str,
+           test_filter: str | None, cases: list[dict], executions: list[dict],
+           frm: dt.datetime, to: dt.datetime, tz, query: str) -> tuple[str, dict]:
+    report = Report()
+    runs = [e for e in executions if e["outcome"] in RUN_OUTCOMES]
+    fails = [e for e in runs if e["outcome"] in ("failed", "flaky")]
+    scan_url = f"{dv.base_url}/s/"
+    to_ms = int(to.timestamp() * 1000)
+    frm_ms = int(frm.timestamp() * 1000)
+
+    # ---- analysis, before anything is written, so the summary can come first ----
+    groups: dict[str, dict] = {}
+    for execution in fails:
+        signature = execution.get("signature", "unknown")
+        group = groups.setdefault(signature, {
+            "signature": signature, "executions": [],
+            "exception": execution.get("exception", "(unknown)"),
+        })
+        group["executions"].append(execution)
+    ordered = sorted(groups.values(), key=lambda g: (-len(g["executions"]),
+                                                     g["executions"][0]["time"]))
+    for index, group in enumerate(ordered, start=1):
+        group["label"] = f"F{index}"
+    if args.artifacts > 0 and ordered:
+        attach_artifacts(jenkins, ordered, container, args.artifacts, args.jobs)
+    shown_groups = ordered[:MAX_GROUP_COLUMNS]
+    by_config: dict[str, list[dict]] = defaultdict(list)
+    for execution in executions:
+        by_config[execution["config"]].append(execution)
+    breakdown = dimension_breakdown(runs)
+    signals = tag_signals(runs, ordered, breakdown) if fails else []
+    change = best_change_point(executions) if fails else None
+
+    title = container + (f"#{test_filter}" if test_filter else "")
+    report.line(f"# Test failure history — `{title}`")
+    report.line()
+    report.line(f"* Window: **{frm.strftime('%Y-%m-%d %H:%M')} → "
+                f"{to.strftime('%Y-%m-%d %H:%M')}** "
+                f"({(to - frm).days} days, times in `{tz}`)")
+    report.line(f"* Build query: `{query}`")
+    report.line(f"* Grouping: `--group-by {args.group_by}`, line numbers "
+                f"{'kept' if args.keep_line_numbers else 'stripped'} from stack frames")
+    work_units = sorted({wu for case in cases for entry in (case.get("workUnits") or [])
+                         for wu in [_work_unit_name(entry)] if wu})
+    if work_units:
+        report.line(f"* Work units: {', '.join(f'`{w}`' for w in work_units)}")
+
+    if not executions:
+        report.line()
+        report.line("**No executions of this test found in the window.** "
+                    "Check the container/test name and the project filter.")
+        return str(report), {}
+
+    report.line()
+    report.line(f"* Executions: **{len(runs)}** "
+                f"(passed {sum(1 for e in runs if e['outcome'] == 'passed')}, "
+                f"failed {sum(1 for e in runs if e['outcome'] == 'failed')}, "
+                f"flaky {sum(1 for e in runs if e['outcome'] == 'flaky')}, "
+                f"skipped {sum(1 for e in executions if e['outcome'] == 'skipped')})")
+    report.line(f"* Failure rate: **{pct(len(fails), len(runs))}** "
+                f"({len(fails)}/{len(runs)})")
+    if fails:
+        report.line(f"* First failure: {fmt_time(fails[0]['time'], tz)}, "
+                    f"last failure: {fmt_time(fails[-1]['time'], tz)} "
+                    f"({(to - dt.datetime.fromtimestamp(fails[-1]['time'] / 1000, tz)).days}"
+                    f" days ago)")
+
+    all_tags = [set(e["tags"]) for e in executions]
+    common_tags = sorted(set.intersection(*all_tags)) if all_tags else []
+    if common_tags:
+        report.line(f"* Tags on every execution (omitted from the tables below): "
+                    f"{', '.join('`' + t + '`' for t in common_tags)}")
+    untagged_browser = sum(1 for e in executions
+                           if not any(t.lower() in BROWSERS for t in e["tags"]))
+    if untagged_browser:
+        report.line(f"* {untagged_browser} of {len(executions)} executions carry no "
+                    f"browser tag; they run the default browser and are counted as "
+                    f"`{IMPLICIT_BROWSER}`.")
+    report.line("* A `flaky` execution is one that Develocity classified as flaky "
+                "instead of failed in its cross-build test statistics. Despite "
+                "Develocity's definition of the term (failed, then passed on retry "
+                "within the same build), it does not mean that here: XWiki retries "
+                "no test, and the builds behind such an execution ran it exactly "
+                "once and report it as a plain failure. It is therefore counted as "
+                "a failure below, a `pass` always means a clean run.")
+    report.line()
+
+    cases_seen = sorted({e["test"] for e in executions})
+    findings = key_findings(ordered, by_config, signals, change, fails, runs,
+                            to_ms, tz, multi_case=len(cases_seen) > 1)
+    if findings:
+        report.line("## Key findings")
+        report.line()
+        for finding in findings:
+            report.line(f"* {finding}")
+        report.line()
+
+    if len(cases_seen) > 1:
+        report.line("## Test cases in this container")
+        report.line()
+        rows = []
+        for case_name in cases_seen:
+            subset = [e for e in executions if e["test"] == case_name]
+            stats = config_stats(subset)
+            rows.append([case_name, str(stats["runs"]), str(stats["fail_count"]),
+                         pct(stats["fail_count"], stats["runs"])])
+        report.table(["test case", "runs", "failures", "fail %"], rows, "lrrr")
+
+    # ---------------- section 1: configurations ---------------- #
+    report.line("## 1. Configurations (tag combinations)")
+    report.line()
+    report.line("`span` = between the first and the last failure in this "
+                "configuration. Read `pass after` against the configuration's own "
+                "`fail %`: at a 10% failure rate a run of 5 passes happens 59% of "
+                "the time by chance, so only a streak far longer than 1/`fail %` "
+                "says anything about the failure being gone.")
+    report.line()
+    rows = []
+    for config in sorted(by_config, key=lambda c: (
+            -config_stats(by_config[c])["fail_count"], c)):
+        subset = by_config[config]
+        stats = config_stats(subset)
+        labels = sorted({groups[e["signature"]]["label"] for e in subset
+                         if e["outcome"] in ("failed", "flaky")
+                         and e.get("signature") in groups},
+                        key=lambda l: int(l[1:]))
+        last = stats["last_run"]
+        if last:
+            verdict = "FAIL" if last["outcome"] in ("failed", "flaky") else "pass"
+            last_run = f"{verdict} {fmt_date(last['time'], tz)}"
+        else:
+            last_run = "-"
+        rows.append([
+            config, str(stats["runs"]), str(stats["fail_count"]),
+            pct(stats["fail_count"], stats["runs"]),
+            fmt_date(stats["first_fail"], tz), fmt_date(stats["last_fail"], tz),
+            str(stats["fail_in_span"]), str(stats["pass_in_span"]),
+            str(stats["pass_before"]), str(stats["pass_after"]),
+            str(stats["longest_streak"]), last_run,
+            ",".join(labels) or "-",
+        ])
+    report.table(["configuration (branch / browser / db / servlet)", "runs", "fails",
+                  "fail %", "first fail", "last fail", "fails in span",
+                  "pass in span", "pass before", "pass after", "max streak",
+                  "last run", "failures"],
+                 rows, "lrrrllrrrrrll")
+
+    if not fails:
+        report.line("**No failures in this window.**")
+        return str(report), {"groups": [], "configs": {}}
+
+    # ---------------- section 2: distinct failures ---------------- #
+    report.line("## 2. Distinct failures")
+    report.line()
+    report.line("Failures are grouped by normalised message and stack trace: object "
+                "hashes, lambda names, session ids, host names, temp paths, "
+                "versions, timestamps and long numbers are replaced by placeholders, "
+                "and environment boilerplate (`Build info:`, `Capabilities {…}`, "
+                "`(Session info: chrome=…)`, …) is dropped. Frames that only build "
+                "the exception (reflection, WebDriver error decoding) are dropped "
+                "from the stack, and the detail message of exceptions whose wording "
+                "is purely driver-specific (`StaleElementReferenceException`) is "
+                "ignored, so the same failure groups across browsers. In each "
+                "per-configuration table below, `pass "
+                "before`/`pass after` count clean runs in that configuration before "
+                "the first and after the last occurrence of *this* failure.")
+    report.line()
+    if args.artifacts > 0:
+        report.line(f"Each failure also lists the screenshot and the video that "
+                    f"Jenkins archived for up to {args.artifacts} of its most recent "
+                    f"occurrences, picked in as many different configurations "
+                    f"(browsers first) as it happened in. Jenkins discards the "
+                    f"artifacts of old builds, so a failure that stopped happening "
+                    f"weeks ago usually has none left. The videos are Flash "
+                    f"recordings (`.flv`): download them and open them in a video "
+                    f"player.")
+        report.line()
+    stack_collisions: dict[str, list[str]] = defaultdict(list)
+    for group in ordered:
+        stack_sig = group["executions"][0].get("stack_signature")
+        if stack_sig:
+            stack_collisions[stack_sig].append(group["label"])
+    by_label = {g["label"]: g for g in ordered}
+    shared = [labels for labels in stack_collisions.values() if len(labels) > 1]
+    if shared and args.group_by != "stack":
+        for labels in shared:
+            raw_stacks = {by_label[l]["executions"][-1]["stack"] for l in labels}
+            hint = ("`--group-by stack` merges them"
+                    if len(raw_stacks) == 1 else
+                    "they fail at different source lines, so `--keep-line-numbers` "
+                    "keeps them apart even with `--group-by stack`")
+            report.line(f"* {', '.join(labels)} have the same normalised stack trace "
+                        f"and differ only in the message — {hint}.")
+        report.line()
+
+    for group in ordered:
+        members = group["executions"]
+        where = (f"`{members[0]['test']}` — " if len(cases_seen) > 1 else "")
+        report.line(f"### {group['label']} — {where}`{group['exception']}` "
+                    f"({len(members)} failures, {pct(len(members), len(fails))} "
+                    f"of all failures)")
+        report.line()
+        report.line(f"* First: {fmt_time(members[0]['time'], tz)} · "
+                    f"Last: {fmt_time(members[-1]['time'], tz)} · "
+                    f"Configurations: {len({m['config'] for m in members})} · "
+                    f"Signature: `{group['signature']}`")
+        only = sum(1 for m in members if m.get("build_test_failures", 0) <= 1)
+        others = sorted(
+            (m.get("build_test_failures", 0) - 1 for m in members), reverse=True)
+        median_others = others[len(others) // 2] if others else 0
+        report.line(f"* Sole test failure in its build: {only}/{len(members)} "
+                    f"(median other test failures in the same build: {median_others})")
+        co_failing = Counter(name for m in members for name in m.get("co_failing", []))
+        if co_failing:
+            report.line("* Frequently failing together (sampled from the same builds): "
+                        + ", ".join(f"`{name}` ×{count}"
+                                    for name, count in co_failing.most_common(5)))
+        # Variants expose what the grouping deliberately ignores: the source line
+        # that failed (stripped from the stack so a failure groups across
+        # branches) and, with --group-by stack, the differing assertion messages.
+        variants: dict[tuple[str, str], list[dict]] = defaultdict(list)
+        for member in members:
+            variants[(member.get("site", "(unknown)"),
+                      member.get("norm_message", ""))].append(member)
+        ranked = sorted(variants.items(), key=lambda kv: -len(kv[1]))
+        sites = Counter(member.get("site", "(unknown)") for member in members)
+        report.line("* Failed at: " + ", ".join(f"`{site}` ×{count}"
+                                                for site, count in sites.most_common(6))
+                    + (" …" if len(sites) > 6 else ""))
+        report.line()
+        if len(ranked) > 1:
+            report.line(f"{len(ranked)} distinct errors are merged into this group "
+                        f"(same failure after normalisation, but a different "
+                        f"assertion message or source line):")
+            report.line()
+            rows = []
+            for (site, _), hits in ranked[:args.max_variants]:
+                rows.append([str(len(hits)), site, fmt_date(hits[0]["time"], tz),
+                             fmt_date(hits[-1]["time"], tz),
+                             truncate(hits[-1].get("raw_message") or "(no message)",
+                                      args.variant_chars)])
+            report.table(["count", "failed at", "first", "last",
+                          "message (most recent occurrence)"], rows, "rllll")
+            if len(ranked) > args.max_variants:
+                report.line(f"_({len(ranked) - args.max_variants} rarer variants not "
+                            f"shown, raise `--max-variants`.)_")
+                report.line()
+        newest = members[-1]
+        report.line("<details><summary>Representative failure (most recent "
+                    f"occurrence, {fmt_time(newest['time'], tz)})</summary>")
+        report.line()
+        report.line("```")
+        body = newest["message"] or "(no message)"
+        report.line(truncate(body, args.message_chars))
+        if newest["stack"]:
+            report.line(truncate(newest["stack"].rstrip(), args.stack_chars))
+        report.line("```")
+        report.line("</details>")
+        report.line()
+        by_group_config: dict[str, list[dict]] = defaultdict(list)
+        for member in members:
+            by_group_config[member["config"]].append(member)
+        rows = []
+        for config in sorted(by_group_config,
+                             key=lambda c: -len(by_group_config[c])):
+            hits = by_group_config[config]
+            all_runs = [e for e in by_config[config] if e["outcome"] in RUN_OUTCOMES]
+            stats = config_stats(by_config[config], group_filter=group["signature"])
+            rows.append([config, str(len(hits)),
+                         fmt_time(hits[0]["time"], tz), fmt_time(hits[-1]["time"], tz),
+                         pct(len(hits), len(all_runs)),
+                         str(stats["pass_before"]), str(stats["pass_after"])])
+        report.table(["configuration", "count", "first", "last",
+                      "of runs in that config", "pass before", "pass after"],
+                     rows, "lrllrrr")
+        recent = list(reversed(members))[:args.top_scans]
+        report.line("Recent build scans: " + ", ".join(
+            f"[{fmt_date(m['time'], tz)}]({scan_url}{m['scan_id']})" for m in recent))
+        report.line()
+        found = group.get("artifacts") or []
+        if found:
+            report.line("Screenshots and videos archived by Jenkins:")
+            report.line()
+            for entry in found:
+                links = []
+                if entry["screenshot"]:
+                    links.append(f"[screenshot]({entry['screenshot']})")
+                if entry["video"]:
+                    links.append(f"[video]({entry['video']})")
+                links.append(f"[build]({entry['build_url']})")
+                report.line(f"* {fmt_time(entry['time'], tz)} · `{entry['config']}` "
+                            f"— " + " · ".join(links))
+            report.line()
+        elif group.get("artifact_attempts"):
+            report.line(f"_No screenshot or video found on Jenkins for the "
+                        f"{group['artifact_attempts']} most recent occurrence(s) — "
+                        f"either this is not a UI test, or Jenkins has already "
+                        f"discarded the artifacts of those builds._")
+            report.line()
+
+    # ---------------- section 3: per-tag analysis ---------------- #
+    report.line("## 3. Per-tag breakdown")
+    report.line()
+    report.line("Each dimension independently: how often the test ran with that "
+                "tag value and how many failures of each group happened there. "
+                "A group concentrated in one value points at a "
+                "configuration-specific problem.")
+    report.line()
+    if len(shown_groups) < len(ordered):
+        report.line(f"Only the {len(shown_groups)} most frequent failures get a "
+                    f"column below.")
+        report.line()
+    for dimension in DIMENSION_ORDER:
+        data = breakdown[dimension]
+        values = data["values"]
+        if len(values) < 2 and dimension not in ("branch", "browser"):
+            continue
+        report.line(f"### {dimension}")
+        report.line()
+        if data["too_granular"]:
+            report.line(f"_Skipped: {len(values)} distinct values for {len(runs)} "
+                        f"executions — too granular to aggregate._")
+            report.line()
+            continue
+        headers = ["value", "runs", "fails", "fail %"] + [g["label"]
+                                                         for g in shown_groups]
+        rows = []
+        for value in sorted(values, key=lambda v: -len(values[v])):
+            subset = values[value]
+            subset_fails = [e for e in subset if e["outcome"] in ("failed", "flaky")]
+            row = [value, str(len(subset)), str(len(subset_fails)),
+                   pct(len(subset_fails), len(subset))]
+            for group in shown_groups:
+                count = sum(1 for e in subset_fails
+                            if e.get("signature") == group["signature"])
+                row.append(str(count) if count else "·")
+            rows.append(row)
+        report.table(headers, rows, "lrrr" + "r" * len(shown_groups))
+
+    if signals:
+        report.line("### Concentration signals")
+        report.line()
+        report.line("Tag values in which one failure is over-represented "
+                    "(one-sided Fisher exact test, uncorrected p-values — treat as "
+                    "hints, not proof). Values that are merely correlated with a "
+                    "stronger signal, because they always occur together with it, "
+                    "are left out:")
+        report.line()
+        for signal in signals:
+            report.line(f"* {describe_signal(signal)}")
+        report.line()
+
+    # ---------------- section 4: trend ---------------- #
+    report.line("## 4. Trend over time")
+    report.line()
+    weeks = max(1, math.ceil((to_ms - frm_ms) / (7 * 24 * 3600 * 1000)))
+    buckets = weekly_buckets(executions, to_ms, weeks)
+    headers = ["7-day window", "runs", "fails", "fail %"] + [g["label"]
+                                                            for g in shown_groups]
+    rows = []
+    for bucket in buckets:
+        inside = bucket["executions"]
+        bucket_fails = [e for e in inside if e["outcome"] in ("failed", "flaky")]
+        row = [f"{fmt_date(bucket['lo'], tz)} → {fmt_date(bucket['hi'], tz)}",
+               str(len(inside)), str(len(bucket_fails)),
+               pct(len(bucket_fails), len(inside))]
+        for group in shown_groups:
+            count = sum(1 for e in bucket_fails
+                        if e.get("signature") == group["signature"])
+            row.append(str(count) if count else "·")
+        rows.append(row)
+    report.table(headers, rows, "lrrr" + "r" * len(shown_groups))
+
+    for index in range(1, len(buckets)):
+        previous, current = buckets[index - 1], buckets[index]
+        n1 = len([e for e in previous["executions"] if e["outcome"] in RUN_OUTCOMES])
+        n2 = len([e for e in current["executions"] if e["outcome"] in RUN_OUTCOMES])
+        f1 = len([e for e in previous["executions"]
+                  if e["outcome"] in ("failed", "flaky")])
+        f2 = len([e for e in current["executions"]
+                  if e["outcome"] in ("failed", "flaky")])
+        p = fisher_two_proportions(f1, n1, f2, n2)
+        if p < 0.05:
+            direction = "increase" if (f2 / n2 if n2 else 0) > (f1 / n1 if n1 else 0) \
+                else "decrease"
+            report.line(f"* Significant {direction} in week starting "
+                        f"{fmt_date(current['lo'], tz)}: {f1}/{n1} → {f2}/{n2} "
+                        f"(p={p:.2g})")
+    points = rolling_rates(executions, frm_ms, to_ms)
+    if points:
+        report.line(f"* Rolling 7-day failure rate (1-day step, "
+                    f"{fmt_date(points[0]['hi'], tz)} → "
+                    f"{fmt_date(points[-1]['hi'], tz)}): "
+                    f"`{sparkline(p['rate'] for p in points)}` "
+                    f"min {min(p['rate'] for p in points) * 100:.1f}%, "
+                    f"max {max(p['rate'] for p in points) * 100:.1f}%")
+    if change:
+        report.line(
+            f"* Most significant change point: "
+            f"{fmt_date(change['cut'], tz)} — "
+            f"{change['before_fails']}/{change['before_runs']} "
+            f"({pct(change['before_fails'], change['before_runs'])}) before vs "
+            f"{change['after_fails']}/{change['after_runs']} "
+            f"({pct(change['after_fails'], change['after_runs'])}) after, "
+            f"p={change['p']:.2g} "
+            f"(adjusted for {change['tests']} candidate splits: "
+            f"{change['p_adjusted']:.2g})")
+    report.line()
+
+    report.line(f"_Generated by `dv-test-history` with {dv.request_count} "
+                f"Develocity request{'' if dv.request_count == 1 else 's'}"
+                + (f" and {jenkins.request_count} Jenkins request"
+                   f"{'' if jenkins.request_count == 1 else 's'}"
+                   if jenkins.request_count else "") + "._")
+
+    machine = {
+        "container": container,
+        "test": test_filter,
+        "window": {"from": frm.isoformat(), "to": to.isoformat()},
+        "query": query,
+        "totals": {
+            "runs": len(runs),
+            "failures": len(fails),
+            "passed": sum(1 for e in runs if e["outcome"] == "passed"),
+            "flaky": sum(1 for e in runs if e["outcome"] == "flaky"),
+        },
+        "groups": [{
+            "label": g["label"],
+            "signature": g["signature"],
+            "exception": g["exception"],
+            "count": len(g["executions"]),
+            "first": g["executions"][0]["time"],
+            "last": g["executions"][-1]["time"],
+            "normalised_message": g["executions"][-1]["norm_message"],
+            "normalised_stack": g["executions"][-1]["norm_stack"],
+            "sites": dict(Counter(m.get("site", "(unknown)")
+                                  for m in g["executions"])),
+            "artifacts": g.get("artifacts") or [],
+            "occurrences": [{
+                "scan_id": m["scan_id"], "time": m["time"], "config": m["config"],
+                "tags": m["tags"], "test": m["test"], "site": m.get("site"),
+                "message": m.get("raw_message"),
+                "build_test_failures": m.get("build_test_failures"),
+            } for m in g["executions"]],
+        } for g in ordered],
+        "configs": {config: config_stats(subset)
+                    for config, subset in by_config.items()},
+    }
+    for stats in machine["configs"].values():
+        stats.pop("last_run", None)
+    return str(report), machine
+
+
+def report_recent_failures(dv: Develocity, cache: Cache, args, frm: dt.datetime,
+                           to: dt.datetime, tz, project: str | None) -> str:
+    """List the tests that failed recently, as candidates for a full analysis."""
+    report = Report()
+    recent_query = build_query(frm, to, project, args.query)
+    containers = fetch_failing_containers(dv, recent_query)
+
+    def cases_of(container: str, query: str) -> tuple[str, list[dict]]:
+        return container, fetch_test_cases(dv, container, query)
+
+    names = [c["name"] for c in containers]
+    recent: dict[str, list[dict]] = {}
+    if names:
+        with ThreadPoolExecutor(max_workers=args.jobs) as pool:
+            for container, cases in pool.map(
+                    lambda n: cases_of(n, recent_query), names):
+                recent[container] = cases
+
+    # One extra request per container tells us whether a failure is new; without
+    # it every flaky old-timer looks as urgent as a fresh regression.
+    baseline: dict[str, dict[str, dict]] = {}
+    baseline_from = frm - dt.timedelta(days=args.baseline_days)
+    if args.baseline_days > 0 and names:
+        baseline_query = build_query(baseline_from, frm, project, args.query)
+        with ThreadPoolExecutor(max_workers=args.jobs) as pool:
+            for container, cases in pool.map(
+                    lambda n: cases_of(n, baseline_query), names):
+                baseline[container] = {c["name"]: c.get("outcomeDistribution") or {}
+                                       for c in cases}
+
+    candidates = []
+    for container, cases in recent.items():
+        for case in cases:
+            distribution = case.get("outcomeDistribution") or {}
+            failed = distribution.get("failed", 0)
+            flaky = distribution.get("flaky", 0)
+            if not failed and not flaky:
+                continue
+            by_outcome = case.get("buildScanIdsByOutcome") or {}
+            full_name = case.get("name", "")
+            candidates.append({
+                "container": container,
+                "case": full_name.rsplit(".", 1)[-1],
+                "failed": failed,
+                "flaky": flaky,
+                "runs": sum(distribution.get(o, 0) for o in RUN_OUTCOMES),
+                "scans": list(by_outcome.get("failed", []))
+                + list(by_outcome.get("flaky", [])),
+                "baseline": baseline.get(container, {}).get(full_name),
+            })
+
+    scan_ids = sorted({s for c in candidates for s in c["scans"]})
+    attributes = (fetch_build_attributes(dv, cache, scan_ids, frm, to)
+                  if scan_ids else {})
+    for candidate in candidates:
+        times, tags = [], []
+        for scan_id in candidate["scans"]:
+            attrs = attributes.get(scan_id)
+            if not attrs:
+                continue
+            if attrs.get("start_time"):
+                times.append(attrs["start_time"])
+            tags.append(dimensions(attrs["tags"], attrs.get("jvm", ""),
+                                   attrs.get("host", "")))
+        candidate["last"] = max(times) if times else None
+        candidate["branches"] = sorted({d["branch"] for d in tags})
+        candidate["browsers"] = sorted({d["browser"] for d in tags})
+        distribution = candidate["baseline"]
+        if args.baseline_days <= 0:
+            # Without the baseline request we cannot tell new from long-known.
+            candidate["status"] = "?"
+            candidate["baseline_text"] = "-"
+        elif distribution is None:
+            # The test did not run at all before this window.
+            candidate["status"] = "new"
+            candidate["baseline_text"] = "never ran"
+        else:
+            base_fails = (distribution.get("failed", 0)
+                          + distribution.get("flaky", 0))
+            base_runs = sum(distribution.get(o, 0) for o in RUN_OUTCOMES)
+            candidate["status"] = "new" if base_fails == 0 else "known"
+            candidate["baseline_text"] = (f"{base_fails}/{base_runs} "
+                                          f"({pct(base_fails, base_runs)})")
+
+    candidates.sort(key=lambda c: (c["status"] == "known",
+                                   -(c["failed"] + c["flaky"]), c["container"]))
+
+    hours = (to - frm).total_seconds() / 3600
+    report.line(f"# Tests that failed in the last {hours:g} "
+                f"hour{'' if hours == 1 else 's'}")
+    report.line()
+    report.line(f"* Window: **{frm.strftime('%Y-%m-%d %H:%M')} → "
+                f"{to.strftime('%Y-%m-%d %H:%M')}** (times in `{tz}`)")
+    report.line(f"* Build query: `{recent_query}`")
+    report.line(f"* {len(candidates)} failing test case(s) in "
+                f"{len(recent)} container(s).")
+    report.line()
+    if not candidates:
+        report.line("**No test failed in this window.**")
+        return str(report)
+
+    report.line("Columns:")
+    report.line()
+    report.line("* `fails`, `flaky`, `runs`, `fail %` count executions **inside the "
+                "window above**: `runs` is how often the test ran at all there, "
+                "`flaky` how often Develocity classified a failure of it as flaky "
+                "rather than failed (XWiki retries no test, so such a run failed "
+                "too — it is just counted in another column), and `fail %` = "
+                "(`fails` + `flaky`) / `runs`.")
+    if args.baseline_days > 0:
+        report.line(f"* `baseline` counts the same thing in the **{args.baseline_days:g} "
+                    f"days before** the window ({baseline_from.strftime('%Y-%m-%d')} → "
+                    f"{frm.strftime('%Y-%m-%d')}), as `failures/runs` and their "
+                    f"percentage. It is a different, longer time range than `runs`, so "
+                    f"compare only the percentages: a `fail %` well above the baseline "
+                    f"percentage means the failure got worse, a similar one means it "
+                    f"has been flickering all along.")
+        report.line("* `status` is `new` when the test never failed in that baseline "
+                    "range (`never ran` when it did not run either) and `known` when "
+                    "it already failed there. New failures are listed first.")
+    else:
+        report.line("* There is no `status`/`baseline` column: `--baseline-days 0` "
+                    "skipped the comparison with the preceding days that tells a "
+                    "fresh regression from a long-known flicker.")
+    report.line()
+
+    with_status = args.baseline_days > 0
+    rows = []
+    for candidate in candidates:
+        total = candidate["failed"] + candidate["flaky"]
+        rows.append(([candidate["status"]] if with_status else []) + [
+            str(candidate["failed"]),
+            str(candidate["flaky"]),
+            str(candidate["runs"]),
+            pct(total, candidate["runs"]),
+        ] + ([candidate["baseline_text"]] if with_status else []) + [
+            fmt_time(candidate["last"], tz),
+            ", ".join(candidate["branches"]) or "-",
+            ", ".join(candidate["browsers"]) or "-",
+            f"{candidate['container'].rsplit('.', 1)[-1]}#{candidate['case']}",
+        ])
+    report.table((["status"] if with_status else [])
+                 + ["fails", "flaky", "runs", "fail %"]
+                 + (["baseline fails/runs"] if with_status else [])
+                 + ["last failure", "branches", "browsers", "test"], rows,
+                 ("l" if with_status else "") + "rrrr"
+                 + ("r" if with_status else "") + "llll")
+
+    # Suggest every new failure, then fill up with the most frequent known ones.
+    suggested = [c for c in candidates if c["status"] == "new"]
+    suggested += [c for c in candidates if c["status"] != "new"][
+        :max(0, MAX_SUGGESTIONS - len(suggested))]
+    report.line("Analyse one of them with:")
+    report.line()
+    report.line("```zsh")
+    for candidate in suggested[:MAX_SUGGESTIONS]:
+        report.line(f"dv-test-history '{candidate['container']}"
+                    f"#{candidate['case']}'")
+    report.line("```")
+    report.line()
+    report.line(f"_Generated by `dv-test-history` with {dv.request_count} "
+                f"Develocity request{'' if dv.request_count == 1 else 's'}._")
+    return str(report)
+
+
+def _work_unit_name(entry: dict) -> str:
+    for tool, data in entry.items():
+        if not isinstance(data, dict):
+            continue
+        if "goalName" in data:
+            return (f"{data.get('groupId','')}:{data.get('artifactId','')}:"
+                    f"{data.get('goalName','')}"
+                    + (f"@{data['executionId']}" if data.get("executionId") else ""))
+        if "taskPath" in data:
+            return data["taskPath"]
+        return json.dumps(data)
+    return ""
+
+
+# --------------------------------------------------------------------------- #
+# CLI
+# --------------------------------------------------------------------------- #
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="dv-test-history",
+        description="Analyse the failure history of a test using Develocity.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="TARGET is a test container FQN, 'Container#testCase', or a "
+               "Develocity /scans/tests URL.")
+    parser.add_argument("target", nargs="?",
+                        help="test container FQN, 'Container#testCase', or a "
+                             "Develocity /scans/tests URL; omit it together with "
+                             "--recent-failures")
+    parser.add_argument("--recent-failures", nargs="?", type=float, const=24,
+                        default=None, metavar="HOURS",
+                        help="instead of analysing one test, list the tests that "
+                             "failed in the last HOURS (default 24) as candidates "
+                             "for an analysis")
+    parser.add_argument("--baseline-days", type=float, default=14, metavar="DAYS",
+                        help="with --recent-failures, how far back to look to tell "
+                             "a new failure from a known one (0 to skip, saves one "
+                             "request per container; default 14)")
+    parser.add_argument("--test", help="test case name (overrides the one in TARGET)")
+    parser.add_argument("--days", type=float, default=None,
+                        help=f"length of the window in days (default {DEFAULT_DAYS})")
+    parser.add_argument("--since", help="window start, ISO date/datetime")
+    parser.add_argument("--to", help="window end, ISO date/datetime (default: now)")
+    parser.add_argument("--project", default=None,
+                        help="root project name filter, wildcards allowed "
+                             "(default: XWiki*)")
+    parser.add_argument("--query", help="extra Develocity build query terms")
+    parser.add_argument("--tz", default=None,
+                        help="timezone for displayed times (default: local)")
+    parser.add_argument("--group-by", choices=("message+stack", "stack", "message"),
+                        default="message+stack",
+                        help="what makes two failures the same (default message+stack)")
+    parser.add_argument("--keep-line-numbers", action="store_true",
+                        help="keep source line numbers in stack frames; by default "
+                             "they are stripped so the same failure groups across "
+                             "branches")
+    parser.add_argument("--max-failure-pages", type=int, default=6,
+                        help="how many pages of test failures to read per build "
+                             "when looking for this test (20 per page, default 6)")
+    parser.add_argument("--top-scans", type=int, default=8,
+                        help="build scan links to list per failure group")
+    parser.add_argument("--artifacts", type=int, default=3, metavar="N",
+                        help="how many recent occurrences of each failure to look "
+                             "up on Jenkins for an archived screenshot and video "
+                             "(default 3, 0 to skip Jenkins entirely)")
+    parser.add_argument("--max-variants", type=int, default=12,
+                        help="distinct raw messages to list per failure group "
+                             "(default 12)")
+    parser.add_argument("--variant-chars", type=int, default=220,
+                        help="how much of each raw message to show in the variant "
+                             "table (default 220)")
+    parser.add_argument("--message-chars", type=int, default=1200)
+    parser.add_argument("--stack-chars", type=int, default=2500)
+    parser.add_argument("--jobs", type=int, default=6,
+                        help="parallel requests for failure details (default 6)")
+    parser.add_argument("--no-cache", action="store_true")
+    parser.add_argument("--cache-dir", default=None)
+    parser.add_argument("--json", dest="json_out",
+                        help="also write the raw analysis as JSON to this file")
+    parser.add_argument("-o", "--output", help="write the report to this file")
+    parser.add_argument("--server", help="Develocity base URL")
+    parser.add_argument("--token", help="Develocity access key")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    args = parser.parse_args(argv)
+
+    if args.target is None and args.recent_failures is None:
+        parser.error("either TARGET or --recent-failures is required")
+    if args.target is not None and args.recent_failures is not None:
+        parser.error("--recent-failures lists all failing tests, so it cannot be "
+                     "combined with a TARGET")
+    container, url_test, url_project, url_window = parse_target(args.target or "")
+    test_filter = args.test or url_test
+    project = args.project or url_project or "XWiki*"
+
+    if args.tz and ZoneInfo:
+        tz = ZoneInfo(args.tz)
+    else:
+        tz = dt.datetime.now().astimezone().tzinfo
+    if args.recent_failures is not None and not (args.since or args.days):
+        args.days = args.recent_failures / 24
+    frm, to = resolve_window(args, url_window, tz)
+
+    base_url, token = resolve_credentials(args.server, args.token)
+    dv = Develocity(base_url, token, args.verbose)
+    cache_dir = None if args.no_cache else (
+        args.cache_dir or os.path.join(
+            os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache")),
+            "dv-test-history"))
+    cache = Cache(cache_dir)
+
+    if args.recent_failures is not None:
+        text = report_recent_failures(dv, cache, args, frm, to, tz, project)
+        if args.output:
+            with open(args.output, "w") as fh:
+                fh.write(text)
+            print(f"Report written to {args.output}", file=sys.stderr)
+        else:
+            sys.stdout.write(text)
+        return 0
+
+    query = build_query(frm, to, project, args.query)
+    cases = fetch_test_cases(dv, container, query)
+    if not cases:
+        print(f"No test cases found for container {container!r} in the window "
+              f"(query: {query}).", file=sys.stderr)
+        return 1
+    scan_ids = sorted({scan_id for case in cases
+                       for ids in (case.get("buildScanIdsByOutcome") or {}).values()
+                       for scan_id in ids})
+    dv.log(f"{len(cases)} test case(s), {len(scan_ids)} build scans")
+    attributes = fetch_build_attributes(dv, cache, scan_ids, frm, to)
+    executions = collect_executions(cases, attributes, test_filter)
+    if test_filter and not executions:
+        known = sorted({c["name"].rsplit(".", 1)[-1] for c in cases})
+        print(f"No executions of test {test_filter!r} found. Known test cases in "
+              f"this container: {', '.join(known)}", file=sys.stderr)
+        return 1
+    attach_failures(dv, cache, executions, container, args, args.jobs)
+
+    jenkins = Jenkins(cache, args.verbose)
+    text, machine = render(dv, jenkins, args, container, test_filter, cases,
+                           executions, frm, to, tz, query)
+    if args.output:
+        with open(args.output, "w") as fh:
+            fh.write(text)
+        print(f"Report written to {args.output}", file=sys.stderr)
+    else:
+        sys.stdout.write(text)
+    if args.json_out:
+        with open(args.json_out, "w") as fh:
+            json.dump(machine, fh, indent=1, default=str)
+        print(f"JSON written to {args.json_out}", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except DevelocityError as error:
+        sys.exit(f"dv-test-history: {error}")
+    except KeyboardInterrupt:
+        sys.exit(130)
