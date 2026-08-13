@@ -6,6 +6,7 @@
   re-execute these tests, see `get-failing-tests.py -h` for more details.
 * `mvn-sha256sum.sh`: Print the SHA256 (256-bit) checksums of a Maven artifact, see `mvn-sha256sum.sh -h` for more details.
 * `xmvn`: A special version of `mvn` which adds the automatic switch to the right Java version based on the current resolved pom `xwiki.java.version` or `commons.version` value.
+* `dv-test-history`: get failing tests, their history, failure modes and screenshots and screen recordings from Develocity and Jenkins. Useful to analyze failing or flickering tests.
 
 # Install
 
