@@ -1,4 +1,15 @@
 #!/bin/bash
+# The Sonar Maven plugin does not support Java versions lower than 11
+XMAVEN_SONAR_MINIMUM_JAVA_VERSION=11
+# Check if the command line executes the Sonar Maven plugin (either the "sonar:sonar" shortcut or the fully
+# qualified "<groupId>:sonar-maven-plugin:<version>:sonar" form)
+XMAVEN_SONAR=false
+for XMAVEN_ARG in "$@"; do
+    if [[ $XMAVEN_ARG =~ (^|:)sonar(-maven-plugin)?:([^:]+:)*sonar$ ]]; then
+        XMAVEN_SONAR=true
+        break
+    fi
+done
 # Only try to find the Java version from the pom if the current folder is a Maven project
 if [[ -f pom.xml ]]; then
     MAJORVERSION_REGEX="[0-9]+"
@@ -24,6 +35,11 @@ if [[ -f pom.xml ]]; then
                 echo "The version of Java to use is $XMAVEN_JAVA_VERSION."
             fi
         fi
+    fi
+    if [[ $XMAVEN_JAVA_VERSION ]] && [[ $XMAVEN_SONAR == true ]] \
+        && [ $XMAVEN_JAVA_VERSION -lt $XMAVEN_SONAR_MINIMUM_JAVA_VERSION ]; then
+        XMAVEN_JAVA_VERSION=$XMAVEN_SONAR_MINIMUM_JAVA_VERSION
+        echo "The Sonar Maven plugin is executed, using Java $XMAVEN_JAVA_VERSION instead."
     fi
     if [[ $XMAVEN_JAVA_VERSION ]]; then
         # Find the installed versions of the java command line
