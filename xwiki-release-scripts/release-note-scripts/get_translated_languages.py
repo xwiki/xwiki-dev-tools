@@ -69,7 +69,7 @@ def is_matching_branch(json_branch_value, branch):
 def retrieve_languages_for_changes(date_previous_version, date_next_version, branch, projects, token):
     ## List of actions can be found in https://github.com/WeblateOrg/weblate/blob/main/weblate/trans/actions.py#L16
     request_payload = {
-        'action': [2, 5], ## 2 is translation changed and 5 is translation added
+        'action': [2, 5, 77], ## 2 is translation changed, 5 is translation added, 77 is propagated change
         'timestamp_after': date_previous_version,
         'timestamp_before': date_next_version,
     }
