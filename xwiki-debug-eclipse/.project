@@ -2,6 +2,8 @@
 <projectDescription>
 	<name>xwiki-debug-eclipse</name>
 	<comment></comment>
+	<projects>
+	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.wst.jsdt.core.javascriptValidator</name>
@@ -83,6 +85,11 @@
 			<name>src/main/webapp/WEB-INF/portlet.xml</name>
 			<type>1</type>
 			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/WEB-INF/portlet.xml</locationURI>
+		</link>
+		<link>
+			<name>src/main/webapp/WEB-INF/resourcecheck</name>
+			<type>2</type>
+			<locationURI>XWIKIPLATFORM/xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-war/src/main/webapp/WEB-INF/resourcecheck</locationURI>
 		</link>
 		<link>
 			<name>src/main/webapp/WEB-INF/sun-web.xml</name>
