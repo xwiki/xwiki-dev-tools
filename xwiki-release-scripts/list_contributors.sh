@@ -8,6 +8,7 @@ PROJECTS=("xwiki-commons" "xwiki-rendering" "xwiki-platform")
 usage() {
   echo "Usage: $SCRIPT_NAME start_version end_version"
   echo "Example: $SCRIPT_NAME 10.4 10.5"
+  echo "The contributor names are printed on stdout, one per line; everything else is printed on stderr."
 }
 
 VERSION1=$1
@@ -22,9 +23,9 @@ TMP_FILE="/tmp/list_contributors_$VERSION1_$VERSION1.txt"
 rm $TMP_FILE 2> /dev/null
 
 for PROJECT in ${PROJECTS[@]}; do
-  echo "Checking [$PROJECT]..."
+  echo "Checking [$PROJECT]..." >&2
 
-  cd $PROJECT 2> /dev/null || { echo "ERROR: unable to find project [$PROJECT]. Execute script from 'xwiki-trunks' parent folder."; exit 2; }
+  cd $PROJECT 2> /dev/null || { echo "ERROR: unable to find project [$PROJECT]. Execute script from 'xwiki-trunks' parent folder." >&2; exit 2; }
 
   if [[ $VERSION1 =~ ^[0-9] ]]
   then
@@ -40,17 +41,17 @@ for PROJECT in ${PROJECTS[@]}; do
     TO=${VERSION2}
   fi
 
-  git fetch --tags
+  git fetch --tags >&2
 
   git cat-file -e $FROM
   if [[ $? != 0 ]]; then
-    echo "ERROR: Invalid start version."
+    echo "ERROR: Invalid start version." >&2
     exit 3
   fi
 
   git cat-file -e $TO
   if [[ $? != 0 ]]; then
-    echo "ERROR: Invalid end version."
+    echo "ERROR: Invalid end version." >&2
     exit 4
   fi
 
@@ -65,7 +66,8 @@ for PROJECT in ${PROJECTS[@]}; do
   cd ..
 done
 
-echo
-echo "Results:"
+## Only the names go to stdout, so that callers can consume them directly
+echo >&2
+echo "Results:" >&2
 cat $TMP_FILE | sort -u
 rm $TMP_FILE
