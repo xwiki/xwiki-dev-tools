@@ -26,21 +26,17 @@ corresponding release note, where the {{releasenotecontributors/}} macro renders
 list_contributors.sh is called from here rather than piped into this script because both need the same versions: the
 end version gives both the end of the git range and the release note to update. With a pipe, the versions would have
 to be passed to each script separately, and nothing would ensure that the list is the one of the release note.
-
-Only the Python standard library is used, so that the script runs on the release machine without installing anything.
 """
 
 import argparse
-import base64
 import getpass
-import json
 import os
 import re
 import subprocess
 import sys
-import urllib.error
 import urllib.parse
-import urllib.request
+
+import requests
 
 LIST_CONTRIBUTORS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'list_contributors.sh')
 
@@ -51,6 +47,8 @@ RELEASE_NOTE_CLASS = 'ReleaseNotes.Code.ReleaseNoteClass'
 
 # Authors and co-authors that are not people (AI agents, dependency updaters, service accounts). Regular expressions,
 # matched against whole contributor names.
+# TODO: maintain this list outside of the code (e.g. in a local configuration file or a wiki page), so that adding a
+# bot does not require changing the script.
 BOT_PATTERNS = [
     r'.*\[bot\]',
     r'Claude( .*)?',
@@ -94,7 +92,8 @@ class Wiki:
     def __init__(self, url):
         self.url = url
         self.rest_base = url + '/rest/wikis/xwiki'
-        self.authorization = None
+        self.session = requests.Session()
+        self.session.headers['Accept'] = 'application/json'
 
     def ask_credentials(self):
         username = os.environ.get('XWIKI_USERNAME')
@@ -106,32 +105,21 @@ class Wiki:
             username = input()
         if not password:
             password = getpass.getpass('Password for [{}]: '.format(username))
-        token = base64.b64encode('{}:{}'.format(username, password).encode('utf-8')).decode('ascii')
-        self.authorization = 'Basic ' + token
+        self.session.auth = (username, password)
 
     def request(self, url, accepted, method='GET', data=None):
-        """Performs a REST request and returns the status and the decoded JSON response, or None when the response has
-        no body. Fails on HTTP errors, except for the accepted statuses."""
-        headers = {'Accept': 'application/json'}
-        if data is not None:
-            headers['Content-Type'] = 'application/json'
-            data = json.dumps(data).encode('utf-8')
-        if self.authorization:
-            headers['Authorization'] = self.authorization
-        request = urllib.request.Request(url, data=data, headers=headers, method=method)
+        """Performs a REST request and returns the status and the decoded JSON response, or None when the response is
+        an error or has no body. Fails on the statuses that are not accepted."""
         try:
-            with urllib.request.urlopen(request) as response:
-                status, body = response.status, response.read()
-        except urllib.error.HTTPError as e:
-            status, body = e.code, None
-        except urllib.error.URLError as e:
-            raise RestError('unable to reach [{}]: {}'.format(url, e.reason))
-        if status not in accepted:
-            raise RestError('unexpected HTTP status [{}] for [{} {}]'.format(status, method, url))
-        if not body:
-            return status, None
+            response = self.session.request(method, url, json=data)
+        except requests.RequestException as e:
+            raise RestError('unable to reach [{}]: {}'.format(url, e))
+        if response.status_code not in accepted:
+            raise RestError('unexpected HTTP status [{}] for [{} {}]'.format(response.status_code, method, url))
+        if not response.ok or not response.content:
+            return response.status_code, None
         try:
-            return status, json.loads(body)
+            return response.status_code, response.json()
         except ValueError as e:
             raise RestError('invalid JSON response for [{} {}]: {}'.format(method, url, e))
 
