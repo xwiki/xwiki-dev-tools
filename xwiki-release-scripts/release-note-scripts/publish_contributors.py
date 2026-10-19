@@ -57,6 +57,7 @@ BOT_PATTERNS = [
     r'Mend Renovate',
     r'anonymous',
     r'XWiki',
+    r'XWiki LLM Bot|xwikiorg-llm-bot',
 ]
 BOT_REGEX = re.compile('|'.join('(?:{})'.format(pattern) for pattern in BOT_PATTERNS))
 
