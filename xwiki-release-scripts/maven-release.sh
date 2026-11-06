@@ -176,7 +176,9 @@ function set_packages_version() {
   version="$1"
   current_directory=$PWD
 
-  find "$current_directory" -type d -name "node_modules" -prune -o -name "package.json" -print | \
+  # The build directories are skipped: target/checkout holds the npm packages built by release:perform, which
+  # publish_npm() publishes after the release branch moved to the next SNAPSHOT version.
+  find "$current_directory" -type d \( -name "node_modules" -o -name "target" \) -prune -o -name "package.json" -print | \
   grep -v "^$current_directory/package.json$" | \
   while IFS= read -r pkg_path; do
       
