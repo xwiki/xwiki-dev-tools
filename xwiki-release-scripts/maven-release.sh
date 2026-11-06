@@ -393,7 +393,9 @@ function release_maven() {
   # Note: We disable the Develocity local and remote caches to make sure everything is rebuilt and to avoid
   # any security issue (e.g. if the remote cache has been compromised for example).
   # Hence the: -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false
-  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Darguments="-Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
+  # The npm packages are only checked (xwiki.npm.publish.dryRun): publish_npm() publishes them at the end of the
+  # release, once the release manager is there to approve the publication with their two-factor authentication.
+  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.npm.publish.dryRun=true -Darguments="-Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.npm.publish.dryRun=true -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
 }
 
 # Create the GPG-signed git tag for the release. release:prepare only creates an unsigned tag,
@@ -406,15 +408,76 @@ function create_signed_tag() {
 
 # All the steps that must run once the artifacts have been published by release_maven
 # (release:perform): sign the tag, bump the release branch to the next SNAPSHOT, merge and push
-# it, clean up and push the tag + create the GitHub release.
+# it, push the tag + create the GitHub release, publish the npm packages and clean up.
 # This is the single source of truth for the post-publish steps, shared by the normal release
 # flow (release_project) and the resume-after-publish flow (resume_project_after_publish).
+# The first (mandatory) parameter is the name of the project being released (xwiki-commons, etc).
 function finish_release_after_publish() {
   create_signed_tag
   post_update_versions
   push_release
-  post_cleanup
   push_tag
+  # The cleanup comes last because it deletes target/checkout, where publish_npm() finds the npm packages built by
+  # release:perform.
+  if [[ $1 == 'xwiki-platform' ]]
+  then
+    publish_npm false
+  fi
+  post_cleanup
+}
+
+# The directory of the npm packages built by release:perform, relative to the xwiki-platform clone.
+NPM_PACKAGES_DIR=target/checkout/xwiki-platform-core/xwiki-platform-node
+
+# Publish the npm packages built by release:perform to the npm registry. npm only accepts a publication approved with
+# the two-factor authentication of the release manager, so this waits for them before publishing, and offers to retry
+# a failed publication. Publishing again is safe: pnpm skips the packages already published, and the dist-tag stays
+# the same (see deploy.js).
+# The first (mandatory) parameter is true when the npm packages must exist (resuming with -n), false when a release
+# without npm packages (XWiki older than 18.0) skips the publication.
+function publish_npm() {
+  if [[ ! -d $NPM_PACKAGES_DIR/src/main/node ]]
+  then
+    if [[ $1 == 'true' ]]
+    then
+      echo -e "\033[1;31mCannot publish the npm packages: $NPM_PACKAGES_DIR/src/main/node does not exist in this clone.\033[0m"
+      echo -e "\033[1;31mThe build of the failed run must still be present. Otherwise, publish the npm packages from a fresh build of the tag ${TAG_NAME}.\033[0m"
+      exit -1
+    fi
+    echo -e "\033[0;32m* No npm packages to publish\033[0m"
+    return
+  fi
+
+  local snapshot_registry=`mvn -N -f target/checkout/pom.xml help:evaluate -Dexpression=xwiki.npm.snapshot.registry -q -DforceStdout`
+  local release_registry=`mvn -N -f target/checkout/pom.xml help:evaluate -Dexpression=xwiki.npm.release.registry -q -DforceStdout`
+  local node_dir=$PWD/$NPM_PACKAGES_DIR/target/node
+
+  echo -e "\033[0;32m* Publishing the npm packages to ${release_registry}\033[0m"
+  echo "npm asks you to approve the publication with your two-factor authentication: pnpm prints a link to open."
+  echo "Check the option to skip the two-factor authentication for the next 5 minutes, so that one approval covers every package."
+  read -e -p "Press Enter when you are ready> " tmp
+  until (cd $NPM_PACKAGES_DIR/src/main/node && PATH=$node_dir:$PATH pnpm run deploy ${snapshot_registry} ${release_registry} $PWD)
+  do
+    echo -e "\033[1;31mThe npm publication failed.\033[0m"
+    echo "Retry the npm publication?"
+    unset CONFIRM
+    read -e -p "[Y|n]> " CONFIRM
+    if [[ $CONFIRM == 'n' ]]
+    then
+      echo -e "\033[1;31mThe npm packages are not all published. Once the problem is fixed, run this script again with -n to publish them.\033[0m"
+      echo -e "\033[1;31mDo not clean this clone: -n publishes the packages built in $NPM_PACKAGES_DIR.\033[0m"
+      exit -1
+    fi
+  done
+}
+
+# Resume an xwiki-platform release whose npm publication failed: publish the npm packages and run the last cleanup.
+# Everything else (Maven publication, tag, GitHub release) is already done.
+function resume_platform_npm_publication() {
+  echo -e "\033[0;33m* Resuming the npm publication of xwiki-platform\033[0m"
+  compute_tag_name
+  publish_npm true
+  post_cleanup
 }
 
 function post_update_versions() {
@@ -518,13 +581,20 @@ function resume_project_after_publish() {
     exit -1
   fi
 
-  finish_release_after_publish
+  finish_release_after_publish $1
 }
 
 # Wrapper function that calls all the other release steps, for one project only.
 # The first (mandatory) parameter is the name of the subdirectory where the project sources are (xwiki-commons, xwiki-enterprise, etc).
 function release_project() {
   cd $1
+  # Resuming the npm publication of xwiki-platform: only the npm publication and the cleanup are left.
+  if [[ $do_release == true && $resume_npm_publication == true && $1 == 'xwiki-platform' ]]
+  then
+    resume_platform_npm_publication
+    cd ..
+    return
+  fi
   # If this project is the one to resume after a failed publish, run only the post-publish steps.
   if [[ $do_release == true && "$RESUME_AFTER_PUBLISH_PROJECT" == "$1" ]]
   then
@@ -540,9 +610,24 @@ function release_project() {
     create_release_branch
     pre_update_versions
     release_maven
-    finish_release_after_publish
+    finish_release_after_publish $1
   fi
   cd ..
+}
+
+# Validate the -n (resume the npm publication) option. Only xwiki-platform publishes npm packages, and it is
+# released last: xwiki-commons and xwiki-rendering are necessarily already released.
+function check_resume_npm_publication() {
+  [[ $resume_npm_publication != true ]] && return
+
+  if [[ $do_release == false || -n $RESUME_AFTER_PUBLISH_PROJECT || $do_xwiki_platform == false ]]
+  then
+    echo -e "\033[1;31m-n cannot be combined with -r, -p or -P.\033[0m"
+    exit -1
+  fi
+  echo -e "\033[0;33m* Resuming the npm publication of xwiki-platform: xwiki-commons and xwiki-rendering are already released, skipping them.\033[0m"
+  do_xwiki_commons=false
+  do_xwiki_rendering=false
 }
 
 # Validate the -p (resume after publish) option and, since the release order is fixed
@@ -604,6 +689,7 @@ function release_all() {
   # Validate the -p option first (it only depends on flags parsed by getopts) so we fail fast on
   # a bad combination before the gpg setup and the version prompts.
   check_resume_after_publish
+  check_resume_npm_publication
   init
   check_env
   check_versions
@@ -649,16 +735,20 @@ function display_help() {
   echo "    publish step, when release:perform published the artifacts to Maven Central but a later"
   echo "    step failed (e.g. a 502/timeout while polling the deployment status). Only the"
   echo "    post-publish steps are run for that project (signed tag, version bump, merge/push,"
-  echo "    cleanup, tag push and GitHub release). Projects ordered before it are skipped"
+  echo "    tag push and GitHub release, npm publication for xwiki-platform, cleanup). Projects ordered before it are skipped"
   echo "    automatically (they are necessarily already released), and the following projects are"
   echo "    released normally. Requires the local clone to still hold the release branch and tag"
   echo "    from the failed run, and the artifacts to be confirmed as published on the Central portal."
+  echo "-n: Resume an xwiki-platform release whose npm publication failed or was interrupted. Only the npm"
+  echo "    publication and the final cleanup are run. Requires the local clone to still hold the build of"
+  echo "    the failed run (target/checkout)."
   echo ""
   echo "This script performs the technical release:"
   echo "* Create a release branch"
   echo "* Update the root project's parent version and the commons.version variable, if needed"
   echo "* Invoke the maven release process (mvn release:prepare and mvn release:perform)"
   echo "* Create GPG-signed tags and push them to the upstream repository"
+  echo "* Publish the xwiki-platform npm packages, approved with the release manager's two-factor authentication"
   echo "* [Optional] Branch the current master into a stable release and update the master to the next version"
   echo ""
   echo "Prerequisite steps:"
@@ -673,7 +763,7 @@ do_release=true
 do_xwiki_commons=true
 do_xwiki_rendering=true
 do_xwiki_platform=true
-while getopts ":hbrCRPp:" o
+while getopts ":hbrnCRPp:" o
 do
     case "${o}" in
         p)
@@ -687,6 +777,10 @@ do
               ;;
           esac
           echo "The script will resume ${RESUME_AFTER_PUBLISH_PROJECT} right after the Maven publish step (post-publish steps only)."
+          ;;
+        n)
+          echo "The script will only publish the npm packages of xwiki-platform and finish its cleanup."
+          resume_npm_publication=true
           ;;
         r)
           echo "You called the script with skipping the actual release: "
