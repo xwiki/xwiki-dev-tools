@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "name": "xwiki-npm-publish",
+  "description": "Publish the npm packages of an XWiki project, see publish.sh",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run"
+  },
+  "dependencies": {
+    "semver": "7.8.5"
+  },
+  "devDependencies": {
+    "vitest": "5.0.5"
+  }
+}
