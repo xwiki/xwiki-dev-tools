@@ -395,9 +395,7 @@ function release_maven() {
   # Note: We disable the Develocity local and remote caches to make sure everything is rebuilt and to avoid
   # any security issue (e.g. if the remote cache has been compromised for example).
   # Hence the: -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false
-  # The npm packages are only checked (xwiki.npm.publish.dryRun): publish_npm() publishes them at the end of the
-  # release, once the release manager is there to approve the publication with their two-factor authentication.
-  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.npm.publish.dryRun=true -Darguments="-Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.npm.publish.dryRun=true -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
+  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Darguments="-Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
 }
 
 # Create the GPG-signed git tag for the release. release:prepare only creates an unsigned tag,
@@ -419,8 +417,7 @@ function finish_release_after_publish() {
   post_update_versions
   push_release
   push_tag
-  # The cleanup comes last because it deletes target/checkout, where publish_npm() finds the npm packages built by
-  # release:perform.
+  # The cleanup comes last because it deletes the npm packages built by release:perform, see publish_npm().
   if [[ $1 == 'xwiki-platform' ]]
   then
     publish_npm false
@@ -428,21 +425,36 @@ function finish_release_after_publish() {
   post_cleanup
 }
 
-# The directory of the npm packages built by release:perform, relative to the xwiki-platform clone.
-NPM_PACKAGES_DIR=target/checkout/xwiki-platform-core/xwiki-platform-node
+# The project built by release:perform, holding the npm packages to publish.
+RELEASE_CHECKOUT_DIR=target/checkout
 
-# Publish the npm packages built by release:perform to the npm registry. npm only accepts a publication approved with
-# the two-factor authentication of the release manager, so this waits for them before publishing, and offers to retry
-# a failed publication. Publishing again is safe: pnpm skips the packages already published, and the dist-tag stays
-# the same (see deploy.js).
+# True when the project built by release:perform has npm packages, i.e. a pnpm workspace (XWiki 18.0+).
+function has_npm_packages() {
+  [[ -f $RELEASE_CHECKOUT_DIR/pnpm-workspace.yaml ]]
+}
+
+# Check that npm accepts the npm packages built by release:perform, without publishing them, so that a package npm
+# would reject stops the release before its tag is pushed. Only xwiki-platform has npm packages for now.
+function check_npm_publication() {
+  if [[ $1 == 'xwiki-platform' ]] && has_npm_packages
+  then
+    echo -e "\033[0;32m* Checking the npm publication\033[0m"
+    $PRGDIR/npm-publish/publish.sh $RELEASE_CHECKOUT_DIR --dry-run || exit -2
+  fi
+}
+
+# Publish the npm packages built by release:perform: every package of the pnpm workspace that is not private (see
+# npm-publish/publish.sh). npm only accepts a publication approved with the two-factor authentication of the release
+# manager, so this waits for them before publishing, and offers to retry a failed publication. Publishing again is
+# safe: pnpm skips the packages already published, and the dist-tag stays the same.
 # The first (mandatory) parameter is true when the npm packages must exist (resuming with -n), false when a release
 # without npm packages (XWiki older than 18.0) skips the publication.
 function publish_npm() {
-  if [[ ! -d $NPM_PACKAGES_DIR/src/main/node ]]
+  if ! has_npm_packages
   then
     if [[ $1 == 'true' ]]
     then
-      echo -e "\033[1;31mCannot publish the npm packages: $NPM_PACKAGES_DIR/src/main/node does not exist in this clone.\033[0m"
+      echo -e "\033[1;31mCannot publish the npm packages: $RELEASE_CHECKOUT_DIR/pnpm-workspace.yaml does not exist in this clone.\033[0m"
       echo -e "\033[1;31mThe build of the failed run must still be present. Otherwise, publish the npm packages from a fresh build of the tag ${TAG_NAME}.\033[0m"
       exit -1
     fi
@@ -450,15 +462,11 @@ function publish_npm() {
     return
   fi
 
-  local snapshot_registry=`mvn -N -f target/checkout/pom.xml help:evaluate -Dexpression=xwiki.npm.snapshot.registry -q -DforceStdout`
-  local release_registry=`mvn -N -f target/checkout/pom.xml help:evaluate -Dexpression=xwiki.npm.release.registry -q -DforceStdout`
-  local node_dir=$PWD/$NPM_PACKAGES_DIR/target/node
-
-  echo -e "\033[0;32m* Publishing the npm packages to ${release_registry}\033[0m"
+  echo -e "\033[0;32m* Publishing the npm packages\033[0m"
   echo "npm asks you to approve the publication with your two-factor authentication: pnpm prints a link to open."
   echo "Check the option to skip the two-factor authentication for the next 5 minutes, so that one approval covers every package."
   read -e -p "Press Enter when you are ready> " tmp
-  until (cd $NPM_PACKAGES_DIR/src/main/node && PATH=$node_dir:$PATH pnpm run deploy ${snapshot_registry} ${release_registry} $PWD)
+  until $PRGDIR/npm-publish/publish.sh $RELEASE_CHECKOUT_DIR
   do
     echo -e "\033[1;31mThe npm publication failed.\033[0m"
     echo "Retry the npm publication?"
@@ -467,7 +475,7 @@ function publish_npm() {
     if [[ $CONFIRM == 'n' ]]
     then
       echo -e "\033[1;31mThe npm packages are not all published. Once the problem is fixed, run this script again with -n to publish them.\033[0m"
-      echo -e "\033[1;31mDo not clean this clone: -n publishes the packages built in $NPM_PACKAGES_DIR.\033[0m"
+      echo -e "\033[1;31mDo not clean this clone: -n publishes the packages built in $RELEASE_CHECKOUT_DIR.\033[0m"
       exit -1
     fi
   done
@@ -612,6 +620,7 @@ function release_project() {
     create_release_branch
     pre_update_versions
     release_maven
+    check_npm_publication $1
     finish_release_after_publish $1
   fi
   cd ..
