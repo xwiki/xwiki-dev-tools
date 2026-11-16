@@ -45,3 +45,6 @@ __pycache__
 /xwiki-debug-eclipse/src/main/webapp/WEB-INF/currentoracle_hibernate.cfg.xml
 /xwiki-debug-eclipse/src/main/webapp/WEB-INF/currentpgsql_hibernate.cfg.xml
 
+
+# Node
+node_modules
