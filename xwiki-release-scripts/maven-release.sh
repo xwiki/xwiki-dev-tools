@@ -395,7 +395,10 @@ function release_maven() {
   # Note: We disable the Develocity local and remote caches to make sure everything is rebuilt and to avoid
   # any security issue (e.g. if the remote cache has been compromised for example).
   # Hence the: -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false
-  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Darguments="-Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
+  # Note: -DdeployAtEnd=true (inside -Darguments, so it applies to the build of the checkout) defers every deployment
+  # to the end of the reactor: nothing is deployed unless all the modules build and verify successfully, e.g. when the
+  # check that the npm packages can be published fails.
+  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Darguments="-DdeployAtEnd=true -Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
 }
 
 # Create the GPG-signed git tag for the release. release:prepare only creates an unsigned tag,
@@ -433,13 +436,22 @@ function has_npm_packages() {
   [[ -f $RELEASE_CHECKOUT_DIR/pnpm-workspace.yaml ]]
 }
 
-# Check that npm accepts the npm packages built by release:perform, without publishing them, so that a package npm
-# would reject stops the release before its tag is pushed. Only xwiki-platform has npm packages for now.
+# Second check, on the released versions, that npm accepts the npm packages built by release:perform, without publishing
+# them. The main check runs in the Maven build and fails the release before anything is deployed. This one runs after
+# release:perform, so a package npm would reject stops the release before its tag is pushed.
+# Only xwiki-platform has npm packages for now.
 function check_npm_publication() {
   if [[ $1 == 'xwiki-platform' ]] && has_npm_packages
   then
     echo -e "\033[0;32m* Checking the npm publication\033[0m"
-    $PRGDIR/npm-publish/publish.sh $RELEASE_CHECKOUT_DIR --dry-run || exit -2
+    if ! $PRGDIR/npm-publish/publish.sh $RELEASE_CHECKOUT_DIR --dry-run
+    then
+      echo -e "\033[1;31mThe npm publication check failed.\033[0m"
+      echo -e "\033[1;31mThe Maven artifacts of $1 are already deployed, but nothing was tagged with a signed tag, pushed or published to npm.\033[0m"
+      echo -e "\033[1;31mFix the problem, then run this script again with -p $1 to sign the tag, push, and publish the npm packages.\033[0m"
+      echo -e "\033[1;31mDo not clean this clone: -p reuses the release branch, the tag and $RELEASE_CHECKOUT_DIR.\033[0m"
+      exit -2
+    fi
   fi
 }
 
