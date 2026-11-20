@@ -7,6 +7,14 @@ if [ ! -d ".git" ]; then
   fi
 fi
 
+# GNU sed (Linux) takes an optional backup suffix glued to -i, while BSD sed (macOS) requires one as a separate
+# argument, an empty one meaning no backup. The options must also come before the files for BSD sed.
+if sed --version > /dev/null 2>&1; then
+  SED_INPLACE=(-i)
+else
+  SED_INPLACE=(-i '')
+fi
+
 while getopts hv: flag
 do
     case "${flag}" in
@@ -18,7 +26,7 @@ done
 if [ $help ]
 then
   echo "Usage: xbranch-reset-version.sh [option]"
-  echo "Reset the version in the pom files to what is expected for main branch on which the current feature branch is based."
+  echo "Reset the version in the pom files (and the package.json files of the node packages) to what is expected for main branch on which the current feature branch is based."
   echo "For example if the current version is 16.5.0-feature-deploy-jakarta-SNAPSHOT and the feature branch name is feature-deploy-jakarta then new reset version will be 16.5.0-SNAPSHOT."
   echo ""
   echo "Options:"
@@ -46,17 +54,49 @@ REPOSITORY=$(basename -s .git `git config --get remote.origin.url`)
 echo "Repository: $REPOSITORY"
 
 GREEN='\033[0;32m'
-find . -type f -name 'pom.xml' | xargs sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g"
+
+# Replace the version of the node packages, the same way the release scripts do (see set_packages_version in
+# xwiki-release-scripts/maven-release.sh): the root package.json and the private packages are left alone. Only the
+# packages with the expected old version are modified, so that resetting the version restores exactly what was set.
+function replace_packages_version() {
+  local old_version="$1"
+  local new_version="$2"
+  if ! command -v jq > /dev/null; then
+    >&2 echo "jq is not installed, the version of the node packages was not updated"
+    return
+  fi
+  local count=0
+  while IFS= read -r -d '' package; do
+    if [[ $(jq -r '.private' "$package") == 'true' || $(jq -r '.version' "$package") != "$old_version" ]]; then
+      continue
+    fi
+    local temp_file=$(mktemp)
+    if jq ".version = \"$new_version\"" "$package" > "$temp_file"; then
+      # Write into the existing file to keep its permissions
+      cat "$temp_file" > "$package"
+      count=$((count + 1))
+    else
+      >&2 echo "Failed to update the version of $package"
+    fi
+    rm -f "$temp_file"
+  done < <(find . -path ./package.json -prune -o \( -name node_modules -o -name target \) -prune -o -type f -name package.json -print0)
+  if [ $count -gt 0 ]; then
+    echo -e "${GREEN}Replaced version ${old_version} by ${new_version} in ${count} package.json files"
+  fi
+}
+find . -type f -name 'pom.xml' -exec sed "${SED_INPLACE[@]}" -e "s/$CURRENT_VERSION/$NEW_VERSION/g" {} +
 echo -e "${GREEN}Replaced version ${CURRENT_VERSION} by ${NEW_VERSION} in all pom files"
 
 if [[ $REPOSITORY == 'xwiki-platform' ]]
 then
-  sed -e "s/<platform.version>.*<\/platform.version>/<platform.version>\${commons.version}<\/platform.version>/" -i pom.xml
+  sed "${SED_INPLACE[@]}" -e "s/<platform.version>.*<\/platform.version>/<platform.version>\${commons.version}<\/platform.version>/" pom.xml
   echo -e "${GREEN}Reseted the <platform.version> property to \${commons.version}"
 fi
 
 if [[ $REPOSITORY == 'xwiki-rendering' ]]
 then
-  sed -e "s/<rendering.version>.*<\/rendering.version>/<rendering.version>\${commons.version}<\/rendering.version>/" -i pom.xml
+  sed "${SED_INPLACE[@]}" -e "s/<rendering.version>.*<\/rendering.version>/<rendering.version>\${commons.version}<\/rendering.version>/" pom.xml
   echo -e "${GREEN}Reseted the <rendering.version> property to \${commons.version}"
 fi
+
+replace_packages_version "$CURRENT_VERSION" "$NEW_VERSION"
