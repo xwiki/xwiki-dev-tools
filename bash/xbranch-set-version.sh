@@ -7,6 +7,14 @@ if [ ! -d ".git" ]; then
   fi
 fi
 
+# GNU sed (Linux) takes an optional backup suffix glued to -i, while BSD sed (macOS) requires one as a separate
+# argument, an empty one meaning no backup. The options must also come before the files for BSD sed.
+if sed --version > /dev/null 2>&1; then
+  SED_INPLACE=(-i)
+else
+  SED_INPLACE=(-i '')
+fi
+
 while getopts ahv: flag
 do
     case "${flag}" in
@@ -82,7 +90,7 @@ function replace_packages_version() {
 }
 if [ ${all} ] || [ $REPOSITORY == 'xwiki-commons' ]
 then
-  find . -type f -name 'pom.xml' | xargs sed -i "s/$STANDARD_VERSION/$NEW_VERSION/g"
+  find . -type f -name 'pom.xml' -exec sed "${SED_INPLACE[@]}" -e "s/$STANDARD_VERSION/$NEW_VERSION/g" {} +
   echo -e "${GREEN}Replaced version ${STANDARD_VERSION} by ${NEW_VERSION} in all pom files"
 else
   mvn versions:update-parent -DallowSnapshots=true -DparentVersion=[${STANDARD_VERSION}],[${NEW_VERSION}] -DgenerateBackupPoms=false -N
@@ -91,18 +99,18 @@ else
   mvn -f pom.xml versions:set -DnewVersion=${NEW_VERSION} -DallowSnapshots=true -DgenerateBackupPoms=false -Plegacy,integration-tests,snapshot,docker
   echo -e "${GREEN}Updated version ${STANDARD_VERSION} by ${NEW_VERSION}"
 
-  sed -e "s/<commons.version>.*<\/commons.version>/<commons.version>${NEW_VERSION}<\/commons.version>/" -i pom.xml
+  sed "${SED_INPLACE[@]}" -e "s/<commons.version>.*<\/commons.version>/<commons.version>${NEW_VERSION}<\/commons.version>/" pom.xml
   echo -e "${GREEN}Forced <commons.version> (if it exist) to ${NEW_VERSION}"
 
   if [[ $REPOSITORY == 'xwiki-platform' ]]
   then
-    sed -e "s/<platform.version>.*<\/platform.version>/<platform.version>${NEW_VERSION}<\/platform.version>/" -i pom.xml
+    sed "${SED_INPLACE[@]}" -e "s/<platform.version>.*<\/platform.version>/<platform.version>${NEW_VERSION}<\/platform.version>/" pom.xml
     echo -e "${GREEN}Force the <platform.version> property to ${NEW_VERSION}"
   fi
 
   if [[ $REPOSITORY == 'xwiki-rendering' ]]
   then
-    sed -e "s/<rendering.version>.*<\/rendering.version>/<rendering.version>${NEW_VERSION}<\/rendering.version>/" -i pom.xml
+    sed "${SED_INPLACE[@]}" -e "s/<rendering.version>.*<\/rendering.version>/<rendering.version>${NEW_VERSION}<\/rendering.version>/" pom.xml
     echo -e "${GREEN}Force the <rendering.version> property to ${NEW_VERSION}"
   fi
 fi

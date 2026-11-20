@@ -7,6 +7,14 @@ if [ ! -d ".git" ]; then
   fi
 fi
 
+# GNU sed (Linux) takes an optional backup suffix glued to -i, while BSD sed (macOS) requires one as a separate
+# argument, an empty one meaning no backup. The options must also come before the files for BSD sed.
+if sed --version > /dev/null 2>&1; then
+  SED_INPLACE=(-i)
+else
+  SED_INPLACE=(-i '')
+fi
+
 while getopts hv: flag
 do
     case "${flag}" in
@@ -76,18 +84,18 @@ function replace_packages_version() {
     echo -e "${GREEN}Replaced version ${old_version} by ${new_version} in ${count} package.json files"
   fi
 }
-find . -type f -name 'pom.xml' | xargs sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g"
+find . -type f -name 'pom.xml' -exec sed "${SED_INPLACE[@]}" -e "s/$CURRENT_VERSION/$NEW_VERSION/g" {} +
 echo -e "${GREEN}Replaced version ${CURRENT_VERSION} by ${NEW_VERSION} in all pom files"
 
 if [[ $REPOSITORY == 'xwiki-platform' ]]
 then
-  sed -e "s/<platform.version>.*<\/platform.version>/<platform.version>\${commons.version}<\/platform.version>/" -i pom.xml
+  sed "${SED_INPLACE[@]}" -e "s/<platform.version>.*<\/platform.version>/<platform.version>\${commons.version}<\/platform.version>/" pom.xml
   echo -e "${GREEN}Reseted the <platform.version> property to \${commons.version}"
 fi
 
 if [[ $REPOSITORY == 'xwiki-rendering' ]]
 then
-  sed -e "s/<rendering.version>.*<\/rendering.version>/<rendering.version>\${commons.version}<\/rendering.version>/" -i pom.xml
+  sed "${SED_INPLACE[@]}" -e "s/<rendering.version>.*<\/rendering.version>/<rendering.version>\${commons.version}<\/rendering.version>/" pom.xml
   echo -e "${GREEN}Reseted the <rendering.version> property to \${commons.version}"
 fi
 
