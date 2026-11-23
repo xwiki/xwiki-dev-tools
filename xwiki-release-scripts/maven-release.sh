@@ -439,6 +439,11 @@ function has_npm_packages() {
 # Check, before release:perform deploys anything, that the npm packages of the release tag created by release:prepare
 # pass the checks of their publication (build, publint and a dry run). They are built from a temporary worktree of the
 # tag and are not published. A failing check stops the release before anything is deployed.
+# The Maven build of release:perform runs the same checks in its verify phase, but too late: each module is deployed
+# right after its own build, so a check failing there leaves the modules built before it already deployed. Running the
+# same checks here means none of them can fail for the first time during release:perform. The CI runs them on the same
+# sources, so they rarely fail here: they guard against a release started without a successful CI build, and against
+# problems caused by the release version. They only take a few seconds besides the build that the dry run needs anyway.
 # The first (mandatory) parameter is the name of the project being released. Only xwiki-platform has npm packages for now.
 function check_npm_packages() {
   if [[ $1 == 'xwiki-platform' ]] && git cat-file -e ${TAG_NAME}:pnpm-workspace.yaml 2> /dev/null

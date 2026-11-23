@@ -81,6 +81,8 @@ then
   pnpm install --frozen-lockfile
   pnpm -r --if-present build
   # The same pnpm arguments as the publint check of the Maven build, split the way the Maven plugin splits them.
+  # publint runs again during release:perform, but only after some modules are already deployed (see
+  # check_npm_packages in maven-release.sh).
   if [[ -n $PUBLINT_ARGUMENTS && $PUBLINT_ARGUMENTS != null* ]]
   then
     read -ra PUBLINT_ARGS <<< "$PUBLINT_ARGUMENTS"
