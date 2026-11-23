@@ -25,13 +25,13 @@
 #
 # Usage: publish.sh <project directory> [--dry-run | --check]
 #
-# --check builds the packages from the sources, then verifies that npm accepts them (publint and a dry run) without
+# --check builds the packages from the sources, then runs publint and a dry run of the publication, without
 # publishing anything. Used by maven-release.sh on a checkout of the release tag, before the release is performed.
 #
 # The project directory holds the root pom.xml and the pnpm-workspace.yaml of the project, with its packages already
-# built. The Node and pnpm versions (node.version, pnpm.version) and the registries (xwiki.npm.snapshot.registry,
-# xwiki.npm.release.registry) are read from that pom, so that a branch is always published with its own build tools
-# and registries. The registry credentials come from the user's .npmrc.
+# built (except with --check, which builds them). The Node and pnpm versions (node.version, pnpm.version) and the
+# registries (xwiki.npm.snapshot.registry, xwiki.npm.release.registry) are read from that pom, so that a branch is
+# always published with its own build tools and registries. The registry credentials come from the user's .npmrc.
 
 set -e
 
@@ -53,6 +53,14 @@ NODE_VERSION=$(evaluate node.version)
 PNPM_VERSION=$(evaluate pnpm.version)
 SNAPSHOT_REGISTRY=$(evaluate xwiki.npm.snapshot.registry)
 RELEASE_REGISTRY=$(evaluate xwiki.npm.release.registry)
+for value in "$NODE_VERSION" "$PNPM_VERSION" "$SNAPSHOT_REGISTRY" "$RELEASE_REGISTRY"
+do
+  if [[ -z $value || $value == null* ]]
+  then
+    echo "The pom $PROJECT_DIR/pom.xml does not define node.version, pnpm.version or the npm registries." >&2
+    exit 1
+  fi
+done
 PUBLINT_ARGUMENTS=$(evaluate xwiki.npm.publintCheck.arguments 2>/dev/null || true)
 
 # Install the Node and pnpm versions of the project, the way its build does. The downloads are cached in the local
@@ -75,9 +83,7 @@ then
   if [[ -n $PUBLINT_ARGUMENTS && $PUBLINT_ARGUMENTS != null* ]]
   then
     read -ra PUBLINT_ARGS <<< "$PUBLINT_ARGUMENTS"
-    set -f
     pnpm "${PUBLINT_ARGS[@]}"
-    set +f
   else
     echo "xwiki.npm.publintCheck.arguments is not defined in the pom: skipping publint."
   fi

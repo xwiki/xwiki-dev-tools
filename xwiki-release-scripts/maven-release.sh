@@ -422,7 +422,8 @@ function finish_release_after_publish() {
   # The cleanup comes last because it deletes the npm packages built by release:perform, see publish_npm().
   if [[ $1 == 'xwiki-platform' ]]
   then
-    publish_npm false
+    # Decide from the tag, so that a missing target/checkout cannot silently skip the publication of the npm packages.
+    publish_npm $(git cat-file -e ${TAG_NAME}:pnpm-workspace.yaml 2> /dev/null && echo true || echo false)
   fi
   post_cleanup
 }
@@ -435,9 +436,9 @@ function has_npm_packages() {
   [[ -f $RELEASE_CHECKOUT_DIR/pnpm-workspace.yaml ]]
 }
 
-# Check, before release:perform deploys anything, that npm accepts the npm packages of the release tag created by
-# release:prepare: they are built from a temporary worktree of the tag and checked without being published. A package
-# npm would reject then stops the release before anything is deployed, and the release can be restarted.
+# Check, before release:perform deploys anything, that the npm packages of the release tag created by release:prepare
+# pass the checks of their publication (build, publint and a dry run). They are built from a temporary worktree of the
+# tag and are not published. A failing check stops the release before anything is deployed.
 # The first (mandatory) parameter is the name of the project being released. Only xwiki-platform has npm packages for now.
 function check_npm_packages() {
   if [[ $1 == 'xwiki-platform' ]] && git cat-file -e ${TAG_NAME}:pnpm-workspace.yaml 2> /dev/null
@@ -446,13 +447,14 @@ function check_npm_packages() {
     local tag_dir
     tag_dir=$(mktemp -d)
     if ! (
-      trap 'git worktree remove --force "$tag_dir" || rm -rf "$tag_dir"' EXIT
+      trap 'git worktree remove --force "$tag_dir" || { rm -rf "$tag_dir"; git worktree prune; }' EXIT
       git worktree add --detach "$tag_dir" ${TAG_NAME} -q && $PRGDIR/npm-publish/publish.sh "$tag_dir" --check
     )
     then
       echo -e "\033[1;31mThe npm packages check failed.\033[0m"
-      echo -e "\033[1;31mNothing was deployed, tagged with a signed tag, pushed or published to npm.\033[0m"
-      echo -e "\033[1;31mFix the problem, then clean this clone and restart the release.\033[0m"
+      echo -e "\033[1;31mNothing was deployed, signed, pushed or published to npm, but release:prepare left the local branch ${RELEASE_BRANCH} and the unsigned tag ${TAG_NAME}.\033[0m"
+      echo -e "\033[1;31mFix the problem, remove them with: git checkout master && git branch -D ${RELEASE_BRANCH} && git tag -d ${TAG_NAME}\033[0m"
+      echo -e "\033[1;31mThen restart the release with -C -R, since xwiki-commons and xwiki-rendering are already released.\033[0m"
       exit -2
     fi
   fi
@@ -486,7 +488,7 @@ function publish_npm() {
     echo -e "\033[1;31mThe npm publication failed.\033[0m"
     echo "Retry the npm publication?"
     unset CONFIRM
-    read -e -p "[Y|n]> " CONFIRM
+    read -e -p "[Y|n]> " CONFIRM || exit -1
     if [[ $CONFIRM == 'n' ]]
     then
       echo -e "\033[1;31mThe npm packages are not all published. Once the problem is fixed, run this script again with -n to publish them.\033[0m"
@@ -539,9 +541,9 @@ function push_release() {
   echo -e "\033[0;32m* Switch to release base branch\033[0m"
   git checkout ${RELEASE_FROM_BRANCH}
   echo -e "\033[0;32m* Merge release branch\033[0m"
-  git merge ${RELEASE_BRANCH}
+  git merge ${RELEASE_BRANCH} || exit -1
   echo -e "\033[0;32m* Push release base branch\033[0m"
-  git push origin ${RELEASE_FROM_BRANCH}
+  git push origin ${RELEASE_FROM_BRANCH} || exit -1
 }
 
 # Cleanup sources again, after the release.
@@ -558,7 +560,7 @@ function post_cleanup() {
 # Push the signed tag to the upstream repository and create the associated GitHub release
 function push_tag() {
   echo -e "\033[0;32m* Pushing tag\033[0m"
-  git push --tags
+  git push --tags || exit -1
 
   echo -e "\033[0;32m* Creating the GitHub release\033[0m"
   # We are using a Maven plugin to do the GitHub release, se we need the right pom version
