@@ -452,9 +452,16 @@ function check_npm_packages() {
     )
     then
       echo -e "\033[1;31mThe npm packages check failed.\033[0m"
-      echo -e "\033[1;31mNothing was deployed, signed, pushed or published to npm, but release:prepare left the local branch ${RELEASE_BRANCH} and the unsigned tag ${TAG_NAME}.\033[0m"
-      echo -e "\033[1;31mFix the problem, remove them with: git checkout master && git branch -D ${RELEASE_BRANCH} && git tag -d ${TAG_NAME}\033[0m"
-      echo -e "\033[1;31mThen restart the release with -C -R, since xwiki-commons and xwiki-rendering are already released.\033[0m"
+      echo -e "\033[1;31mNothing was deployed, signed, pushed or published to npm.\033[0m"
+      # release:prepare left a local release branch and an unsigned tag, which would make a restart fail.
+      if git checkout master -q && git branch -D ${RELEASE_BRANCH} && git tag -d ${TAG_NAME}
+      then
+        echo -e "\033[1;31mThe local release branch ${RELEASE_BRANCH} and the tag ${TAG_NAME} were removed.\033[0m"
+        echo -e "\033[1;31mFix the problem, then restart the release with -C -R, since xwiki-commons and xwiki-rendering are already released.\033[0m"
+      else
+        echo -e "\033[1;31mCould not remove the local release branch ${RELEASE_BRANCH} and the tag ${TAG_NAME}. Remove them with: git checkout master && git branch -D ${RELEASE_BRANCH} && git tag -d ${TAG_NAME}\033[0m"
+        echo -e "\033[1;31mFix the problem, then restart the release with -C -R, since xwiki-commons and xwiki-rendering are already released.\033[0m"
+      fi
       exit -2
     fi
   fi
