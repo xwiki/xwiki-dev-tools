@@ -70,7 +70,8 @@ mvn -B -ntp -q -N -f "$PROJECT_DIR/pom.xml" com.github.eirslett:frontend-maven-p
   -DnodeVersion=$NODE_VERSION -DpnpmVersion=$PNPM_VERSION -DinstallDirectory="$INSTALL_DIR"
 export PATH=$INSTALL_DIR/node:$PATH
 
-(cd "$SCRIPT_DIR" && pnpm install --frozen-lockfile --silent)
+# CI lets pnpm replace, without a terminal, the node_modules installed by another pnpm version for another branch.
+(cd "$SCRIPT_DIR" && CI=true pnpm install --frozen-lockfile --silent)
 
 if [[ $1 == --check ]]
 then
