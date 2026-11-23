@@ -479,6 +479,16 @@ function publish_npm() {
     return
   fi
 
+  if [[ $1 == 'true' ]]
+  then
+    CHECKOUT_VERSION=$(mvn -B -ntp -q -N -f $RELEASE_CHECKOUT_DIR/pom.xml help:evaluate -Dexpression=project.version -DforceStdout)
+    if [[ $CHECKOUT_VERSION != $VERSION ]]
+    then
+      echo -e "\033[1;31m$RELEASE_CHECKOUT_DIR holds the version $CHECKOUT_VERSION, not $VERSION: it is not the build of the release to resume.\033[0m"
+      exit -1
+    fi
+  fi
+
   echo -e "\033[0;32m* Publishing the npm packages\033[0m"
   echo "npm asks you to approve the publication with your two-factor authentication: pnpm prints a link to open."
   echo "Check the option to skip the two-factor authentication for the next 5 minutes, so that one approval covers every package."
