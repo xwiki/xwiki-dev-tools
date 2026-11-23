@@ -391,14 +391,13 @@ function release_maven() {
     rm -rf $TMP
   fi
 
+  check_npm_packages $1
+
   echo -e "\033[0;32m* release:perform\033[0m"
   # Note: We disable the Develocity local and remote caches to make sure everything is rebuilt and to avoid
   # any security issue (e.g. if the remote cache has been compromised for example).
   # Hence the: -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false
-  # Note: -DdeployAtEnd=true (inside -Darguments, so it applies to the build of the checkout) defers every deployment
-  # to the end of the reactor: nothing is deployed unless all the modules build and verify successfully, e.g. when the
-  # check that the npm packages can be published fails.
-  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Darguments="-DdeployAtEnd=true -Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
+  mvn -e --batch-mode release:perform -DpushChanges=false -DlocalCheckout=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false -Plegacy,integration-tests,standalone,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Darguments="-Plegacy,integration-tests,flavor-integration-tests,distribution,docker ${TEST_SKIP} -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddevelocity.cache.local.enabled=false -Ddevelocity.cache.remote.enabled=false" || exit -2
 }
 
 # Create the GPG-signed git tag for the release. release:prepare only creates an unsigned tag,
@@ -436,20 +435,24 @@ function has_npm_packages() {
   [[ -f $RELEASE_CHECKOUT_DIR/pnpm-workspace.yaml ]]
 }
 
-# Second check, on the released versions, that npm accepts the npm packages built by release:perform, without publishing
-# them. The main check runs in the Maven build and fails the release before anything is deployed. This one runs after
-# release:perform, so a package npm would reject stops the release before its tag is pushed.
-# Only xwiki-platform has npm packages for now.
-function check_npm_publication() {
-  if [[ $1 == 'xwiki-platform' ]] && has_npm_packages
+# Check, before release:perform deploys anything, that npm accepts the npm packages of the release tag created by
+# release:prepare: they are built from a temporary worktree of the tag and checked without being published. A package
+# npm would reject then stops the release before anything is deployed, and the release can be restarted.
+# The first (mandatory) parameter is the name of the project being released. Only xwiki-platform has npm packages for now.
+function check_npm_packages() {
+  if [[ $1 == 'xwiki-platform' ]] && git cat-file -e ${TAG_NAME}:pnpm-workspace.yaml 2> /dev/null
   then
-    echo -e "\033[0;32m* Checking the npm publication\033[0m"
-    if ! $PRGDIR/npm-publish/publish.sh $RELEASE_CHECKOUT_DIR --dry-run
+    echo -e "\033[0;32m* Checking the npm packages\033[0m"
+    local tag_dir
+    tag_dir=$(mktemp -d)
+    if ! (
+      trap 'git worktree remove --force "$tag_dir" || rm -rf "$tag_dir"' EXIT
+      git worktree add --detach "$tag_dir" ${TAG_NAME} -q && $PRGDIR/npm-publish/publish.sh "$tag_dir" --check
+    )
     then
-      echo -e "\033[1;31mThe npm publication check failed.\033[0m"
-      echo -e "\033[1;31mThe Maven artifacts of $1 are already deployed, but nothing was tagged with a signed tag, pushed or published to npm.\033[0m"
-      echo -e "\033[1;31mFix the problem, then run this script again with -p $1 to sign the tag, push, and publish the npm packages.\033[0m"
-      echo -e "\033[1;31mDo not clean this clone: -p reuses the release branch, the tag and $RELEASE_CHECKOUT_DIR.\033[0m"
+      echo -e "\033[1;31mThe npm packages check failed.\033[0m"
+      echo -e "\033[1;31mNothing was deployed, tagged with a signed tag, pushed or published to npm.\033[0m"
+      echo -e "\033[1;31mFix the problem, then clean this clone and restart the release.\033[0m"
       exit -2
     fi
   fi
@@ -631,8 +634,7 @@ function release_project() {
   then
     create_release_branch
     pre_update_versions
-    release_maven
-    check_npm_publication $1
+    release_maven $1
     finish_release_after_publish $1
   fi
   cd ..
